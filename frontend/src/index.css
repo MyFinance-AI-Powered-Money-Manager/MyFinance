@@ -1,3 +1,61 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+	:root {
+		color-scheme: light;
+	}
+
+	html {
+		scroll-behavior: smooth;
+	}
+
+	body {
+		@apply bg-[#F3F8EE] text-zinc-900 antialiased;
+		font-family: 'Plus Jakarta Sans', sans-serif;
+	}
+
+	body::before {
+		content: '';
+		position: fixed;
+		inset: 0;
+		pointer-events: none;
+		background:
+			radial-gradient(circle at top left, rgba(33, 177, 75, 0.08), transparent 26%),
+			radial-gradient(circle at bottom right, rgba(33, 177, 75, 0.06), transparent 22%);
+		opacity: 0.9;
+		z-index: -1;
+	}
+
+	::selection {
+		background: rgba(33, 177, 75, 0.18);
+		color: #0d8a3b;
+	}
+}
+
+@layer components {
+	.finance-shell {
+		@apply min-h-screen bg-[#F3F8EE] text-zinc-900;
+	}
+
+	.finance-card {
+		@apply rounded-[28px] bg-white shadow-card border border-white/70;
+	}
+
+	.finance-card-soft {
+		@apply rounded-[28px] bg-white/90 shadow-card border border-[#E8F1E3];
+	}
+
+	.finance-input {
+		@apply h-14 w-full rounded-[20px] border border-transparent bg-[#E2E8D9] px-4 text-[15px] text-zinc-900 outline-none transition focus:border-finance-500 focus:bg-white focus:ring-4 focus:ring-finance-100;
+	}
+
+	.finance-icon-btn {
+		@apply inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/60 bg-white shadow-card text-finance-700 transition hover:-translate-y-0.5 hover:shadow-soft;
+	}
+
+	.finance-pill {
+		@apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold;
+	}
+}
