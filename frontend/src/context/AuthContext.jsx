@@ -34,18 +34,22 @@ export const AuthProvider = ({ children }) => {
         setError(null);
 
         try {
-            const { data } = await api.post('/auth/login', { email, password });
+            const { data: responseData } = await api.post('/auth/login', { email, password });
 
-            localStorage.setItem('auth_token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            // Backend returns { status, data: { user, token } }
+            const token = responseData.data?.token || responseData.token;
+            const userData = responseData.data?.user || responseData.user;
+
+            localStorage.setItem('auth_token', token);
+            localStorage.setItem('user', JSON.stringify(userData));
 
             // set axios header immediately so subsequent requests have Authorization
-            api.defaults.headers.common.Authorization = `Bearer ${data.token}`;
+            api.defaults.headers.common.Authorization = `Bearer ${token}`;
 
-            setUser(data.user);
+            setUser(userData);
             setIsAuthenticated(true);
 
-            return data;
+            return responseData;
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Login failed';
             setError(errorMessage);
@@ -55,23 +59,23 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    const register = useCallback(async (email, password, name) => {
+    const register = useCallback(async ({ full_name, email, password, confirm_password }) => {
         setLoading(true);
         setError(null);
 
         try {
-            const { data } = await api.post('/auth/register', { email, password, name });
+            const { data: responseData } = await api.post('/auth/register', {
+                full_name,
+                email,
+                password,
+                confirm_password,
+            });
 
-            localStorage.setItem('auth_token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            // Backend register returns { status, message, data: { id, full_name, email } }
+            // It does NOT return a token — user must login after registering
+            const userData = responseData.data || responseData.user;
 
-            // set axios header immediately so subsequent requests have Authorization
-            api.defaults.headers.common.Authorization = `Bearer ${data.token}`;
-
-            setUser(data.user);
-            setIsAuthenticated(true);
-
-            return data;
+            return responseData;
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Registration failed';
             setError(errorMessage);
