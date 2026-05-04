@@ -35,9 +35,14 @@ const Register = () => {
         }
 
         try {
-            await register(data.email, data.password, data.name);
-            showSuccess('Registrasi berhasil');
-            navigate('/dashboard');
+            await register({
+                full_name: data.name,
+                email: data.email,
+                password: data.password,
+                confirm_password: data.confirmPassword,
+            });
+            showSuccess('Registrasi berhasil! Silakan login.');
+            navigate('/login');
         } catch (authError) {
             showError(authError.response?.data?.message || error || 'Registrasi gagal');
         }

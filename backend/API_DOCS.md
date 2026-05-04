@@ -2,7 +2,11 @@
 
 Dokumentasi ini berisi daftar endpoint API backend MyFinance yang dapat digunakan oleh Frontend. Semua endpoint (kecuali Auth & Health) memerlukan Bearer Token (JWT) di header `Authorization`.
 
-**Base URL (Local)**: `http://localhost:3000`
+Cek API Server Backend status di [https://myfinance-backend-staging.up.railway.app/api/v1/health]
+
+
+
+**Base URL Local**: `http://localhost:3000`
 **Category Options**: `NEEDS`, `WANTS`, `OTHER`
 **Type Transaction**: `INCOME`, `EXPENSE`, `TRANSFER`
 **Type Wallets**: `CASH`, `BANK`, `E-WALLET`
