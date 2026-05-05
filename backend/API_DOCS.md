@@ -2,14 +2,16 @@
 
 Dokumentasi ini berisi daftar endpoint API backend MyFinance yang dapat digunakan oleh Frontend. Semua endpoint (kecuali Auth & Health) memerlukan Bearer Token (JWT) di header `Authorization`.
 
-Cek API Server Backend status di [https://myfinance-backend-staging.up.railway.app/api/v1/health]
+Cek API Server Backend status di [Health Check](https://myfinance-backend-staging.up.railway.app/api/v1/health)
 
-
-
-**Base URL Local**: `http://localhost:3000`
-**Category Options**: `NEEDS`, `WANTS`, `OTHER`
-**Type Transaction**: `INCOME`, `EXPENSE`, `TRANSFER`
-**Type Wallets**: `CASH`, `BANK`, `E-WALLET`
+| Key | Value |
+|---|---|
+| **Base URL (Local)** | `http://localhost:3000` |
+| **Base URL (Staging)** | `https://myfinance-backend-staging.up.railway.app` |
+| **API Prefix** | `/api/v1` |
+| **Category Options** | `NEEDS`, `WANTS`, `OTHER` |
+| **Type Transaction** | `INCOME`, `EXPENSE`, `TRANSFER` |
+| **Type Wallets** | `CASH`, `BANK`, `E-WALLET` |
 
 
 ---
@@ -35,7 +37,7 @@ Digunakan untuk mengecek status server.
 
 Endpoint terkait registrasi dan login user.
 
-### POST `/api/auth/register`
+### POST `/api/v1/auth/register`
 Mendaftarkan akun baru.
 - **Auth Required**: No
 - **Body**:
@@ -48,7 +50,7 @@ Mendaftarkan akun baru.
   }
   ```
 
-### POST `/api/auth/login`
+### POST `/api/v1/auth/login`
 Masuk ke dalam sistem dan mendapatkan JWT token.
 - **Auth Required**: No
 - **Body**:
@@ -65,21 +67,35 @@ Masuk ke dalam sistem dan mendapatkan JWT token.
 
 Endpoint terkait manajemen profil pengguna.
 
-### GET `/api/users/profile`
+### GET `/api/v1/users/profile`
 Mendapatkan data profil user yang sedang login.
 - **Auth Required**: Yes
+- **Response**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "id": 1,
+      "full_name": "John Doe",
+      "email": "john@example.com",
+      "profile_picture": "https://example.com/photo.jpg",
+      "created_at": "2026-05-03T12:00:00.000Z"
+    }
+  }
+  ```
 
-### PUT `/api/users/profile`
-Memperbarui nama profil.
+### PUT `/api/v1/users/profile`
+Memperbarui nama dan/atau foto profil. Menggunakan `COALESCE` sehingga field yang tidak dikirim tidak akan di-overwrite.
 - **Auth Required**: Yes
 - **Body**:
   ```json
   {
-    "full_name": "John Doe Updated"
+    "full_name": "John Doe Updated",
+    "profile_picture": "https://example.com/new-photo.jpg"
   }
   ```
 
-### PUT `/api/users/password`
+### PUT `/api/v1/users/password`
 Memperbarui password user.
 - **Auth Required**: Yes
 - **Body**:
@@ -97,23 +113,24 @@ Memperbarui password user.
 
 Endpoint untuk manajemen dompet pengguna.
 
-### GET `/api/wallets`
+### GET `/api/v1/wallets`
 Mendapatkan semua daftar dompet milik pengguna.
 - **Auth Required**: Yes
 
-### POST `/api/wallets`
+### POST `/api/v1/wallets`
 Membuat dompet baru.
 - **Auth Required**: Yes
 - **Body**:
   ```json
   {
     "name": "Dompet Utama",
-    "type": "cash", // atau bank, e-wallet, dll
+    "type": "CASH",
     "balance": 1000000
   }
   ```
+  > **Type options**: `CASH`, `BANK`, `E-WALLET`
 
-### PUT `/api/wallets/:id`
+### PUT `/api/v1/wallets/:id`
 Memperbarui data dompet yang ada berdasarkan ID.
 - **Auth Required**: Yes
 - **Body**:
@@ -125,11 +142,11 @@ Memperbarui data dompet yang ada berdasarkan ID.
   }
   ```
 
-### DELETE `/api/wallets/:id`
+### DELETE `/api/v1/wallets/:id`
 Menghapus dompet berdasarkan ID.
 - **Auth Required**: Yes
 
-### POST `/api/wallets/transfer`
+### POST `/api/v1/wallets/transfer`
 Melakukan transfer saldo antar dompet milik pengguna.
 - **Auth Required**: Yes
 - **Body**:
@@ -147,11 +164,11 @@ Melakukan transfer saldo antar dompet milik pengguna.
 
 Endpoint untuk manajemen batas anggaran bulanan.
 
-### GET `/api/budgets`
+### GET `/api/v1/budgets`
 Mendapatkan daftar anggaran yang telah diatur.
 - **Auth Required**: Yes
 
-### POST `/api/budgets`
+### POST `/api/v1/budgets`
 Membuat anggaran baru untuk kategori tertentu.
 - **Auth Required**: Yes
 - **Body**:
@@ -163,7 +180,7 @@ Membuat anggaran baru untuk kategori tertentu.
   }
   ```
 
-### PUT `/api/budgets/:id`
+### PUT `/api/v1/budgets/:id`
 Memperbarui batas anggaran (limit_amount).
 - **Auth Required**: Yes
 - **Body**:
@@ -173,7 +190,7 @@ Memperbarui batas anggaran (limit_amount).
   }
   ```
 
-### DELETE `/api/budgets/:id`
+### DELETE `/api/v1/budgets/:id`
 Menghapus anggaran berdasarkan ID.
 - **Auth Required**: Yes
 
@@ -183,30 +200,32 @@ Menghapus anggaran berdasarkan ID.
 
 Endpoint untuk mencatat pengeluaran, pemasukan, dan scan struk.
 
-### GET `/api/transactions`
+### GET `/api/v1/transactions`
 Mendapatkan riwayat transaksi pengguna.
 - **Auth Required**: Yes
 
-### POST `/api/transactions`
+### POST `/api/v1/transactions`
 Mencatat transaksi baru (juga mendukung data dari scan AI OCR).
 - **Auth Required**: Yes
-- **Body** (Standar):
+- **Body** (Catat Manual — Income / Expense):
   ```json
   {
     "wallet_id": 1,
-    "type": "expense", // atau 'income'
+    "type": "EXPENSE",
     "total_amount": 50000,
     "category": "NEEDS",
-    "subcategory": "Kebutuhan ",
+    "subcategory": "Kebutuhan",
     "description": "Makan siang di warteg",
     "transaction_date": "2026-05-03"
   }
   ```
-- **Body** (Dengan Item Spesifik & Data Struk AI):
+  > **Type options**: `INCOME`, `EXPENSE`
+
+- **Body** (Dari AI OCR Scan Struk — dengan items & receipt_data):
   ```json
   {
     "wallet_id": 1,
-    "type": "expense",
+    "type": "EXPENSE",
     "total_amount": 100000,
     "category": "NEEDS",
     "subcategory": "Kebutuhan Rumah",
@@ -233,16 +252,64 @@ Mencatat transaksi baru (juga mendukung data dari scan AI OCR).
   }
   ```
 
-### DELETE `/api/transactions/:id`
+### DELETE `/api/v1/transactions/:id`
 Menghapus transaksi berdasarkan ID, yang akan mengembalikan saldo (Reverse Balance Logic).
 - **Auth Required**: Yes
 
 ---
 
-## 7. Insights
+## 7. Financial Insights (Express)
 
-Endpoint untuk fitur Artificial Intelligence (AI) seperti Insight Keuangan.
+Mendapatkan laporan dan insight keuangan hasil agregasi data pengguna.
 
-### GET `/api/insights`
-Mendapatkan insight keuangan berdasarkan transaksi pengguna.
+### GET `/api/v1/insights`
+Mengambil ringkasan kondisi keuangan (Health Score, Money Leak, dll). Data ini diolah melalui integrasi dengan Python AI Service.
 - **Auth Required**: Yes
+- **Query Params**: `?period=monthly` atau `?period=weekly`
+- **Response**:
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "health_score": 85,
+      "money_leak": "Pengeluaran kopi terlalu tinggi di minggu ini.",
+      "ai_insight": "Anda bisa menabung 10% lebih banyak jika mengurangi WANTS sebesar Rp 200.000",
+      "predicted_cashflow": 1500000
+    }
+  }
+  ```
+
+---
+
+## 8. AI & Data Science Services (Python API)
+
+Endpoint khusus yang mengarah ke server Python untuk pemrosesan berbasis Machine Learning dan Computer Vision. Frontend dapat menembak endpoint ini secara langsung atau melalui proxy Express backend.
+
+### POST `/api/v1/ai/scan`
+Melakukan ekstraksi OCR dari gambar struk belanja.
+- **Base URL**: Python Service
+- **Auth Required**: Yes
+- **Content-Type**: `multipart/form-data`
+- **Body**: `image` — File gambar struk (JPG/PNG)
+- **Response**: Mengembalikan array objek item belanja yang nantinya dikirim oleh Frontend ke endpoint `POST /api/v1/transactions`.
+
+### POST `/api/v1/ai/overbudget/check`
+Memprediksi status risiko overbudget menggunakan Model BiLSTM sebelum transaksi benar-benar disimpan.
+- **Base URL**: Python Service
+- **Auth Required**: Yes
+- **Body**:
+  ```json
+  {
+    "user_id": "uuid-user-123",
+    "amount": 150000,
+    "category": "WANTS"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "is_overbudget": true,
+    "confidence_score": 0.88,
+    "alert_message": "Peringatan: Transaksi ini berisiko membuat anggaran WANTS Anda jebol bulan ini!"
+  }
+  ```
