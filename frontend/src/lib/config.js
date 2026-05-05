@@ -1,5 +1,5 @@
 export const config = {
-  apiUrl: import.meta.env.VITE_API_URL || 'https://myfinance-backend-staging.up.railway.app/api',
+  apiUrl: import.meta.env.VITE_API_URL || 'https://myfinance-backend-staging.up.railway.app/api/v1',
   appName: import.meta.env.VITE_APP_NAME || 'MyFinance',
   appVersion: import.meta.env.VITE_APP_VERSION || '1.0.0',
   environment: import.meta.env.MODE,
