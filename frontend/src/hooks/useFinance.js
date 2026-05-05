@@ -1,15 +1,80 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { showError, showSuccess } from '../lib/toast';
-import { config } from '../lib/config';
 
-const unwrapData = (response) => response?.data ?? response;
+const unwrapData = (response) => response?.data?.data ?? response?.data ?? response;
+
+const normalizeWallet = (wallet) => ({
+  ...wallet,
+  id: wallet?.id,
+  name: wallet?.name ?? wallet?.label ?? wallet?.type ?? 'Wallet',
+  type: wallet?.type ?? 'cash',
+  balance: Number(wallet?.balance ?? wallet?.amount ?? 0),
+});
+
+const normalizeBudget = (budget) => ({
+  ...budget,
+  id: budget?.id,
+  category: budget?.category ?? 'OTHER',
+  limit_amount: Number(budget?.limit_amount ?? budget?.limit ?? budget?.amount ?? 0),
+  limit: Number(budget?.limit_amount ?? budget?.limit ?? budget?.amount ?? 0),
+  month_period: budget?.month_period ?? budget?.monthPeriod ?? null,
+  monthPeriod: budget?.month_period ?? budget?.monthPeriod ?? null,
+  spent: Number(budget?.spent ?? budget?.used ?? 0),
+});
+
+const normalizeTransaction = (tx) => {
+  const totalAmount = Number(tx?.total_amount ?? tx?.amount ?? 0);
+  const transactionDate = tx?.transaction_date ?? tx?.date ?? tx?.created_at ?? tx?.createdAt ?? null;
+
+  return {
+    ...tx,
+    id: tx?.id,
+    amount: totalAmount,
+    total_amount: totalAmount,
+    date: transactionDate,
+    transaction_date: transactionDate,
+    wallet_id: tx?.wallet_id ?? tx?.walletId ?? null,
+    walletId: tx?.wallet_id ?? tx?.walletId ?? null,
+    category: tx?.category ?? tx?.subcategory ?? tx?.type ?? 'Kategori',
+    subcategory: tx?.subcategory ?? tx?.category ?? '',
+    description: tx?.description ?? tx?.label ?? '',
+    label: tx?.label ?? tx?.description ?? tx?.subcategory ?? 'Transaksi',
+    type: String(tx?.type ?? (totalAmount >= 0 ? 'income' : 'expense')).toLowerCase(),
+  };
+};
+
+const normalizeTransactionPayload = (data) => ({
+  wallet_id: data?.wallet_id ?? data?.walletId ?? null,
+  type: String(data?.type ?? 'expense').toLowerCase(),
+  total_amount: Number(data?.total_amount ?? data?.amount ?? 0),
+  category: data?.category ?? data?.subcategory ?? 'OTHER',
+  subcategory: data?.subcategory ?? data?.category ?? data?.description ?? 'OTHER',
+  description: data?.description ?? '',
+  transaction_date: data?.transaction_date ?? data?.date ?? new Date().toISOString().slice(0, 10),
+  items: data?.items,
+  receipt_data: data?.receipt_data,
+});
+
+const normalizeInsight = (insight) => {
+  const raw = insight?.data ?? insight;
+
+  if (typeof raw === 'string') {
+    return raw;
+  }
+
+  if (!raw || typeof raw !== 'object') {
+    return null;
+  }
+
+  return raw.insight ?? raw.message ?? raw.recommendation ?? raw.text ?? raw;
+};
 
 // Wallets
 export const useWallets = (options = {}) => {
   return useQuery({
     queryKey: ['wallets'],
-    queryFn: async () => unwrapData(await api.get('/wallets')),
+    queryFn: async () => unwrapData(await api.get('/wallets')).map(normalizeWallet),
     staleTime: 5 * 60 * 1000,
     ...options,
   });
@@ -64,7 +129,7 @@ export const useDeleteWallet = () => {
 export const useBudgets = (options = {}) => {
   return useQuery({
     queryKey: ['budgets'],
-    queryFn: async () => unwrapData(await api.get('/budgets')),
+    queryFn: async () => unwrapData(await api.get('/budgets')).map(normalizeBudget),
     staleTime: 5 * 60 * 1000,
     ...options,
   });
@@ -119,7 +184,7 @@ export const useDeleteBudget = () => {
 export const useTransactions = (options = {}) => {
   return useQuery({
     queryKey: ['transactions'],
-    queryFn: async () => unwrapData(await api.get('/transactions')),
+    queryFn: async () => unwrapData(await api.get('/transactions')).map(normalizeTransaction),
     staleTime: 5 * 60 * 1000,
     ...options,
   });
@@ -129,49 +194,10 @@ export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data) => api.post('/transactions', data),
-    onSuccess: (res) => {
-      const newItem = res?.data ?? res;
-
-      if (config.useTransactionCachePatch) {
-        // mark as newly created for UI highlight
-        const patched = { ...(newItem || {}), __new: true };
-
-        try {
-          queryClient.setQueryData(['transactions'], (old) => {
-            if (!old) return Array.isArray(patched) ? patched : [patched];
-            if (Array.isArray(old)) {
-              return [patched, ...old];
-            }
-            if (old && Array.isArray(old.data)) {
-              return { ...old, data: [patched, ...old.data] };
-            }
-            return old;
-          });
-
-          // auto-clear the __new flag after 6 seconds so highlight disappears
-          setTimeout(() => {
-            try {
-              queryClient.setQueryData(['transactions'], (old) => {
-                if (!old) return old;
-                if (Array.isArray(old)) {
-                  return old.map((it) => ({ ...it, __new: false }));
-                }
-                if (old && Array.isArray(old.data)) {
-                  return { ...old, data: old.data.map((it) => ({ ...it, __new: false })) };
-                }
-                return old;
-              });
-            } catch {
-              /* ignore */
-            }
-          }, 6000);
-        } catch {
-          queryClient.invalidateQueries({ queryKey: ['transactions'] });
-        }
-      } else {
-        queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      }
+    mutationFn: (data) => api.post('/transactions', normalizeTransactionPayload(data)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['wallets'] });
 
       showSuccess('Transaction created successfully');
     },
@@ -199,15 +225,23 @@ export const useDeleteTransaction = () => {
 // AI Services
 export const useScanReceipt = () => {
   return useMutation({
-    mutationFn: async (payload) => {
-      const isFormData = typeof FormData !== 'undefined' && payload instanceof FormData;
-      return unwrapData(await api.post('/ai/scan', payload, isFormData ? {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      } : {}));
+    mutationFn: async () => {
+      throw new Error('Endpoint scan AI belum tersedia di backend ini.');
     },
     onError: (error) => {
-      showError(error.response?.data?.message || 'Failed to scan receipt');
+      showError(error.response?.data?.message || error.message || 'Failed to scan receipt');
     },
+  });
+};
+
+export const useFinancialInsights = (walletId, period = 'monthly', options = {}) => {
+  const { enabled: optionEnabled = true, ...restOptions } = options;
+
+  return useQuery({
+    queryKey: ['insights', walletId, period],
+    queryFn: async () => normalizeInsight(await api.get('/insights', { params: { wallet_id: walletId, period } })),
+    enabled: Boolean(walletId) && optionEnabled,
+    ...restOptions,
   });
 };
 

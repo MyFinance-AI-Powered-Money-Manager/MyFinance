@@ -30,8 +30,8 @@ export const TransactionFormModal = ({
         setCategory('');
         setDescription('');
         setDate(todayDate());
-        setWalletId('');
-    }, [open, type]);
+        setWalletId(wallets?.[0]?.id ? String(wallets[0].id) : '');
+    }, [open, type, wallets]);
 
     if (!open) {
         return null;
@@ -53,14 +53,19 @@ export const TransactionFormModal = ({
             return;
         }
 
+        if (!walletId) {
+            showError('Pilih wallet terlebih dahulu');
+            return;
+        }
+
         const payload = {
             amount: numericAmount,
             type,
             category,
             date,
             description,
-            walletId: walletId || undefined,
-            wallet_id: walletId || undefined,
+            walletId,
+            wallet_id: walletId,
         };
 
         await onSubmit(payload);
@@ -120,8 +125,8 @@ export const TransactionFormModal = ({
                             value={walletId}
                             onChange={(e) => setWalletId(e.target.value)}
                             className="finance-input"
+                            required
                         >
-                            <option value="">Tanpa wallet spesifik</option>
                             {wallets.map((wallet) => {
                                 const id = wallet.id ?? wallet.walletId ?? wallet._id;
                                 const label = wallet.name || wallet.label || wallet.type || 'Wallet';
