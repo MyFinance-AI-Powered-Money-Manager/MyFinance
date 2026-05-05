@@ -3,7 +3,7 @@ import { Download, ChevronDown, Sparkles, TrendingDown, TrendingUp, Target, Car,
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Layout } from '../components/layout/Layout';
 import { LoadingScreen } from '../components/LoadingScreen';
-import { useBudgets, useTransactions, useWallets } from '../hooks/useFinance';
+import { useBudgets, useFinancialInsights, useTransactions, useWallets } from '../hooks/useFinance';
 import { useLanguage } from '../context/LanguageContext';
 import { cn, formatCurrency } from '../lib/utils';
 
@@ -16,6 +16,10 @@ const Reports = () => {
     const transactions = Array.isArray(transactionsData) ? transactionsData : transactionsData?.data ?? [];
     const wallets = Array.isArray(walletsData) ? walletsData : walletsData?.data ?? [];
     const budgets = Array.isArray(budgetsData) ? budgetsData : budgetsData?.data ?? [];
+    const primaryWalletId = wallets[0]?.id;
+    const { data: insightData } = useFinancialInsights(primaryWalletId, 'monthly', {
+        enabled: Boolean(primaryWalletId),
+    });
 
     const isLoading = transactionsLoading || walletsLoading || budgetsLoading;
     const error = transactionsError || walletsError || budgetsError;
@@ -198,6 +202,18 @@ const Reports = () => {
                         );
                     })}
                 </div>
+            </div>
+
+            <div className="mt-4 finance-card p-6 md:p-8">
+                <div className="mb-4 flex items-center justify-between">
+                    <h3 className="text-lg font-extrabold text-zinc-900">Insight Backend</h3>
+                    <span className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
+                        {primaryWalletId ? 'Aktif' : 'Belum ada wallet'}
+                    </span>
+                </div>
+                <p className="text-sm leading-7 text-zinc-600">
+                    {insightData || 'Tambahkan wallet dan transaksi agar endpoint /insights dari backend bisa menghasilkan analisis.'}
+                </p>
             </div>
 
             <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
