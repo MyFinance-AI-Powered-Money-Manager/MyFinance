@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { config } from './config';
 import { showError } from './toast';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://myfinance-backend-staging.up.railway.app/api',
+  baseURL: config.apiUrl || 'https://myfinance-backend-staging.up.railway.app/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

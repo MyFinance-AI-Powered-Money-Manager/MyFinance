@@ -37,6 +37,12 @@ const Scan = () => {
   const wallets = Array.isArray(walletsData) ? walletsData : walletsData?.data ?? [];
 
   React.useEffect(() => {
+    if (!selectedWalletId && wallets[0]?.id) {
+      setSelectedWalletId(String(wallets[0].id));
+    }
+  }, [wallets, selectedWalletId]);
+
+  React.useEffect(() => {
     return () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
@@ -74,24 +80,33 @@ const Scan = () => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('receipt', file);
-    formData.append('file', file);
+    try {
+      const formData = new FormData();
+      formData.append('receipt', file);
+      formData.append('file', file);
 
-    const response = await scanReceipt.mutateAsync(formData);
-    const normalized = normalizeScanResult(response);
-    if (!normalized) {
-      showError('Respons AI scan tidak valid');
+      const response = await scanReceipt.mutateAsync(formData);
+      const normalized = normalizeScanResult(response);
+      if (!normalized) {
+        showError('Respons AI scan tidak valid');
+        return;
+      }
+
+      setResult(normalized);
+      showSuccess('Scan struk berhasil');
+    } catch {
       return;
     }
-
-    setResult(normalized);
-    showSuccess('Scan struk berhasil');
   };
 
   const handleSaveTransaction = async () => {
     if (!result) {
       showError('Belum ada hasil scan untuk disimpan');
+      return;
+    }
+
+    if (!selectedWalletId) {
+      showError('Pilih wallet terlebih dahulu');
       return;
     }
 
@@ -101,8 +116,8 @@ const Scan = () => {
       category: result.category,
       description: result.description,
       date: result.date,
-      walletId: selectedWalletId || undefined,
-      wallet_id: selectedWalletId || undefined,
+      walletId: selectedWalletId,
+      wallet_id: selectedWalletId,
     });
 
     showSuccess('Hasil scan disimpan sebagai transaksi');
@@ -182,8 +197,8 @@ const Scan = () => {
                   value={selectedWalletId}
                   onChange={(e) => setSelectedWalletId(e.target.value)}
                   className="h-11 w-full rounded-xl border border-zinc-200 px-3 outline-none focus:ring-2 focus:ring-[#008744]/30 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  required
                 >
-                  <option value="">Tanpa wallet spesifik</option>
                   {wallets.map((wallet) => {
                     const id = wallet.id ?? wallet.walletId ?? wallet._id;
                     const label = wallet.name || wallet.label || wallet.type || 'Wallet';
