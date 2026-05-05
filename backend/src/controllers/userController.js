@@ -68,7 +68,7 @@ const updatePassword = async (req, res) => {
         }
 
         // Ambil password lama dari database
-        const userResult = await db.query('SELECT password_hash FROM users WHERE id = $1', [userId]);
+        const userResult = await db.query('SELECT password FROM users WHERE id = $1', [userId]);
         const user = userResult.rows[0];
 
         // Verifikasi password lama
@@ -81,7 +81,7 @@ const updatePassword = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const newPasswordHash = await bcrypt.hash(new_password, salt);
 
-        await db.query('UPDATE users SET password_hash = $1 WHERE id = $2', [newPasswordHash, userId]);
+        await db.query('UPDATE users SET password = $1 WHERE id = $2', [newPasswordHash, userId]);
 
         res.status(200).json({ status: 'success', message: 'Password berhasil diubah.' });
     } catch (error) {
