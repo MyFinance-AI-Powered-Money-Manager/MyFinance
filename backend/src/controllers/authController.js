@@ -40,7 +40,7 @@ const register = async (req, res) => {
 
         // 6. Simpan ke database beserta full_name
         const newUser = await db.query(
-            'INSERT INTO users (full_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, full_name, email, created_at',
+            'INSERT INTO users (full_name, email, password) VALUES ($1, $2, $3) RETURNING id, full_name, email, created_at',
             [full_name, email, passwordHash]
         );
 
@@ -76,7 +76,7 @@ const login = async (req, res) => {
         const user = result.rows[0];
 
         // 3. Verifikasi Password
-        const isMatch = await bcrypt.compare(password, user.password_hash);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ status: 'error', message: 'Email atau password salah.' });
         }

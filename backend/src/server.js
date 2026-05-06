@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Health Check Endpoint
+// Health Check Server Express Endpoint
 app.get('/api/v1/health', (req, res) => {
     res.status(200).json({
         status: 'success',
@@ -31,13 +31,13 @@ const budgetRoutes = require('./routes/budgetRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const insightRoutes = require('./routes/insightRoutes');
 
-// routing endpoint sesuai swagger
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/wallets', walletRoutes);
-app.use('/api/budgets', budgetRoutes);
-app.use('/api/transactions', transactionRoutes);
-app.use('/api/insights', insightRoutes);
+// routing endpoint sesuai swagger 
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/wallets', walletRoutes);
+app.use('/api/v1/budgets', budgetRoutes);
+app.use('/api/v1/transactions', transactionRoutes);
+app.use('/api/v1/insights', insightRoutes);
 
 // Server Listener
 app.listen(PORT, () => {
