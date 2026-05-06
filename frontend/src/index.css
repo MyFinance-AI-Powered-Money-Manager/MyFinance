@@ -7,6 +7,10 @@
 		color-scheme: light;
 	}
 
+	html.dark {
+		color-scheme: dark;
+	}
+
 	html {
 		scroll-behavior: smooth;
 	}
@@ -14,6 +18,10 @@
 	body {
 		@apply bg-[#F3F8EE] text-zinc-900 antialiased;
 		font-family: 'Plus Jakarta Sans', sans-serif;
+	}
+
+	html.dark body {
+		@apply bg-[#0F1419] text-[#F0F1F3];
 	}
 
 	body::before {
@@ -28,9 +36,21 @@
 		z-index: -1;
 	}
 
+	html.dark body::before {
+		background:
+			radial-gradient(circle at top left, rgba(33, 177, 75, 0.08), transparent 26%),
+			radial-gradient(circle at bottom right, rgba(33, 177, 75, 0.06), transparent 22%);
+		opacity: 0.25;
+	}
+
 	::selection {
 		background: rgba(33, 177, 75, 0.18);
 		color: #0d8a3b;
+	}
+
+	html.dark ::selection {
+		background: rgba(33, 177, 75, 0.2);
+		color: #7CF38E;
 	}
 }
 
@@ -39,23 +59,224 @@
 		@apply min-h-screen bg-[#F3F8EE] text-zinc-900;
 	}
 
+	html.dark .finance-shell {
+		@apply bg-[#0F1419] text-[#F0F1F3];
+	}
+
 	.finance-card {
 		@apply rounded-[28px] bg-white shadow-card border border-white/70;
+	}
+
+	html.dark .finance-card {
+		@apply bg-[#1A1F2E] border-[#2D3748] text-[#F0F1F3];
+		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 	}
 
 	.finance-card-soft {
 		@apply rounded-[28px] bg-white/90 shadow-card border border-[#E8F1E3];
 	}
 
+	html.dark .finance-card-soft {
+		@apply bg-[#1A1F2E]/90 border-[#2D3748] text-[#F0F1F3];
+		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+	}
+
 	.finance-input {
 		@apply h-14 w-full rounded-[20px] border border-transparent bg-[#E2E8D9] px-4 text-[15px] text-zinc-900 outline-none transition focus:border-finance-500 focus:bg-white focus:ring-4 focus:ring-finance-100;
+	}
+
+	html.dark .finance-input {
+		@apply bg-[#2D3748] text-[#F0F1F3] border-[#3F4959];
+		border-width: 1px;
+	}
+
+	html.dark .finance-input:focus {
+		@apply bg-[#374151] border-finance-400;
+		box-shadow: 0 0 0 4px rgba(33, 177, 75, 0.15);
+	}
+
+	html.dark .finance-input::placeholder {
+		@apply text-[#8B92A9];
 	}
 
 	.finance-icon-btn {
 		@apply inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/60 bg-white shadow-card text-finance-700 transition hover:-translate-y-0.5 hover:shadow-soft;
 	}
 
+	html.dark .finance-icon-btn {
+		@apply border-[#3F4959] bg-[#1A1F2E] text-[#7CF38E];
+		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+	}
+
+	html.dark .finance-icon-btn:hover {
+		@apply bg-[#2D3748];
+		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+	}
+
 	.finance-pill {
 		@apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold;
+	}
+
+	html.dark .finance-pill {
+		@apply bg-[#2D3748] text-[#F0F1F3];
+	}
+
+	/* Text color improvements */
+	html.dark h1,
+	html.dark h2,
+	html.dark h3,
+	html.dark h4,
+	html.dark h5,
+	html.dark h6 {
+		@apply text-[#F0F1F3];
+	}
+
+	html.dark p {
+		@apply text-[#E8EAED];
+	}
+
+	html.dark label {
+		@apply text-[#D9DCE3];
+	}
+
+	html.dark .text-zinc-500 {
+		@apply text-[#B0B8CC];
+	}
+
+	html.dark .text-zinc-600 {
+		@apply text-[#8B92A9];
+	}
+
+	html.dark .text-zinc-700 {
+		@apply text-[#7B8298];
+	}
+
+	html.dark .text-zinc-900 {
+		@apply text-[#F0F1F3];
+	}
+
+	html.dark .text-zinc-400 {
+		@apply text-[#D1D5DB];
+	}
+
+	html.dark .border-zinc-200,
+	html.dark .border-\[\#E3EAD8\],
+	html.dark .border-\[\#E7EEDF\],
+	html.dark .border-\[\#E8F1E3\] {
+		@apply border-[#2D3748];
+	}
+
+	/* Background color overrides for dark mode */
+	html.dark .bg-white {
+		background-color: #1A1F2E;
+	}
+
+	html.dark .bg-white\/70 {
+		background-color: rgba(26, 31, 46, 0.7);
+	}
+
+	html.dark .bg-white\/90 {
+		background-color: rgba(26, 31, 46, 0.9);
+	}
+
+	html.dark .shadow-card {
+		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+	}
+
+	html.dark .shadow-soft {
+		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+	}
+
+	html.dark .hover\:bg-white:hover {
+		@apply bg-[#2D3748];
+	}
+
+	html.dark .hover\:bg-zinc-50:hover {
+		@apply bg-[#2D3748];
+	}
+
+	html.dark .hover\:bg-zinc-100:hover {
+		@apply bg-[#2D3748];
+	}
+
+	/* Specific text color for dark mode */
+	html.dark .text-\[15px\] {
+		@apply text-[#E8EAED];
+	}
+
+	/* Light mode only - disable dark mode for specific pages */
+	.light-mode-only,
+	.light-mode-only * {
+		color-scheme: light !important;
+	}
+
+	html.dark .light-mode-only {
+		background-color: white !important;
+		color: rgb(24, 23, 23) !important;
+	}
+
+	html.dark .light-mode-only h1,
+	html.dark .light-mode-only h2,
+	html.dark .light-mode-only h3,
+	html.dark .light-mode-only h4,
+	html.dark .light-mode-only h5,
+	html.dark .light-mode-only h6 {
+		color: rgb(24, 23, 23) !important;
+	}
+
+	html.dark .light-mode-only p {
+		color: rgb(113, 113, 122) !important;
+	}
+
+	html.dark .light-mode-only label {
+		color: rgb(63, 63, 70) !important;
+	}
+
+	html.dark .light-mode-only .text-zinc-500 {
+		color: rgb(113, 113, 122) !important;
+	}
+
+	html.dark .light-mode-only .text-zinc-600 {
+		color: rgb(82, 82, 89) !important;
+	}
+
+	html.dark .light-mode-only .text-zinc-700 {
+		color: rgb(63, 63, 70) !important;
+	}
+
+	html.dark .light-mode-only .text-zinc-900 {
+		color: rgb(24, 23, 23) !important;
+	}
+
+	html.dark .light-mode-only .bg-white {
+		background-color: white !important;
+	}
+
+	html.dark .light-mode-only .bg-white\/70 {
+		background-color: rgba(255, 255, 255, 0.7) !important;
+	}
+
+	html.dark .light-mode-only .bg-white\/90 {
+		background-color: rgba(255, 255, 255, 0.9) !important;
+	}
+
+	html.dark .light-mode-only .finance-card {
+		background-color: white !important;
+		border-color: rgba(255, 255, 255, 0.7) !important;
+		color: rgb(24, 23, 23) !important;
+		box-shadow: 0 12px 30px rgba(16, 24, 40, 0.06) !important;
+	}
+
+	html.dark .light-mode-only .finance-input {
+		background-color: rgb(226, 232, 217) !important;
+		color: rgb(24, 23, 23) !important;
+		border-color: transparent !important;
+	}
+
+	html.dark .light-mode-only .finance-icon-btn {
+		background-color: white !important;
+		color: rgb(21, 128, 61) !important;
+		border-color: rgba(255, 255, 255, 0.6) !important;
+		box-shadow: 0 12px 30px rgba(16, 24, 40, 0.06) !important;
 	}
 }

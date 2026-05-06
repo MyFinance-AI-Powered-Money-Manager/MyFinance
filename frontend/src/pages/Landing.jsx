@@ -1,8 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Zap, Shield, BarChart3, Globe, Mail, Phone, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Zap, Shield, BarChart3, CheckCircle2, BookOpen } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '../lib/utils';
+import { PageHeader } from '../components/PageHeader';
+import { PageFooter } from '../components/PageFooter';
 
 const Landing = () => {
     const navigate = useNavigate();
@@ -21,28 +23,14 @@ const Landing = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-white font-sans text-zinc-900">
-            {/* Header */}
-            <header className="fixed top-0 z-50 flex h-auto w-full items-center justify-between gap-3 bg-white/80 px-4 py-3 backdrop-blur-md sm:h-20 sm:px-6 lg:px-12">
-                <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#008744]">
-                        <span className="text-sm font-bold text-white">MF</span>
-                    </div>
-                    <span className="text-xl font-bold text-[#008744]">MyFinance</span>
-                </div>
-                <nav className="hidden items-center gap-8 text-sm font-medium text-zinc-600 lg:flex">
-                    <button type="button" onClick={() => scrollToSection(featuresRef)} className="hover:text-[#008744]">Fitur</button>
-                    <button type="button" onClick={() => scrollToSection(testimonialsRef)} className="hover:text-[#008744]">Testimoni</button>
-                    <button type="button" onClick={() => scrollToSection(faqRef)} className="hover:text-[#008744]">FAQ</button>
-                </nav>
-                <div className="flex items-center gap-2 sm:gap-4">
-                    <button onClick={() => navigate('/login')} className="hidden whitespace-nowrap text-sm font-bold text-[#008744] sm:inline-flex">Masuk</button>
-                    <button onClick={() => navigate('/register')} className="whitespace-nowrap rounded-full bg-[#008744] px-4 py-2 text-[13px] font-bold text-white transition-all hover:bg-[#007038] sm:px-6 sm:py-2.5 sm:text-sm">
-                        <span className="sm:hidden">Mulai</span>
-                        <span className="hidden sm:inline">Mulai Sekarang</span>
-                    </button>
-                </div>
-            </header>
+        <div className="light-mode-only min-h-screen bg-white font-sans text-zinc-900">
+            <PageHeader />
+            {/* Landing Navigation Overlay */}
+            <nav className="fixed top-0 z-40 hidden lg:flex items-center gap-8 text-sm font-medium text-zinc-600 w-full justify-center pt-5">
+                <button type="button" onClick={() => scrollToSection(featuresRef)} className="hover:text-[#008744]">Fitur</button>
+                <button type="button" onClick={() => scrollToSection(testimonialsRef)} className="hover:text-[#008744]">Testimoni</button>
+                <button type="button" onClick={() => scrollToSection(faqRef)} className="hover:text-[#008744]">FAQ</button>
+            </nav>
 
             {/* Hero Section */}
             <section className="pt-40 lg:pt-52 px-6 lg:px-12 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -64,8 +52,8 @@ const Landing = () => {
                         <button onClick={() => navigate('/register')} className="flex items-center justify-center gap-2 rounded-full bg-[#008744] px-8 py-4 text-lg font-bold text-white hover:bg-[#007038] transition-all group">
                             Mulai Sekarang <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                         </button>
-                        <button className="flex items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white px-8 py-4 text-lg font-bold text-zinc-600 hover:bg-zinc-50 transition-all">
-                            Pelajari Lebih Lanjut
+                        <button onClick={() => navigate('/learn-more')} className="flex items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white px-8 py-4 text-lg font-bold text-zinc-600 hover:border-[#008744] hover:bg-[#F3FBF5] transition-all">
+                            <BookOpen className="h-5 w-5" /> Pelajari Lebih Lanjut
                         </button>
                     </div>
                 </motion.div>
@@ -76,7 +64,7 @@ const Landing = () => {
                     className="relative"
                 >
                     <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-8 border-white">
-                        <img src="public/images/dashboard-preview.png" alt="Dashboard Preview" className="w-full h-auto" />
+                        <img src="/images/dashboard-preview.png" alt="Dashboard Preview" className="w-full h-auto" />
                         {/* Receipt Overlay (as seen in screenshot) */}
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/50 animate-bounce-slow">
                             <div className="flex items-center justify-between mb-3">
@@ -128,62 +116,64 @@ const Landing = () => {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="lg:col-span-2 rounded-[40px] overflow-hidden relative h-[450px]">
-                            <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=2000&auto=format&fit=crop" className="w-full h-full object-cover" alt="parsing" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-12 flex flex-col justify-end">
-                                <span className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-2">MESIN UTAMA</span>
-                                <h3 className="text-4xl font-bold text-white mb-4">Parsing Struk Neural</h3>
-                                <p className="text-zinc-300 max-w-md italic">Cukup ambil foto. AI kami mengidentifikasi item, pajak, dan bahkan memprediksi kategori pajak untuk pelaporan akhir tahun Anda.</p>
-                                <div className="flex gap-4 mt-8">
-                                    <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 flex-1 border border-white/10 text-center">
-                                        <p className="text-white font-bold text-sm">Instan</p>
-                                        <p className="text-white/60 text-[10px] uppercase">KECEPATAN PARSING</p>
-                                    </div>
-                                    <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 flex-1 border border-white/10 text-center">
-                                        <p className="text-white font-bold text-sm">Otomatis</p>
-                                        <p className="text-white/60 text-[10px] uppercase">KATEGORISASI</p>
-                                    </div>
+                        {/* Left: Parsing Struk Neural card */}
+                        <div className="rounded-[40px] bg-white p-8 border border-zinc-100 shadow-sm flex flex-col justify-between">
+                            <div>
+                                <span className="inline-block text-[10px] font-bold text-[#008744] uppercase tracking-wider bg-[#F0FFF4] px-3 py-1 rounded-full">Mesin Utama</span>
+                                <h3 className="text-3xl font-bold text-zinc-900 mt-6 mb-4">Parsing Struk Neural</h3>
+                                <p className="text-zinc-500 italic mb-6">Cukup ambil foto. AI kami mengidentifikasi item, pajak, dan memprediksi kategori untuk memudahkan pelaporan dan analisis.</p>
+                            </div>
+                            <div className="flex gap-3 mt-4">
+                                <div className="flex-1 rounded-2xl border border-zinc-100 bg-[#F7FFF6] p-4 text-center">
+                                    <p className="font-bold text-sm text-[#008744]">Instan</p>
+                                    <p className="text-[10px] text-zinc-500 uppercase mt-1">Kecepatan Parsing</p>
+                                </div>
+                                <div className="flex-1 rounded-2xl border border-zinc-100 bg-[#F7FFF6] p-4 text-center">
+                                    <p className="font-bold text-sm text-[#008744]">Otomatis</p>
+                                    <p className="text-[10px] text-zinc-500 uppercase mt-1">Kategorisasi</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="rounded-[40px] bg-[#004D2A] p-10 flex flex-col justify-between overflow-hidden relative group">
+                        {/* Middle: Image */}
+                        <div className="rounded-[40px] overflow-hidden shadow-2xl border-8 border-white">
+                            <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=2000&auto=format&fit=crop" className="w-full h-full object-cover" alt="parsing" />
+                        </div>
+
+                        {/* Right: Predictive budget card */}
+                        <div className="rounded-[40px] bg-[#004D2A] p-10 flex flex-col justify-between text-white">
                             <div>
-                                <h3 className="text-2xl font-bold text-white mb-4">Penganggaran Prediktif</h3>
-                                <p className="text-green-200/80 italic text-sm leading-relaxed">
-                                    Kami tidak hanya melacak apa yang Anda belanjakan; kami memprediksi pengeluaran Anda bulan depan berdasarkan tren musiman.
-                                </p>
+                                <h3 className="text-2xl font-bold mb-4">Penganggaran Prediktif</h3>
+                                <p className="text-green-200/80 italic text-sm leading-relaxed">Kami tidak hanya melacak apa yang Anda belanjakan; kami memprediksi pengeluaran Anda bulan depan berdasarkan tren musiman.</p>
                             </div>
                             <div className="mt-8">
                                 <div className="flex items-end gap-2 h-32">
                                     {[40, 70, 45, 90, 60, 80].map((h, i) => (
-                                        <div key={i} className="flex-1 bg-green-500 rounded-t-lg transition-all group-hover:bg-green-400" style={{ height: `${h}%` }}></div>
+                                        <div key={i} className="flex-1 bg-green-500 rounded-t-lg" style={{ height: `${h}%` }}></div>
                                     ))}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="rounded-[40px] bg-[#F1F8E9] p-10 flex flex-col justify-between overflow-hidden relative md:h-[400px]">
+                        {/* Bottom left: Wawasan Investasi */}
+                        <div className="rounded-[40px] bg-[#F1F8E9] p-10 flex flex-col justify-between">
                             <div>
                                 <div className="h-12 w-12 rounded-xl bg-[#008744] flex items-center justify-center text-white mb-6">
                                     <BarChart3 className="h-6 w-6" />
                                 </div>
                                 <h3 className="text-2xl font-bold text-zinc-900 mb-4">Wawasan Investasi</h3>
-                                <p className="text-zinc-500 italic text-sm leading-relaxed">
-                                    Kurasi personal dari tren pasar yang secara spesifik memengaruhi aset portofolio Anda.
-                                </p>
+                                <p className="text-zinc-500 italic text-sm leading-relaxed">Kurasi personal dari tren pasar yang secara spesifik memengaruhi aset portofolio Anda.</p>
                             </div>
-                            <button className="flex items-center gap-2 text-[#008744] font-bold group">
+                            <button onClick={() => navigate('/investment-insights')} className="flex items-center gap-2 text-[#008744] font-bold group mt-6">
                                 Jelajahi Wawasan <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                             </button>
                         </div>
 
+                        {/* Bottom right: Brankas Data */}
                         <div className="lg:col-span-2 rounded-[40px] bg-[#216148] p-10 flex items-center justify-between overflow-hidden relative">
                             <div className="max-w-md">
                                 <h3 className="text-3xl font-bold text-white mb-4">Brankas Data</h3>
-                                <p className="text-green-100/80 italic text-sm leading-relaxed">
-                                    Identitas finansial Anda terkunci dalam brankas terdesentralisasi yang aman. Kami menggunakan zero-knowledge proofs untuk memastikan bahkan kami tidak bisa melihat data Anda tanpa izin.
-                                </p>
+                                <p className="text-green-100/80 italic text-sm leading-relaxed">Identitas finansial Anda terkunci dalam brankas terdesentralisasi yang aman. Kami menggunakan zero-knowledge proofs untuk memastikan bahkan kami tidak bisa melihat data Anda tanpa izin.</p>
                             </div>
                             <div className="hidden md:block">
                                 <Shield className="h-32 w-32 text-white/10" />
@@ -193,8 +183,77 @@ const Landing = () => {
                 </div>
             </section>
 
+            {/* Dipercaya & FAQ */}
+            <section className="scroll-mt-28 py-20 px-6 lg:px-12 max-w-7xl mx-auto">
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl font-bold">Dipercaya oleh Ribuan Pengguna</h2>
+                    <p className="text-zinc-500 mt-2">Kisah nyata dari pengguna kami.</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                    <div className="rounded-[20px] p-6 bg-white border border-zinc-100 shadow-sm">
+                        <div className="flex items-start gap-4">
+                            <div className="h-12 w-12 rounded-full bg-[#E8F9EE] flex items-center justify-center text-[#008744] font-bold">DC</div>
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-sm font-bold">David Chen</span>
+                                    <span className="text-xs text-zinc-400">Pengusaha Teknologi</span>
+                                </div>
+                                <p className="text-zinc-600 italic">"MyFinance mengubah kecemasan saya menjadi kejelasan. Pemindaian struk AI-nya sangat rapi—menghemat 10 jam waktu saya selama musim pajak."</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="rounded-[20px] p-6 bg-white border border-zinc-100 shadow-sm">
+                        <div className="flex items-start gap-4">
+                            <div className="h-12 w-12 rounded-full bg-[#E8F9EE] flex items-center justify-center text-[#008744] font-bold">SJ</div>
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-sm font-bold">Sarah Jenkins</span>
+                                    <span className="text-xs text-zinc-400">Direktur Kreatif</span>
+                                </div>
+                                <p className="text-zinc-600 italic">"Antarmuka yang intuitif dan laporan investasinya memudahkan saya memonitor portofolio setiap pagi."</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="rounded-[20px] p-6 bg-white border border-zinc-100 shadow-sm">
+                        <div className="flex items-start gap-4">
+                            <div className="h-12 w-12 rounded-full bg-[#E8F9EE] flex items-center justify-center text-[#008744] font-bold">MT</div>
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-sm font-bold">Marcus Thorne</span>
+                                    <span className="text-xs text-zinc-400">Analis Keuangan</span>
+                                </div>
+                                <p className="text-zinc-600 italic">"Fitur prediksi penganggaran membantu klien saya merencanakan kas dengan lebih baik. Hasilnya nyata."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* FAQ Section */}
+                <div ref={faqRef} id="faq" className="max-w-4xl mx-auto">
+                    <h3 className="text-2xl font-bold mb-6">Pertanyaan Umum</h3>
+                    <div className="space-y-3">
+                        <details className="rounded-xl border border-zinc-100 bg-white p-4">
+                            <summary className="cursor-pointer font-semibold">Seberapa aman data saya?</summary>
+                            <div className="mt-2 text-zinc-600 text-sm">Data Anda sangat aman bersama kami. Kami menggunakan HTTPS untuk mengamankan jalur komunikasi, enkripsi, dan kebijakan privasi yang ketat.</div>
+                        </details>
+                        <details className="rounded-xl border border-zinc-100 bg-white p-4">
+                            <summary className="cursor-pointer font-semibold">Apakah AI ini berfungsi untuk struk tulisan tangan?</summary>
+                            <div className="mt-2 text-zinc-600 text-sm">AI kami paling akurat pada struk cetak; dukungan tulisan tangan sedang dalam pengembangan dan akan diperbarui seiring waktu.</div>
+                        </details>
+                        <details className="rounded-xl border border-zinc-100 bg-white p-4">
+                            <summary className="cursor-pointer font-semibold">Bisakah saya mengekspor data untuk akuntan saya?</summary>
+                            <div className="mt-2 text-zinc-600 text-sm">Ya — ekspor CSV dan integrasi akuntansi tersedia pada paket tertentu.</div>
+                        </details>
+                        <details className="rounded-xl border border-zinc-100 bg-white p-4">
+                            <summary className="cursor-pointer font-semibold">Apa yang membuat MyFinance berbeda dari yang lain?</summary>
+                            <div className="mt-2 text-zinc-600 text-sm">Kombinasi parsing struk neural, privasi tingkat tinggi, dan prediksi penganggaran membuat MyFinance unik.</div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
             {/* Get Started */}
-            <section ref={faqRef} id="faq" className="scroll-mt-28 py-24 px-6 lg:px-12 max-w-7xl mx-auto">
+            <section id="get-started" className="scroll-mt-28 py-24 px-6 lg:px-12 max-w-7xl mx-auto">
                 <div className="rounded-[60px] bg-[#004D2A] p-12 lg:p-24 text-center relative overflow-hidden shadow-2xl">
                     <h2 className="text-4xl lg:text-6xl font-bold text-white mb-8 relative z-10">Mulai Kelola Uang Anda Hari Ini</h2>
                     <p className="text-green-100 text-lg mb-12 max-w-2xl mx-auto relative z-10 italic">Bergabunglah dengan lebih dari 50.000 pengguna yang telah menemukan sanctuary finansial mereka.</p>
@@ -209,51 +268,7 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* Footer Reuse or similar structure */}
-            <footer className="bg-white py-20 px-6 lg:px-12 max-w-7xl mx-auto border-t border-zinc-100">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-                    <div className="md:col-span-2">
-                        <div className="flex items-center gap-2 mb-6">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#008744]">
-                                <span className="text-sm font-bold text-white">MF</span>
-                            </div>
-                            <span className="text-2xl font-bold text-[#008744]">MyFinance</span>
-                        </div>
-                        <p className="text-zinc-500 max-w-sm italic mb-8">
-                            Sanctuary Terpandu untuk kekayaan Anda. Kami mendefinisikan ulang manajemen kekayaan melalui estetika editorial dan kecerdasan buatan.
-                        </p>
-                        <div className="flex gap-6">
-                            <Globe className="h-6 w-6 text-zinc-400 hover:text-[#008744] cursor-pointer" />
-                            <Mail className="h-6 w-6 text-zinc-400 hover:text-[#008744] cursor-pointer" />
-                            <Phone className="h-6 w-6 text-zinc-400 hover:text-[#008744] cursor-pointer" />
-                        </div>
-                    </div>
-                    <div>
-                        <h4 className="font-bold mb-6">PLATFORM</h4>
-                        <ul className="space-y-4 text-zinc-500">
-                            <li className="hover:text-[#008744] cursor-pointer">Fitur</li>
-                            <li className="hover:text-[#008744] cursor-pointer">Keamanan</li>
-                            <li className="hover:text-[#008744] cursor-pointer">Dokumentasi API</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 className="font-bold mb-6">LEGAL</h4>
-                        <ul className="space-y-4 text-zinc-500">
-                            <li className="hover:text-[#008744] cursor-pointer">Kebijakan Privasi</li>
-                            <li className="hover:text-[#008744] cursor-pointer">Syarat Layanan</li>
-                            <li className="hover:text-[#008744] cursor-pointer">Keamanan</li>
-                            <li className="hover:text-[#008744] cursor-pointer">Kontak</li>
-                        </ul>
-                    </div>
-                </div>
-                <div className="mt-20 pt-8 border-t border-zinc-100 flex flex-col md:flex-row justify-between items-center text-sm text-zinc-400">
-                    <p>© 2024 MyFinance. Perlindungan Terpandu untuk kekayaan Anda.</p>
-                    <div className="flex items-center gap-2 mt-4 md:mt-0">
-                        <div className="h-2 w-2 rounded-full bg-[#008744]"></div>
-                        <span>Layanan Beroperasi Normal</span>
-                    </div>
-                </div>
-            </footer>
+            <PageFooter />
         </div>
     );
 };

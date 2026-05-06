@@ -15,11 +15,11 @@ export const Sidebar = () => {
     ];
 
     return (
-        <aside className="fixed left-0 top-0 hidden h-full w-[270px] flex-col border-r border-[#E3EAD8] bg-[#EDF4E4]/95 backdrop-blur md:flex">
+        <aside className="fixed left-0 top-0 hidden h-full w-[270px] flex-col border-r border-[#E3EAD8] bg-[#EDF4E4]/95 backdrop-blur md:flex dark:border-[#2D3748] dark:bg-[#1A1F2E]/95">
             <div className="p-6">
-                <div className="flex items-center gap-2 text-finance-700">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-finance-700 text-[10px] font-bold text-white shadow-sm">MF</div>
-                    <span className="text-lg font-extrabold tracking-tight">MyFinance</span>
+                <div className="flex items-center gap-2 text-finance-700 dark:text-[#7CF38E]">
+                    <img src="/images/logo.png" alt="MyFinance" className="h-7 w-7 rounded-full object-cover shadow-sm" />
+                    <span className="text-lg font-extrabold tracking-tight dark:text-[#E8EAED]">MyFinance</span>
                 </div>
             </div>
 
@@ -32,8 +32,8 @@ export const Sidebar = () => {
                             cn(
                                 'flex items-center gap-3 rounded-[16px] px-4 py-3.5 text-sm font-semibold transition-all',
                                 isActive
-                                    ? 'bg-[#DDF4E2] text-finance-700 shadow-sm border border-finance-200'
-                                    : 'text-zinc-500 hover:bg-white/70 hover:text-finance-700'
+                                    ? 'bg-[#DDF4E2] text-finance-700 shadow-sm border border-finance-200 dark:bg-[#2D3748] dark:text-[#7CF38E] dark:border-[#3F4959]'
+                                    : 'text-zinc-500 hover:bg-white/70 hover:text-finance-700 dark:text-[#9CA3AF] dark:hover:bg-[#2D3748] dark:hover:text-[#7CF38E]'
                             )
                         }
                     >
@@ -56,7 +56,7 @@ export const MobileNav = () => {
     ];
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#E2E8D9] bg-white/95 px-4 py-3 backdrop-blur md:hidden">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#E2E8D9] bg-white/95 px-4 py-3 backdrop-blur md:hidden dark:border-[#2D3748] dark:bg-[#1A1F2E]/95">
             <div className="mx-auto grid max-w-md grid-cols-4 gap-2">
             {navItems.map((item) => (
                 <NavLink
@@ -65,7 +65,7 @@ export const MobileNav = () => {
                     className={({ isActive }) =>
                         cn(
                             'flex flex-col items-center justify-center gap-1 rounded-[18px] px-3 py-2 text-[11px] font-medium transition-all',
-                            isActive ? 'bg-[#DDF4E2] text-finance-700' : 'text-zinc-500'
+                            isActive ? 'bg-[#DDF4E2] text-finance-700 dark:bg-[#2D3748] dark:text-[#7CF38E]' : 'text-zinc-500 dark:text-[#9CA3AF]'
                         )
                     }
                 >
@@ -81,14 +81,14 @@ export const MobileNav = () => {
 export const Footer = () => {
     const { t } = useLanguage();
     return (
-        <footer className="mt-16 border-t border-[#E3EAD8] bg-[#EDF4E4]/70 px-6 py-12">
+        <footer className="mt-16 border-t border-[#E3EAD8] bg-[#EDF4E4]/70 px-6 py-12 dark:border-[#2D3748] dark:bg-[#1A1F2E]/70">
             <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 md:grid-cols-4">
                 <div className="md:col-span-2">
-                    <div className="mb-4 flex items-center gap-2 text-finance-700">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-finance-700 text-[10px] font-bold text-white">MF</div>
-                        <span className="text-xl font-extrabold tracking-tight">MyFinance</span>
+                    <div className="mb-4 flex items-center gap-2 text-finance-700 dark:text-[#7CF38E]">
+                        <img src="/images/logo.png" alt="MyFinance" className="h-7 w-7 rounded-full object-cover" />
+                        <span className="text-xl font-extrabold tracking-tight dark:text-[#E8EAED]">MyFinance</span>
                     </div>
-                    <p className="max-w-sm text-sm leading-6 text-zinc-500">
+                    <p className="max-w-sm text-sm leading-6 text-zinc-500 dark:text-[#9CA3AF]">
                         {t('footer_text')}
                     </p>
                     <div className="mt-6 flex gap-3">
@@ -105,25 +105,25 @@ export const Footer = () => {
                 </div>
 
                 <div>
-                    <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-zinc-700">PLATFORM</h4>
-                    <ul className="space-y-3 text-sm text-zinc-500">
-                        <li className="hover:text-[#008744] cursor-pointer">Fitur</li>
-                        <li className="hover:text-[#008744] cursor-pointer">Keamanan</li>
-                        <li className="hover:text-[#008744] cursor-pointer">Dokumentasi API</li>
+                    <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-zinc-700 dark:text-[#E8EAED]">PLATFORM</h4>
+                    <ul className="space-y-3 text-sm text-zinc-500 dark:text-[#9CA3AF]">
+                        <li className="hover:text-[#008744] cursor-pointer dark:hover:text-[#7CF38E]">Fitur</li>
+                        <li className="hover:text-[#008744] cursor-pointer dark:hover:text-[#7CF38E]">Keamanan</li>
+                        <li className="hover:text-[#008744] cursor-pointer dark:hover:text-[#7CF38E]">Dokumentasi API</li>
                     </ul>
                 </div>
 
                 <div>
-                    <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-zinc-700">LEGAL</h4>
-                    <ul className="space-y-3 text-sm text-zinc-500">
-                        <li className="hover:text-[#008744] cursor-pointer">Kebijakan Privasi</li>
-                        <li className="hover:text-[#008744] cursor-pointer">Syarat Layanan</li>
-                        <li className="hover:text-[#008744] cursor-pointer">Keamanan</li>
-                        <li className="hover:text-[#008744] cursor-pointer">Kontak</li>
+                    <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-zinc-700 dark:text-[#E8EAED]">LEGAL</h4>
+                    <ul className="space-y-3 text-sm text-zinc-500 dark:text-[#9CA3AF]">
+                        <li className="hover:text-[#008744] cursor-pointer dark:hover:text-[#7CF38E]">Kebijakan Privasi</li>
+                        <li className="hover:text-[#008744] cursor-pointer dark:hover:text-[#7CF38E]">Syarat Layanan</li>
+                        <li className="hover:text-[#008744] cursor-pointer dark:hover:text-[#7CF38E]">Keamanan</li>
+                        <li className="hover:text-[#008744] cursor-pointer dark:hover:text-[#7CF38E]">Kontak</li>
                     </ul>
                 </div>
             </div>
-            <div className="mx-auto mt-12 flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-[#E3EAD8] pt-8 text-xs text-zinc-400 md:flex-row">
+            <div className="mx-auto mt-12 flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-[#E3EAD8] pt-8 text-xs text-zinc-400 md:flex-row dark:border-[#2D3748] dark:text-[#9CA3AF]">
                 <p>{t('copyright')}</p>
                 <div className="flex items-center gap-2 mt-4 md:mt-0">
                     <div className="h-2 w-2 rounded-full bg-finance-500"></div>

@@ -20,6 +20,21 @@ const Transactions = () => {
     const { data: walletsData } = useWallets();
     const createTransaction = useCreateTransaction();
 
+    const isSameDay = (left, right) => {
+        if (!left || !right) {
+            return false;
+        }
+
+        return left.toDateString() === right.toDateString();
+    };
+
+    const daysBetween = (left, right) => {
+        const msPerDay = 24 * 60 * 60 * 1000;
+        const startOfLeft = new Date(left.getFullYear(), left.getMonth(), left.getDate());
+        const startOfRight = new Date(right.getFullYear(), right.getMonth(), right.getDate());
+        return Math.round((startOfRight - startOfLeft) / msPerDay);
+    };
+
     if (isLoading) {
         return <LoadingScreen />;
     }
@@ -51,12 +66,16 @@ const Transactions = () => {
         .filter((tx) => {
             const matchesSearch = [tx.label, tx.category, String(tx.amount)].join(' ').toLowerCase().includes(search.toLowerCase());
             const matchesType = activeType === 'all' ? true : tx.type === activeType;
+            const transactionDate = tx.date ? new Date(tx.date) : null;
+            const today = new Date();
             const matchesDate =
                 activeDate === 'today'
-                    ? true
+                    ? transactionDate ? isSameDay(transactionDate, today) : false
                     : activeDate === 'yesterday'
-                        ? tx.date && new Date(tx.date).toDateString() !== new Date().toDateString()
-                        : true;
+                        ? transactionDate ? daysBetween(transactionDate, today) === 1 : false
+                        : activeDate === 'month'
+                            ? transactionDate ? daysBetween(transactionDate, today) >= 0 && daysBetween(transactionDate, today) < 30 : false
+                            : true;
             return matchesSearch && matchesType && matchesDate;
         });
 
@@ -92,8 +111,8 @@ const Transactions = () => {
         <Layout>
             <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                    <h1 className="text-3xl font-extrabold leading-tight text-finance-700 md:text-4xl">{t('all_transactions')}</h1>
-                    <p className="mt-1 text-sm text-zinc-500">{t('manage_cashflow')}</p>
+                    <h1 className="text-3xl font-extrabold leading-tight text-finance-700 md:text-4xl dark:text-[#7CF38E]">{t('all_transactions')}</h1>
+                    <p className="mt-1 text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('manage_cashflow')}</p>
                 </div>
                 <div className="relative w-full lg:max-w-md">
                     <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400" />
@@ -102,7 +121,7 @@ const Transactions = () => {
                         placeholder={t('search_transactions_placeholder')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="finance-input pl-12"
+                        className="finance-input pl-12 dark:bg-[#2D3748] dark:border-[#3F4959] dark:text-[#F0F1F3] dark:placeholder-[#8B92A9]"
                     />
                 </div>
             </div>
@@ -116,8 +135,8 @@ const Transactions = () => {
                             className={cn(
                                 'finance-pill whitespace-nowrap border transition',
                                 activeDate === tab.id
-                                    ? 'bg-white text-finance-700 shadow-card border-white'
-                                    : 'bg-transparent text-zinc-500 border-transparent hover:text-finance-700'
+                                    ? 'bg-white text-finance-700 shadow-card border-white dark:bg-[#2D3748] dark:text-[#7CF38E] dark:border-[#2D3748]'
+                                    : 'bg-transparent text-zinc-500 border-transparent hover:text-finance-700 dark:text-[#8B92A9] dark:hover:text-[#7CF38E]'
                             )}
                         >
                             {tab.label}
@@ -155,7 +174,7 @@ const Transactions = () => {
                         onClick={() => setActiveType(filter.id)}
                         className={cn(
                             'finance-pill whitespace-nowrap transition',
-                            activeType === filter.id ? 'bg-white text-finance-700 shadow-card' : 'bg-white/55 text-zinc-500'
+                            activeType === filter.id ? 'bg-white text-finance-700 shadow-card dark:bg-[#2D3748] dark:text-[#7CF38E]' : 'bg-white/55 text-zinc-500 dark:bg-white/10 dark:text-[#8B92A9]'
                         )}
                     >
                         {filter.label}
@@ -166,7 +185,7 @@ const Transactions = () => {
             <div className="space-y-6">
                 {Object.entries(grouped).length > 0 ? Object.entries(grouped).map(([day, txs]) => (
                     <section key={day} className="finance-card p-6 md:p-8">
-                        <h3 className="text-lg font-extrabold text-zinc-900">{day}</h3>
+                        <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{day}</h3>
                         <div className="mt-6 space-y-4">
                             {txs.map((tx) => (
                                 <div key={tx.id} className="flex items-center justify-between gap-4 rounded-[22px] bg-[#FAFCF7] px-4 py-4">
@@ -175,8 +194,8 @@ const Transactions = () => {
                                             <tx.icon className="h-5 w-5" />
                                         </div>
                                         <div>
-                                            <h4 className="text-sm font-bold text-zinc-900 md:text-base">{tx.label}</h4>
-                                            <p className="text-[11px] text-zinc-500 md:text-sm">{tx.category}</p>
+                                            <h4 className="text-sm font-bold text-zinc-900 md:text-base dark:text-[#F0F1F3]">{tx.label}</h4>
+                                            <p className="text-[11px] text-zinc-500 md:text-sm dark:text-[#8B92A9]">{tx.category}</p>
                                         </div>
                                     </div>
                                     <p className={cn('text-sm font-bold md:text-base', tx.type === 'income' ? 'text-finance-700' : 'text-[#D1496F]')}>

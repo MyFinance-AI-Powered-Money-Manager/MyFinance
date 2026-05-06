@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
+import { config } from '../lib/config';
 import { showError, showSuccess } from '../lib/toast';
 
 const unwrapData = (response) => response?.data?.data ?? response?.data ?? response;
@@ -225,8 +226,12 @@ export const useDeleteTransaction = () => {
 // AI Services
 export const useScanReceipt = () => {
   return useMutation({
-    mutationFn: async () => {
-      throw new Error('Endpoint scan AI belum tersedia di backend ini.');
+    mutationFn: async (formData) => {
+      return api.post(config.scanEndpoint, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
     },
     onError: (error) => {
       showError(error.response?.data?.message || error.message || 'Failed to scan receipt');

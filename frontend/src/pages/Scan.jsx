@@ -34,7 +34,9 @@ const Scan = () => {
   const createTransaction = useCreateTransaction();
   const { data: walletsData } = useWallets();
 
-  const wallets = Array.isArray(walletsData) ? walletsData : walletsData?.data ?? [];
+  const wallets = React.useMemo(() => {
+    return Array.isArray(walletsData) ? walletsData : walletsData?.data ?? [];
+  }, [walletsData]);
 
   React.useEffect(() => {
     if (!selectedWalletId && wallets[0]?.id) {
@@ -129,7 +131,7 @@ const Scan = () => {
         <h1 className="bg-gradient-to-r from-[#008744] to-[#00A86B] bg-clip-text text-4xl font-bold text-transparent">
           Scan Struk AI
         </h1>
-        <p className="mt-2 text-sm text-zinc-500">
+        <p className="mt-2 text-sm text-zinc-500 dark:text-[#B0B8CC]">
           Upload foto struk, proses dengan API AI, lalu simpan otomatis menjadi transaksi.
         </p>
       </div>
@@ -140,10 +142,10 @@ const Scan = () => {
 
           <label className="mb-4 flex h-48 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-zinc-300 p-4 text-center transition hover:border-[#008744] dark:border-zinc-700 dark:hover:border-[#00A86B]">
             <FileImage className="mb-3 h-10 w-10 text-zinc-400" />
-            <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+            <span className="text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">
               Klik untuk pilih gambar struk
             </span>
-            <span className="mt-1 text-xs text-zinc-500">JPG, PNG, WEBP</span>
+            <span className="mt-1 text-xs text-zinc-500 dark:text-[#8B92A9]">JPG, PNG, WEBP</span>
             <input type="file" className="hidden" accept="image/*" onChange={handlePickFile} />
           </label>
 
@@ -168,31 +170,33 @@ const Scan = () => {
           {result ? (
             <div className="space-y-4">
               <div className="rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-800">
-                <p className="text-sm text-zinc-500">Amount</p>
+                <p className="text-sm text-zinc-500 dark:text-[#8B92A9]">Amount</p>
                 <p className="text-xl font-bold text-[#008744]">Rp {Number(result.amount || 0).toLocaleString('id-ID')}</p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <p className="text-sm text-zinc-500">Type</p>
+                  <p className="text-sm text-zinc-500 dark:text-[#8B92A9]">Type</p>
                   <p className="font-semibold uppercase dark:text-zinc-100">{result.type}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-zinc-500">Kategori</p>
+                  <p className="text-sm text-zinc-500 dark:text-[#8B92A9]">Kategori</p>
                   <p className="font-semibold dark:text-zinc-100">{result.category}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-zinc-500">Tanggal</p>
+                  <p className="text-sm text-zinc-500 dark:text-[#8B92A9]">Tanggal</p>
                   <p className="font-semibold dark:text-zinc-100">{result.date}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-zinc-500">Deskripsi</p>
+                  <p className="text-sm text-zinc-500 dark:text-[#8B92A9]">Deskripsi</p>
                   <p className="font-semibold dark:text-zinc-100">{result.description}</p>
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">Simpan ke Wallet</label>
+                <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">
+                  Simpan ke Wallet
+                </label>
                 <select
                   value={selectedWalletId}
                   onChange={(e) => setSelectedWalletId(e.target.value)}
@@ -234,7 +238,7 @@ const Scan = () => {
             <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-200 text-center dark:border-zinc-700">
               <Sparkles className="mb-3 h-8 w-8 text-zinc-400" />
               <p className="font-semibold text-zinc-600 dark:text-zinc-300">Belum ada hasil scan</p>
-              <p className="mt-1 text-sm text-zinc-500">Upload struk lalu klik tombol scan.</p>
+              <p className="mt-1 text-sm text-zinc-500 dark:text-[#B0B8CC]">Upload struk lalu klik tombol scan.</p>
             </div>
           )}
         </section>

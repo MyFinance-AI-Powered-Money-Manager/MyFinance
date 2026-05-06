@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 // Simple translation map
 const translations = {
@@ -18,11 +18,11 @@ const translations = {
         'insight_text': 'Pengeluaran kamu minggu ini 15% lebih rendah dari rata-rata bulanan. Pertahankan tren ini untuk mencapai target tabungan akhir tahun!',
         'transaction_history': 'Riwayat Transaksi',
         'see_all': 'Lihat Semua',
-        'home': 'Home',
-        'scan': 'Scan Transactions',
-        'all_transactions': 'All Transactions',
+        'home': 'Beranda',
+        'scan': 'Scan',
+        'all_transactions': 'Semua Transaksi',
         'transactions': 'Transaksi',
-        'reports': 'Reports',
+        'reports': 'Laporan',
         'catat_pemasukan': 'Catat Pemasukan',
         'catat_pengeluaran': 'Catat Pengeluaran',
         'login_welcome': 'Selamat Datang Kembali',
@@ -97,7 +97,7 @@ const translations = {
         'transaction_history': 'Transaction History',
         'see_all': 'See All',
         'home': 'Home',
-        'scan': 'Scan Transactions',
+        'scan': 'Scan',
         'all_transactions': 'All Transactions',
         'transactions': 'Transactions',
         'reports': 'Reports',
@@ -165,20 +165,27 @@ const LanguageContext = createContext(undefined);
 export const LanguageProvider = ({ children }) => {
     const [language, setLanguage] = useState(() => {
         const savedLanguage = localStorage.getItem('language');
-        return savedLanguage || 'id';
+        return translations[savedLanguage] ? savedLanguage : 'id';
     });
 
+    const setSafeLanguage = useCallback((nextLanguage) => {
+        setLanguage(translations[nextLanguage] ? nextLanguage : 'id');
+    }, []);
+
     useEffect(() => {
-        localStorage.setItem('language', language);
-        document.documentElement.lang = language;
+        const activeLanguage = translations[language] ? language : 'id';
+        localStorage.setItem('language', activeLanguage);
+        document.documentElement.lang = activeLanguage;
     }, [language]);
 
+    const currentTranslations = translations[language] || translations.id;
+
     const t = (key) => {
-        return translations[language][key] || key;
+        return currentTranslations[key] || translations.id[key] || key;
     };
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t }}>
+        <LanguageContext.Provider value={{ language, setLanguage: setSafeLanguage, t }}>
             {children}
         </LanguageContext.Provider>
     );

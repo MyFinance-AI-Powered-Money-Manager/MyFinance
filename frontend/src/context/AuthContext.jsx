@@ -70,11 +70,6 @@ export const AuthProvider = ({ children }) => {
                 password,
                 confirm_password,
             });
-
-            // Backend register returns { status, message, data: { id, full_name, email } }
-            // It does NOT return a token — user must login after registering
-            const userData = responseData.data || responseData.user;
-
             return responseData;
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Registration failed';

@@ -36,7 +36,7 @@ const Dashboard = () => {
             <Layout>
                 <div className="finance-card p-8 text-center md:p-10">
                     <h2 className="text-2xl font-extrabold text-red-600">{t('dashboard_load_failed')}</h2>
-                    <p className="mt-2 text-sm text-zinc-500">{t('dashboard_load_hint')}</p>
+                    <p className="mt-2 text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('dashboard_load_hint')}</p>
                 </div>
             </Layout>
         );
@@ -62,7 +62,6 @@ const Dashboard = () => {
     const totalIncome = transactions.reduce((sum, tx) => sum + (tx.type === 'income' || Number(tx.amount) > 0 ? Number(tx.amount) : 0), 0);
     const totalExpense = transactions.reduce((sum, tx) => sum + (tx.type === 'expense' || Number(tx.amount) < 0 ? Math.abs(Number(tx.amount)) : 0), 0);
     const activeBudget = budgets[0];
-    const savingsRate = totalIncome > 0 ? Math.max(0, Math.round(((totalIncome - totalExpense) / totalIncome) * 100)) : 0;
 
     const recentTransactions = [...transactions]
         .slice(0, 3)
@@ -148,13 +147,13 @@ const Dashboard = () => {
                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-finance-700 text-white shadow-sm">
                             <account.icon className="h-5 w-5" />
                         </div>
-                        <h4 className="mt-4 text-sm font-bold text-zinc-900">{account.name}</h4>
+                        <h4 className="mt-4 text-sm font-bold text-zinc-900 dark:text-[#F0F1F3]">{account.name}</h4>
                         <p className="mt-1 text-sm font-semibold text-finance-700">
                             {formatCurrency(account.amount).replace('Rp', '').trim()}
                         </p>
                     </motion.div>
                 ))}
-                <button className="finance-card flex flex-col items-center justify-center px-4 py-6 text-center text-zinc-500 transition hover:-translate-y-0.5 hover:text-finance-700">
+                <button className="finance-card flex flex-col items-center justify-center px-4 py-6 text-center text-zinc-500 transition hover:-translate-y-0.5 hover:text-finance-700 dark:text-[#8B92A9] dark:hover:text-[#7CF38E]">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E6EEDA] text-finance-700 shadow-sm">
                         <Plus className="h-5 w-5" />
                     </div>
@@ -169,8 +168,8 @@ const Dashboard = () => {
                             <Sparkles className="h-5 w-5" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-lg font-extrabold text-zinc-900">{t('smart_insight')}</h3>
-                            <p className="mt-3 max-w-xl text-sm leading-7 text-zinc-500">
+                            <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('smart_insight')}</h3>
+                            <p className="mt-3 max-w-xl text-sm leading-7 text-zinc-500 dark:text-[#B0B8CC]">
                                 {activeBudget
                                     ? `Pengeluaran kamu minggu ini 15% lebih rendah dari rata-rata bulanan. Pertahankan tren ini untuk mencapai target tabungan akhir tahun!`
                                     : t('insight_text')}
@@ -184,7 +183,7 @@ const Dashboard = () => {
 
                 <section className="finance-card p-6 md:p-8 hidden lg:block lg:col-start-2 lg:row-start-1">
                     <div className="mb-6 flex items-center justify-between">
-                        <h3 className="text-lg font-extrabold text-zinc-900">{t('transaction_history')}</h3>
+                        <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('transaction_history')}</h3>
                         <button onClick={() => navigate('/transactions')} className="text-sm font-bold text-finance-700">
                             {t('see_all')}
                         </button>
@@ -193,12 +192,12 @@ const Dashboard = () => {
                         {recentTransactions.length > 0 ? recentTransactions.map((tx) => (
                             <div key={tx.id} className="flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7CF38E] text-zinc-900">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7CF38E] text-zinc-900 dark:text-zinc-900">
                                         <tx.icon className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-bold text-zinc-900">{tx.label}</h4>
-                                        <p className="text-[11px] text-zinc-500">{tx.category} • {tx.date}</p>
+                                        <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F0F1F3]">{tx.label}</h4>
+                                        <p className="text-[11px] text-zinc-500 dark:text-[#8B92A9]">{tx.category} • {tx.date}</p>
                                     </div>
                                 </div>
                                 <p className={cn('text-sm font-bold md:text-base', tx.amount > 0 ? 'text-finance-700' : 'text-[#D1496F]')}>
@@ -206,7 +205,7 @@ const Dashboard = () => {
                                 </p>
                             </div>
                         )) : (
-                            <p className="text-sm text-zinc-500">{t('recent_backend_empty')}</p>
+                            <p className="text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('recent_backend_empty')}</p>
                         )}
                     </div>
                 </section>
@@ -251,7 +250,7 @@ const Dashboard = () => {
             {/* Mobile-only transaction history moved to bottom */}
             <section className="finance-card p-6 md:p-8 mt-4 block lg:hidden">
                 <div className="mb-6 flex items-center justify-between">
-                    <h3 className="text-lg font-extrabold text-zinc-900">{t('transaction_history')}</h3>
+                    <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('transaction_history')}</h3>
                     <button onClick={() => navigate('/transactions')} className="text-sm font-bold text-finance-700">
                         {t('see_all')}
                     </button>
@@ -260,12 +259,12 @@ const Dashboard = () => {
                     {recentTransactions.length > 0 ? recentTransactions.map((tx) => (
                         <div key={tx.id} className="flex items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7CF38E] text-zinc-900">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7CF38E] text-zinc-900 dark:text-zinc-900">
                                     <tx.icon className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-bold text-zinc-900">{tx.label}</h4>
-                                    <p className="text-[11px] text-zinc-500">{tx.category} • {tx.date}</p>
+                                    <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F0F1F3]">{tx.label}</h4>
+                                    <p className="text-[11px] text-zinc-500 dark:text-[#8B92A9]">{tx.category} • {tx.date}</p>
                                 </div>
                             </div>
                             <p className={cn('text-sm font-bold md:text-base', tx.amount > 0 ? 'text-finance-700' : 'text-[#D1496F]')}>

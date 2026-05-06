@@ -33,7 +33,7 @@ const Reports = () => {
             <Layout>
                 <div className="finance-card p-8 text-center md:p-10">
                     <h2 className="text-2xl font-extrabold text-red-600">{t('report_load_failed')}</h2>
-                    <p className="mt-2 text-sm text-zinc-500">{t('report_load_hint')}</p>
+                    <p className="mt-2 text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('report_load_hint')}</p>
                 </div>
             </Layout>
         );
@@ -85,14 +85,14 @@ const Reports = () => {
         <Layout>
             <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                    <h1 className="text-3xl font-extrabold leading-tight text-finance-700 md:text-4xl">{t('financial_reports')}</h1>
-                    <p className="mt-1 text-sm text-zinc-500">{t('financial_overview')}</p>
+                    <h1 className="text-3xl font-extrabold leading-tight text-finance-700 md:text-4xl dark:text-[#7CF38E]">{t('financial_reports')}</h1>
+                    <p className="mt-1 text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('financial_overview')}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="finance-pill bg-white text-zinc-700 shadow-card">
+                    <button className="finance-pill bg-white text-zinc-700 shadow-card dark:bg-[#2D3748] dark:text-[#E8EAED]">
                         Oktober 2023 <ChevronDown className="h-4 w-4" />
                     </button>
-                    <button className="finance-pill bg-[#7CF38E] text-finance-800 transition hover:-translate-y-0.5">
+                    <button className="finance-pill bg-[#7CF38E] text-finance-800 transition hover:-translate-y-0.5 dark:bg-[#7CF38E] dark:text-finance-800">
                         <Download className="h-4 w-4" /> {t('export')}
                     </button>
                 </div>
@@ -103,8 +103,8 @@ const Reports = () => {
                     <div className="finance-card p-6 relative overflow-hidden">
                         <div className="flex items-start justify-between gap-4">
                             <div>
-                                <p className="text-sm text-zinc-500">{t('total_transactions')}</p>
-                                <h2 className="mt-3 text-3xl font-extrabold text-zinc-900">{totals.count}</h2>
+                                <p className="text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('total_transactions')}</p>
+                                <h2 className="mt-3 text-3xl font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{totals.count}</h2>
                                 <p className="mt-3 flex items-center gap-1 text-sm font-semibold text-finance-700">
                                     <TrendingUp className="h-4 w-4" /> +{Math.round(savingsRate)}% dari bulan lalu
                                 </p>
@@ -118,8 +118,8 @@ const Reports = () => {
                     <div className="finance-card p-6 relative overflow-hidden">
                         <div className="flex items-start justify-between gap-4">
                             <div>
-                                <p className="text-sm text-zinc-500">{t('avg_expense')}</p>
-                                <h2 className="mt-3 text-3xl font-extrabold text-zinc-900">{formatCurrency(totals.count ? totals.expense / totals.count : 0)}<span className="text-base font-medium text-zinc-400">/hari</span></h2>
+                                <p className="text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('avg_expense')}</p>
+                                <h2 className="mt-3 text-3xl font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{formatCurrency(totals.count ? totals.expense / totals.count : 0)}<span className="text-base font-medium text-zinc-400 dark:text-[#8B92A9]">/hari</span></h2>
                                 <p className="mt-3 flex items-center gap-1 text-sm font-semibold text-[#D1496F]">
                                     <TrendingDown className="h-4 w-4" /> -5% dari bulan lalu
                                 </p>
@@ -146,8 +146,8 @@ const Reports = () => {
                 <div className="finance-card p-6 md:p-8">
                     <div className="mb-6 flex items-center justify-between">
                         <div>
-                            <h3 className="text-lg font-extrabold text-zinc-900">{t('income_vs_expense')}</h3>
-                            <p className="mt-1 text-sm text-zinc-500">Oktober 2023</p>
+                            <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('income_vs_expense')}</h3>
+                            <p className="mt-1 text-sm text-zinc-500 dark:text-[#B0B8CC]">Oktober 2023</p>
                         </div>
                         <div className="flex items-center gap-4 text-xs font-semibold text-zinc-500">
                             <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-finance-700" />{t('filter_income')}</span>
@@ -175,7 +175,7 @@ const Reports = () => {
 
             <div className="mt-4 finance-card p-6 md:p-8">
                 <div className="mb-6 flex items-center justify-between">
-                    <h3 className="text-lg font-extrabold text-zinc-900">{t('transaction_history')}</h3>
+                    <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('transaction_history')}</h3>
                     <button className="text-sm font-bold text-finance-700">{t('see_all')}</button>
                 </div>
                 <div className="space-y-5">
@@ -187,11 +187,11 @@ const Reports = () => {
                         return (
                             <div key={tx.id ?? index} className="flex items-center justify-between gap-4 rounded-[22px] bg-[#FAFCF7] px-4 py-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7CF38E] text-zinc-900">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7CF38E] text-zinc-900 dark:text-zinc-900">
                                         <Icon className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-bold text-zinc-900">{tx.label || tx.description || t('transaction')}</h4>
+                                        <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F0F1F3]">{tx.label || tx.description || t('transaction')}</h4>
                                         <p className="text-[11px] text-zinc-500">{tx.category || t('category')} • {tx.date || 'Hari ini'}</p>
                                     </div>
                                 </div>
@@ -206,7 +206,7 @@ const Reports = () => {
 
             <div className="mt-4 finance-card p-6 md:p-8">
                 <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-lg font-extrabold text-zinc-900">Insight Backend</h3>
+                    <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">Insight Backend</h3>
                     <span className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
                         {primaryWalletId ? 'Aktif' : 'Belum ada wallet'}
                     </span>
@@ -218,21 +218,21 @@ const Reports = () => {
 
             <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
                 <div className="finance-card p-6 md:p-8">
-                    <h3 className="text-lg font-extrabold text-zinc-900">{t('category_summary')}</h3>
+                    <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('category_summary')}</h3>
                     <div className="mt-6 space-y-4">
                         {transactions.length > 0 ? transactions.slice(0, 4).map((tx, index) => {
                             const amount = Math.abs(Number(tx.amount ?? 0));
                             return (
                                 <div key={tx.id ?? index} className="flex items-center justify-between rounded-[20px] border border-[#E8F1E3] px-4 py-4">
                                     <div>
-                                        <p className="text-sm font-bold text-zinc-900">{tx.category || t('category')}</p>
+                                        <p className="text-sm font-bold text-zinc-900 dark:text-[#F0F1F3]">{tx.category || t('category')}</p>
                                         <p className="text-xs text-zinc-500">{tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}</p>
                                     </div>
                                     <p className="text-sm font-bold text-finance-700">{formatCurrency(amount)}</p>
                                 </div>
                             );
                         }) : (
-                            <div className="rounded-[20px] border border-dashed border-zinc-200 p-8 text-center text-sm text-zinc-500">
+                            <div className="rounded-[20px] border border-dashed border-zinc-200 p-8 text-center text-sm text-zinc-500 dark:border-[#3F4959] dark:text-[#8B92A9]">
                                 {t('transactions_data_unavailable')}
                             </div>
                         )}

@@ -8,6 +8,8 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoadingScreen } from './components/LoadingScreen';
 
 const Landing = lazy(() => import('./pages/Landing'));
+const LearnMore = lazy(() => import('./pages/LearnMore'));
+const InvestmentInsights = lazy(() => import('./pages/InvestmentInsights'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
@@ -35,6 +37,8 @@ export default function App() {
               <Suspense fallback={<LoadingScreen />}>
                 <Routes>
                   <Route path="/" element={<Landing />} />
+                  <Route path="/learn-more" element={<LearnMore />} />
+                  <Route path="/investment-insights" element={<InvestmentInsights />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route
