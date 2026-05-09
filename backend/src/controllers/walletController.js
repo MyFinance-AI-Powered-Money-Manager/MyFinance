@@ -82,13 +82,13 @@ const transferWallet = async (req, res) => {
         
         await db.query(
             `INSERT INTO transactions (user_id, wallet_id, type, total_amount, category, description, transfer_id) 
-             VALUES ($1, $2, 'expense', $3, 'TRANSFER', 'Transfer Keluar', $4)`,
+             VALUES ($1, $2, 'EXPENSE', $3, 'TRANSFER', 'Transfer Keluar', $4)`,
             [userId, source_wallet_id, amount, transferId]
         );
 
         await db.query(
             `INSERT INTO transactions (user_id, wallet_id, type, total_amount, category, description, transfer_id) 
-             VALUES ($1, $2, 'income', $3, 'TRANSFER', 'Transfer Masuk', $4)`,
+             VALUES ($1, $2, 'INCOME', $3, 'TRANSFER', 'Transfer Masuk', $4)`,
             [userId, destination_wallet_id, amount, transferId]
         );
 
