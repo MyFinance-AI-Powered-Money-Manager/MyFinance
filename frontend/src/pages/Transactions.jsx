@@ -53,6 +53,36 @@ const Transactions = () => {
     const transactions = Array.isArray(data) ? data : data?.data ?? [];
     const wallets = Array.isArray(walletsData) ? walletsData : walletsData?.data ?? [];
 
+    if (wallets.length === 0) {
+        return (
+            <Layout>
+                <div className="finance-card mx-auto max-w-2xl p-8 text-center md:p-10">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#DDF4E2] text-finance-700">
+                        <Wallet className="h-8 w-8" />
+                    </div>
+                    <h1 className="text-2xl font-extrabold text-zinc-900 dark:text-[#F0F1F3]">Buat Dompet Dulu</h1>
+                    <p className="mt-3 text-sm leading-7 text-zinc-500 dark:text-[#B0B8CC]">
+                        Sebelum mencatat transaksi, kamu perlu membuat dompet terlebih dahulu.
+                    </p>
+                    <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                        <button
+                            onClick={() => navigate('/dashboard', { state: { openWalletModal: true } })}
+                            className="rounded-[18px] bg-finance-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-finance-800"
+                        >
+                            Buat Dompet Sekarang
+                        </button>
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            className="rounded-[18px] border border-[#D9E5CF] bg-white px-5 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-[#F6FAF1]"
+                        >
+                            Kembali ke Dashboard
+                        </button>
+                    </div>
+                </div>
+            </Layout>
+        );
+    }
+
     const normalized = transactions
         .map((tx, index) => ({
             id: tx.id ?? index,
@@ -146,6 +176,11 @@ const Transactions = () => {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => {
+                            if (wallets.length === 0) {
+                                navigate('/dashboard', { state: { openWalletModal: true } });
+                                return;
+                            }
+
                             setFormType('income');
                             setOpenTransactionModal(true);
                         }}
@@ -156,6 +191,11 @@ const Transactions = () => {
                     </button>
                     <button
                         onClick={() => {
+                            if (wallets.length === 0) {
+                                navigate('/dashboard', { state: { openWalletModal: true } });
+                                return;
+                            }
+
                             setFormType('expense');
                             setOpenTransactionModal(true);
                         }}

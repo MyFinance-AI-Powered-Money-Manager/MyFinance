@@ -2,6 +2,7 @@ import React from 'react';
 import { Upload, FileImage, Sparkles, Save } from 'lucide-react';
 import { Layout } from '../components/layout/Layout';
 import { useScanReceipt, useCreateTransaction, useWallets } from '../hooks/useFinance';
+import { config } from '../lib/config';
 import { showError, showSuccess } from '../lib/toast';
 
 const normalizeScanResult = (data) => {
@@ -77,6 +78,11 @@ const Scan = () => {
   };
 
   const handleScan = async () => {
+    if (!config.scanEndpoint) {
+      showError('Fitur scan belum dikonfigurasi karena backend ini tidak menyediakan endpoint OCR.');
+      return;
+    }
+
     if (!file) {
       showError('Pilih file struk terlebih dahulu');
       return;
@@ -156,12 +162,22 @@ const Scan = () => {
           <button
             type="button"
             onClick={handleScan}
-            disabled={scanReceipt.isPending}
+            disabled={scanReceipt.isPending || !config.scanEndpoint}
             className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#008744] font-semibold text-white transition hover:bg-[#007038] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Upload className="h-4 w-4" />
-            {scanReceipt.isPending ? 'Memproses scan...' : 'Scan dengan AI'}
+            {scanReceipt.isPending
+              ? 'Memproses scan...'
+              : config.scanEndpoint
+                ? 'Scan dengan AI'
+                : 'Scan belum tersedia'}
           </button>
+
+          {!config.scanEndpoint ? (
+            <p className="mt-3 text-xs text-amber-600 dark:text-amber-300">
+              Backend yang ada belum memiliki endpoint OCR. Anda tetap bisa menyimpan transaksi secara manual dari form transaksi.
+            </p>
+          ) : null}
         </section>
 
         <section className="rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">

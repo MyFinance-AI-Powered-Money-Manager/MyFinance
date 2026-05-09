@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { useWallets } from '../hooks/useFinance';
 import { showError } from '../lib/toast';
 
 const incomeCategories = ['bank', 'e-wallet', 'tabungan', 'investasi', 'lainnya'];
@@ -19,7 +20,9 @@ export const TransactionFormModal = ({
     const [category, setCategory] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [date, setDate] = React.useState(todayDate());
-    const [walletId, setWalletId] = React.useState('');
+    // Wallet selection removed to allow creating transactions without selecting a source
+
+    const { data: walletsData } = useWallets();
 
     React.useEffect(() => {
         if (!open) {
@@ -30,8 +33,12 @@ export const TransactionFormModal = ({
         setCategory('');
         setDescription('');
         setDate(todayDate());
-        setWalletId(wallets?.[0]?.id ? String(wallets[0].id) : '');
+        // no-op: wallet selection removed
     }, [open, type, wallets]);
+
+    const availableWallets = (Array.isArray(wallets) && wallets.length > 0)
+        ? wallets
+        : (Array.isArray(walletsData) ? walletsData : walletsData?.data ?? []);
 
     if (!open) {
         return null;
@@ -53,10 +60,9 @@ export const TransactionFormModal = ({
             return;
         }
 
-        if (!walletId) {
-            showError('Pilih wallet terlebih dahulu');
-            return;
-        }
+        // wallet selection removed: backend will handle wallet assignment if needed
+
+        const defaultWalletId = availableWallets?.[0]?.id ?? availableWallets?.[0]?.walletId ?? availableWallets?.[0]?._id ?? null;
 
         const payload = {
             amount: numericAmount,
@@ -64,9 +70,13 @@ export const TransactionFormModal = ({
             category,
             date,
             description,
-            walletId,
-            wallet_id: walletId,
+            ...(defaultWalletId ? { wallet_id: defaultWalletId, walletId: defaultWalletId } : {}),
         };
+
+        // Debug: log payload to help trace wallet_id issues
+        // Remove this log after debugging
+        // eslint-disable-next-line no-console
+        console.log('Submitting transaction payload:', payload);
 
         await onSubmit(payload);
     };
@@ -119,29 +129,7 @@ export const TransactionFormModal = ({
                         </select>
                     </div>
 
-                    <div>
-                        <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Sumber Dana</label>
-                        <select
-                            value={walletId}
-                            onChange={(e) => setWalletId(e.target.value)}
-                            className="finance-input"
-                            required
-                        >
-                            {wallets.map((wallet) => {
-                                const id = wallet.id ?? wallet.walletId ?? wallet._id;
-                                const label = wallet.name || wallet.label || wallet.type || 'Wallet';
-                                if (!id) {
-                                    return null;
-                                }
-
-                                return (
-                                    <option key={id} value={String(id)}>
-                                        {label}
-                                    </option>
-                                );
-                            })}
-                        </select>
-                    </div>
+                    {/* Sumber Dana removed to allow saving transactions without selecting a wallet */}
 
                     <div>
                         <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Tanggal</label>

@@ -1,11 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowDown, ArrowRight, ArrowUp, Banknote, Car, CreditCard, Landmark, Minus, Plus, Scan, Sparkles, Utensils, Wallet } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Layout } from '../components/layout/Layout';
 import { DashboardHeader } from '../components/dashboard/DashboardHeader';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { TransactionFormModal } from '../components/TransactionFormModal';
+import { WalletFormModal } from '../components/WalletFormModal';
 import { useLanguage } from '../context/LanguageContext';
 import { useBudgets, useCreateTransaction, useTransactions, useWallets } from '../hooks/useFinance';
 import { cn, formatCurrency } from '../lib/utils';
@@ -13,8 +14,10 @@ import { cn, formatCurrency } from '../lib/utils';
 const Dashboard = () => {
     const { t } = useLanguage();
     const navigate = useNavigate();
+    const location = useLocation();
     const [formType, setFormType] = React.useState('income');
     const [openTransactionModal, setOpenTransactionModal] = React.useState(false);
+    const [openWalletModal, setOpenWalletModal] = React.useState(false);
     const { data: walletsData, isLoading: walletsLoading, error: walletsError } = useWallets();
     const { data: budgetsData, isLoading: budgetsLoading, error: budgetsError } = useBudgets();
     const { data: transactionsData, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
@@ -26,6 +29,18 @@ const Dashboard = () => {
 
     const isLoading = walletsLoading || budgetsLoading || transactionsLoading;
     const error = walletsError || budgetsError || transactionsError;
+
+    React.useEffect(() => {
+        if (location.state?.openWalletModal) {
+            setOpenWalletModal(true);
+        }
+    }, [location.state]);
+
+    React.useEffect(() => {
+        if (!isLoading && wallets.length === 0) {
+            setOpenWalletModal(true);
+        }
+    }, [isLoading, wallets.length]);
 
     if (isLoading) {
         return <LoadingScreen />;
@@ -43,11 +58,11 @@ const Dashboard = () => {
     }
 
     const walletFallbacks = [
-        { name: t('bank'), balance: 5000000, icon: Landmark },
-        { name: t('emergency_fund'), balance: 4500000, icon: Banknote },
-        { name: t('e_wallet'), balance: 500000, icon: CreditCard },
-        { name: t('cash'), balance: 1500000, icon: Wallet },
-        { name: t('savings'), balance: 1000000, icon: Wallet },
+        { name: t('bank'), balance: 0, icon: Landmark },
+        { name: t('emergency_fund'), balance: 0, icon: Banknote },
+        { name: t('e_wallet'), balance: 0, icon: CreditCard },
+        { name: t('cash'), balance: 0, icon: Wallet },
+        { name: t('savings'), balance: 0, icon: Wallet },
     ];
 
     const accountCards = (wallets.length ? wallets : walletFallbacks)
@@ -77,6 +92,22 @@ const Dashboard = () => {
     const handleCreateTransaction = async (payload) => {
         await createTransaction.mutateAsync(payload);
         setOpenTransactionModal(false);
+    };
+
+    const handleOpenWalletModal = () => {
+        setOpenWalletModal(true);
+    };
+
+    const handleCloseWalletModal = () => {
+        if (wallets.length === 0) {
+            return;
+        }
+
+        setOpenWalletModal(false);
+    };
+
+    const handleWalletCreated = () => {
+        setOpenWalletModal(false);
     };
 
     return (
@@ -110,10 +141,16 @@ const Dashboard = () => {
                 <section className="hidden gap-4 lg:grid">
                     <button
                         onClick={() => {
+                            if (wallets.length === 0) {
+                                setOpenWalletModal(true);
+                                return;
+                            }
+
                             setFormType('income');
                             setOpenTransactionModal(true);
                         }}
-                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-5 text-finance-700 shadow-sm transition hover:-translate-y-0.5"
+                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-5 text-finance-700 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                        disabled={wallets.length === 0}
                     >
                         <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#DDF4E2]">
                             <Plus className="h-5 w-5" />
@@ -122,10 +159,16 @@ const Dashboard = () => {
                     </button>
                     <button
                         onClick={() => {
+                            if (wallets.length === 0) {
+                                setOpenWalletModal(true);
+                                return;
+                            }
+
                             setFormType('expense');
                             setOpenTransactionModal(true);
                         }}
-                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-5 text-red-500 shadow-sm transition hover:-translate-y-0.5"
+                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-5 text-red-500 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                        disabled={wallets.length === 0}
                     >
                         <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FBE5EA]">
                             <Minus className="h-5 w-5" />
@@ -153,7 +196,10 @@ const Dashboard = () => {
                         </p>
                     </motion.div>
                 ))}
-                <button className="finance-card flex flex-col items-center justify-center px-4 py-6 text-center text-zinc-500 transition hover:-translate-y-0.5 hover:text-finance-700 dark:text-[#8B92A9] dark:hover:text-[#7CF38E]">
+                <button
+                    onClick={handleOpenWalletModal}
+                    className="finance-card flex flex-col items-center justify-center px-4 py-6 text-center text-zinc-500 transition hover:-translate-y-0.5 hover:text-finance-700 dark:text-[#8B92A9] dark:hover:text-[#7CF38E]"
+                >
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E6EEDA] text-finance-700 shadow-sm">
                         <Plus className="h-5 w-5" />
                     </div>
@@ -284,6 +330,13 @@ const Dashboard = () => {
                 onClose={() => setOpenTransactionModal(false)}
                 onSubmit={handleCreateTransaction}
                 isSubmitting={createTransaction.isPending}
+            />
+
+            <WalletFormModal
+                open={openWalletModal}
+                required={wallets.length === 0}
+                onClose={handleCloseWalletModal}
+                onCreated={handleWalletCreated}
             />
         </Layout>
     );

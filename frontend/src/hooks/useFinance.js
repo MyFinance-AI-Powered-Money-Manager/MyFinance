@@ -196,13 +196,45 @@ export const useCreateTransaction = () => {
 
   return useMutation({
     mutationFn: (data) => api.post('/transactions', normalizeTransactionPayload(data)),
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: ['wallets'] });
+
+      const previous = queryClient.getQueryData(['wallets']);
+
+      try {
+        const walletId = String(data?.wallet_id ?? data?.walletId ?? data?.walletId ?? '');
+        const amount = Number(data?.total_amount ?? data?.amount ?? 0);
+        const type = String(data?.type ?? 'expense').toLowerCase();
+
+        if (walletId && Array.isArray(previous)) {
+          const updated = previous.map((w) => {
+            const id = String(w?.id ?? w?.walletId ?? w?._id ?? '');
+            if (id === walletId) {
+              const cur = Number(w?.balance ?? w?.amount ?? 0);
+              const delta = Math.abs(amount) * (type === 'income' ? 1 : -1);
+              return { ...w, balance: cur + delta };
+            }
+            return w;
+          });
+
+          queryClient.setQueryData(['wallets'], updated);
+        }
+      } catch (e) {
+        // ignore optimistic update errors
+      }
+
+      return { previous };
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
 
       showSuccess('Transaction created successfully');
     },
-    onError: (error) => {
+    onError: (error, _variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['wallets'], context.previous);
+      }
       showError(error.response?.data?.message || 'Failed to create transaction');
     },
   });
@@ -227,6 +259,10 @@ export const useDeleteTransaction = () => {
 export const useScanReceipt = () => {
   return useMutation({
     mutationFn: async (formData) => {
+      if (!config.scanEndpoint) {
+        throw new Error('Endpoint scan belum dikonfigurasi di frontend ini.');
+      }
+
       return api.post(config.scanEndpoint, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
