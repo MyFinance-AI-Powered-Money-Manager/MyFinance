@@ -1,14 +1,20 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, History, BarChart3, Scan, Mail, Phone, Globe } from 'lucide-react';
+import { LayoutDashboard, History, BarChart3, Scan, Mail, Phone, Globe, UserCircle2 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
+import { resolveMediaUrl } from '../../lib/utils';
 import { cn } from '../../lib/utils';
 
 export const Sidebar = () => {
     const { t } = useLanguage();
+    const { user } = useAuth();
+    const avatarUrl = resolveMediaUrl(user?.profile_picture);
+    const initial = user?.full_name?.trim()?.charAt(0)?.toUpperCase() || 'U';
 
     const navItems = [
         { icon: LayoutDashboard, label: t('home'), path: '/dashboard' },
+        { icon: UserCircle2, label: t('profile'), path: '/profile' },
         { icon: Scan, label: t('scan'), path: '/scan' },
         { icon: History, label: t('transactions'), path: '/transactions' },
         { icon: BarChart3, label: t('reports'), path: '/reports' },
@@ -20,6 +26,21 @@ export const Sidebar = () => {
                 <div className="flex items-center gap-2 text-finance-700 dark:text-[#7CF38E]">
                     <img src="/images/logo.png" alt="MyFinance" className="h-7 w-7 rounded-full object-cover shadow-sm" />
                     <span className="text-lg font-extrabold tracking-tight dark:text-[#E8EAED]">MyFinance</span>
+                </div>
+                <div className="mt-6 rounded-[24px] border border-[#D9E5CF] bg-white/80 p-4 shadow-sm dark:border-[#3F4959] dark:bg-[#1F2733]/80">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#DDF4E2] text-sm font-bold text-finance-700 dark:bg-[#243225] dark:text-[#7CF38E]">
+                            {avatarUrl ? (
+                                <img src={avatarUrl} alt={user?.full_name || 'Profil'} className="h-full w-full object-cover" />
+                            ) : (
+                                initial
+                            )}
+                        </div>
+                        <div>
+                            <p className="text-sm font-semibold text-zinc-900 dark:text-[#F0F1F3]">{user?.full_name || 'Financial Sanctuary'}</p>
+                            <p className="text-xs text-zinc-500 dark:text-[#8B92A9]">{user?.email || 'Kelola profil dan keamanan akun'}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -50,6 +71,7 @@ export const MobileNav = () => {
     const { t } = useLanguage();
     const navItems = [
         { icon: LayoutDashboard, label: t('home'), path: '/dashboard' },
+        { icon: UserCircle2, label: t('profile'), path: '/profile' },
         { icon: Scan, label: t('scan'), path: '/scan' },
         { icon: History, label: t('transactions'), path: '/transactions' },
         { icon: BarChart3, label: t('reports'), path: '/reports' },
@@ -57,7 +79,7 @@ export const MobileNav = () => {
 
     return (
         <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#E2E8D9] bg-white/95 px-4 py-3 backdrop-blur md:hidden dark:border-[#2D3748] dark:bg-[#1A1F2E]/95">
-            <div className="mx-auto grid max-w-md grid-cols-4 gap-2">
+            <div className="mx-auto grid max-w-md grid-cols-5 gap-2">
             {navItems.map((item) => (
                 <NavLink
                     key={item.path}

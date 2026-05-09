@@ -7,6 +7,7 @@ import { DashboardHeader } from '../components/dashboard/DashboardHeader';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { TransactionFormModal } from '../components/TransactionFormModal';
 import { WalletFormModal } from '../components/WalletFormModal';
+import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useBudgets, useCreateTransaction, useTransactions, useWallets } from '../hooks/useFinance';
 import { cn, formatCurrency } from '../lib/utils';
@@ -15,6 +16,7 @@ const Dashboard = () => {
     const { t } = useLanguage();
     const navigate = useNavigate();
     const location = useLocation();
+    const { user } = useAuth();
     const [formType, setFormType] = React.useState('income');
     const [openTransactionModal, setOpenTransactionModal] = React.useState(false);
     const [openWalletModal, setOpenWalletModal] = React.useState(false);
@@ -87,11 +89,16 @@ const Dashboard = () => {
             category: tx.category || tx.type || 'Kategori',
             date: tx.date || tx.createdAt || 'Hari ini',
             amount: Number(tx.amount ?? 0),
+            type: tx.type || (Number(tx.amount ?? 0) >= 0 ? 'income' : 'expense'),
         }));
 
     const handleCreateTransaction = async (payload) => {
-        await createTransaction.mutateAsync(payload);
-        setOpenTransactionModal(false);
+        try {
+            await createTransaction.mutateAsync(payload);
+            setOpenTransactionModal(false);
+        } catch {
+            // Error already handled by the mutation callback.
+        }
     };
 
     const handleOpenWalletModal = () => {
@@ -112,7 +119,7 @@ const Dashboard = () => {
 
     return (
         <Layout>
-            <DashboardHeader />
+            <DashboardHeader user={user} onProfileClick={() => navigate('/profile')} />
 
             <div className="grid gap-4 lg:grid-cols-[1.7fr_0.95fr]">
                 <section className="finance-card overflow-hidden bg-gradient-to-br from-finance-700 via-finance-600 to-finance-500 p-6 text-white shadow-soft md:p-8 lg:p-10">
@@ -238,7 +245,10 @@ const Dashboard = () => {
                         {recentTransactions.length > 0 ? recentTransactions.map((tx) => (
                             <div key={tx.id} className="flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7CF38E] text-zinc-900 dark:text-zinc-900">
+                                    <div className={cn(
+                                        'flex h-12 w-12 items-center justify-center rounded-full text-zinc-900 dark:text-zinc-900',
+                                        tx.type === 'expense' ? 'bg-[#FBE5EA] text-[#D1496F]' : 'bg-[#7CF38E] text-zinc-900'
+                                    )}>
                                         <tx.icon className="h-5 w-5" />
                                     </div>
                                     <div>
@@ -246,8 +256,8 @@ const Dashboard = () => {
                                         <p className="text-[11px] text-zinc-500 dark:text-[#8B92A9]">{tx.category} • {tx.date}</p>
                                     </div>
                                 </div>
-                                <p className={cn('text-sm font-bold md:text-base', tx.amount > 0 ? 'text-finance-700' : 'text-[#D1496F]')}>
-                                    {tx.amount > 0 ? '+' : '-'} {formatCurrency(Math.abs(tx.amount))}
+                                <p className={cn('text-sm font-bold md:text-base', tx.type === 'expense' ? 'text-[#D1496F]' : 'text-finance-700')}>
+                                    {tx.type === 'expense' ? '-' : '+'} {formatCurrency(Math.abs(tx.amount))}
                                 </p>
                             </div>
                         )) : (
@@ -305,7 +315,10 @@ const Dashboard = () => {
                     {recentTransactions.length > 0 ? recentTransactions.map((tx) => (
                         <div key={tx.id} className="flex items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7CF38E] text-zinc-900 dark:text-zinc-900">
+                                <div className={cn(
+                                    'flex h-12 w-12 items-center justify-center rounded-full text-zinc-900 dark:text-zinc-900',
+                                    tx.type === 'expense' ? 'bg-[#FBE5EA] text-[#D1496F]' : 'bg-[#7CF38E] text-zinc-900'
+                                )}>
                                     <tx.icon className="h-5 w-5" />
                                 </div>
                                 <div>
@@ -313,8 +326,8 @@ const Dashboard = () => {
                                     <p className="text-[11px] text-zinc-500 dark:text-[#8B92A9]">{tx.category} • {tx.date}</p>
                                 </div>
                             </div>
-                            <p className={cn('text-sm font-bold md:text-base', tx.amount > 0 ? 'text-finance-700' : 'text-[#D1496F]')}>
-                                {tx.amount > 0 ? '+' : '-'} {formatCurrency(Math.abs(tx.amount))}
+                            <p className={cn('text-sm font-bold md:text-base', tx.type === 'expense' ? 'text-[#D1496F]' : 'text-finance-700')}>
+                                {tx.type === 'expense' ? '-' : '+'} {formatCurrency(Math.abs(tx.amount))}
                             </p>
                         </div>
                     )) : (

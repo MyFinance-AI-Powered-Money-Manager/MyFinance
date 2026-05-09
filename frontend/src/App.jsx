@@ -16,6 +16,7 @@ const Register = lazy(() => import('./pages/Register'));
 const Transactions = lazy(() => import('./pages/Transactions'));
 const Reports = lazy(() => import('./pages/Reports'));
 const Scan = lazy(() => import('./pages/Scan'));
+const Profile = lazy(() => import('./pages/Profile'));
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -62,6 +63,14 @@ export default function App() {
                     element={
                       <ProtectedRoute>
                         <Reports />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
                       </ProtectedRoute>
                     }
                   />

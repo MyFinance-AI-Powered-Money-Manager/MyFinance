@@ -10,6 +10,7 @@ export const config = {
   isDevelopment: import.meta.env.DEV,
   isProduction: import.meta.env.PROD,
   scanEndpoint: import.meta.env.VITE_SCAN_ENDPOINT || '',
+  overbudgetEndpoint: import.meta.env.VITE_OVERBUDGET_ENDPOINT || '',
   // Toggle whether to patch transactions cache after create (useful for mock servers)
   useTransactionCachePatch: import.meta.env.VITE_USE_TRANSACTION_CACHE_PATCH !== 'false',
 };

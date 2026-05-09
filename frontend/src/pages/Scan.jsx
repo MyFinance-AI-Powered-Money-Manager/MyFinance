@@ -118,17 +118,21 @@ const Scan = () => {
       return;
     }
 
-    await createTransaction.mutateAsync({
-      amount: result.amount,
-      type: result.type,
-      category: result.category,
-      description: result.description,
-      date: result.date,
-      walletId: selectedWalletId,
-      wallet_id: selectedWalletId,
-    });
+    try {
+      await createTransaction.mutateAsync({
+        amount: result.amount,
+        type: result.type,
+        category: result.category,
+        description: result.description,
+        date: result.date,
+        walletId: selectedWalletId,
+        wallet_id: selectedWalletId,
+      });
 
-    showSuccess('Hasil scan disimpan sebagai transaksi');
+      showSuccess('Hasil scan disimpan sebagai transaksi');
+    } catch {
+      // Error already handled by the mutation callback.
+    }
   };
 
   return (
