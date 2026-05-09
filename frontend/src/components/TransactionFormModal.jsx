@@ -20,9 +20,14 @@ export const TransactionFormModal = ({
     const [category, setCategory] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [date, setDate] = React.useState(todayDate());
-    // Wallet selection removed to allow creating transactions without selecting a source
+    const [selectedWalletId, setSelectedWalletId] = React.useState('');
 
     const { data: walletsData } = useWallets();
+    const availableWallets = React.useMemo(() => (
+        Array.isArray(wallets) && wallets.length > 0
+            ? wallets
+            : (Array.isArray(walletsData) ? walletsData : walletsData?.data ?? [])
+    ), [wallets, walletsData]);
 
     React.useEffect(() => {
         if (!open) {
@@ -33,19 +38,15 @@ export const TransactionFormModal = ({
         setCategory('');
         setDescription('');
         setDate(todayDate());
-        // no-op: wallet selection removed
-    }, [open, type, wallets]);
-
-    const availableWallets = (Array.isArray(wallets) && wallets.length > 0)
-        ? wallets
-        : (Array.isArray(walletsData) ? walletsData : walletsData?.data ?? []);
+        const defaultWalletId = availableWallets?.[0]?.id ?? availableWallets?.[0]?.walletId ?? availableWallets?.[0]?._id ?? '';
+        setSelectedWalletId(defaultWalletId ? String(defaultWalletId) : '');
+    }, [open, type, availableWallets]);
 
     if (!open) {
         return null;
     }
 
     const categories = type === 'income' ? incomeCategories : expenseCategories;
-
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -60,9 +61,10 @@ export const TransactionFormModal = ({
             return;
         }
 
-        // wallet selection removed: backend will handle wallet assignment if needed
-
-        const defaultWalletId = availableWallets?.[0]?.id ?? availableWallets?.[0]?.walletId ?? availableWallets?.[0]?._id ?? null;
+        if (!selectedWalletId) {
+            showError('Pilih sumber dana terlebih dahulu');
+            return;
+        }
 
         const payload = {
             amount: numericAmount,
@@ -70,13 +72,9 @@ export const TransactionFormModal = ({
             category,
             date,
             description,
-            ...(defaultWalletId ? { wallet_id: defaultWalletId, walletId: defaultWalletId } : {}),
+            wallet_id: selectedWalletId,
+            walletId: selectedWalletId,
         };
-
-        // Debug: log payload to help trace wallet_id issues
-        // Remove this log after debugging
-        // eslint-disable-next-line no-console
-        console.log('Submitting transaction payload:', payload);
 
         await onSubmit(payload);
     };
@@ -129,7 +127,31 @@ export const TransactionFormModal = ({
                         </select>
                     </div>
 
-                    {/* Sumber Dana removed to allow saving transactions without selecting a wallet */}
+                    <div>
+                        <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Sumber Dana</label>
+                        <select
+                            value={selectedWalletId}
+                            onChange={(e) => setSelectedWalletId(e.target.value)}
+                            className="finance-input"
+                            required
+                        >
+                            <option value="">Pilih wallet</option>
+                            {availableWallets.map((wallet) => {
+                                const walletId = wallet.id ?? wallet.walletId ?? wallet._id;
+                                const walletLabel = wallet.name || wallet.label || wallet.type || 'Wallet';
+
+                                if (!walletId) {
+                                    return null;
+                                }
+
+                                return (
+                                    <option key={walletId} value={String(walletId)}>
+                                        {walletLabel}
+                                    </option>
+                                );
+                            })}
+                        </select>
+                    </div>
 
                     <div>
                         <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Tanggal</label>
@@ -167,3 +189,4 @@ export const TransactionFormModal = ({
         </div>
     );
 };
+

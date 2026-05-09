@@ -133,8 +133,12 @@ const Transactions = () => {
     ];
 
     const handleCreateTransaction = async (payload) => {
-        await createTransaction.mutateAsync(payload);
-        setOpenTransactionModal(false);
+        try {
+            await createTransaction.mutateAsync(payload);
+            setOpenTransactionModal(false);
+        } catch {
+            // Error already handled by the mutation callback.
+        }
     };
 
     return (
@@ -230,7 +234,10 @@ const Transactions = () => {
                             {txs.map((tx) => (
                                 <div key={tx.id} className="flex items-center justify-between gap-4 rounded-[22px] bg-[#FAFCF7] px-4 py-4">
                                     <div className="flex items-center gap-4">
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#7CF38E] text-zinc-900">
+                                        <div className={cn(
+                                            'flex h-12 w-12 items-center justify-center rounded-2xl text-zinc-900',
+                                            tx.type === 'expense' ? 'bg-[#FBE5EA] text-[#D1496F]' : 'bg-[#7CF38E] text-zinc-900'
+                                        )}>
                                             <tx.icon className="h-5 w-5" />
                                         </div>
                                         <div>
@@ -238,8 +245,8 @@ const Transactions = () => {
                                             <p className="text-[11px] text-zinc-500 md:text-sm dark:text-[#8B92A9]">{tx.category}</p>
                                         </div>
                                     </div>
-                                    <p className={cn('text-sm font-bold md:text-base', tx.type === 'income' ? 'text-finance-700' : 'text-[#D1496F]')}>
-                                        {tx.type === 'income' ? '+' : '-'} {formatCurrency(Math.abs(tx.amount))}
+                                    <p className={cn('text-sm font-bold md:text-base', tx.type === 'expense' ? 'text-[#D1496F]' : 'text-finance-700')}>
+                                        {tx.type === 'expense' ? '-' : '+'} {formatCurrency(Math.abs(tx.amount))}
                                     </p>
                                 </div>
                             ))}

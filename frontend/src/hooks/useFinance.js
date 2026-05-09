@@ -58,7 +58,7 @@ const normalizeTransactionPayload = (data) => ({
 });
 
 const normalizeInsight = (insight) => {
-  const raw = insight?.data ?? insight;
+  const raw = insight?.data?.data ?? insight?.data ?? insight;
 
   if (typeof raw === 'string') {
     return raw;
@@ -68,7 +68,7 @@ const normalizeInsight = (insight) => {
     return null;
   }
 
-  return raw.insight ?? raw.message ?? raw.recommendation ?? raw.text ?? raw;
+  return raw.data ?? raw.ai_insight ?? raw.insight ?? raw.message ?? raw.recommendation ?? raw.text ?? raw;
 };
 
 // Wallets
@@ -219,7 +219,7 @@ export const useCreateTransaction = () => {
 
           queryClient.setQueryData(['wallets'], updated);
         }
-      } catch (e) {
+      } catch {
         // ignore optimistic update errors
       }
 
@@ -288,7 +288,13 @@ export const useFinancialInsights = (walletId, period = 'monthly', options = {})
 
 export const useCheckOverbudget = () => {
   return useMutation({
-    mutationFn: (payload) => api.post('/data/overbudget/check', payload),
+    mutationFn: async (payload) => {
+      if (!config.overbudgetEndpoint) {
+        throw new Error('Endpoint overbudget belum dikonfigurasi di frontend ini.');
+      }
+
+      return api.post(config.overbudgetEndpoint, payload);
+    },
     onSuccess: () => {
       showSuccess('Overbudget check completed');
     },
