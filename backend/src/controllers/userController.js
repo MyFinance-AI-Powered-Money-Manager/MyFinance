@@ -72,7 +72,7 @@ const updatePassword = async (req, res) => {
         const user = userResult.rows[0];
 
         // Verifikasi password lama
-        const validPassword = await bcrypt.compare(old_password, user.password_hash);
+        const validPassword = await bcrypt.compare(old_password, user.password);
         if (!validPassword) {
             return res.status(401).json({ status: 'error', message: 'Password lama salah.' });
         }

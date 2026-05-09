@@ -45,7 +45,7 @@ const createTransaction = async (req, res) => {
                 return client.query(
                     `INSERT INTO transaction_items (transaction_id, item_name, price, category, subcategory) 
                      VALUES ($1, $2, $3, $4, $5)`,
-                    [transactionId, item.name, item.price, item.category, item.subcategory]
+                    [transactionId, item.item_name, item.price, item.category, item.subcategory]
                 );
             });
             await Promise.all(itemQueries);
