@@ -13,7 +13,6 @@ const createTransaction = async (req, res) => {
     } = req.body;
 
     const client = await db.connect();
-
     // Normalisasi Tipe Transaksi ke UPPERCASE agar seragam (INCOME/EXPENSE)
     const txType = type.toUpperCase();
 
@@ -54,14 +53,9 @@ const createTransaction = async (req, res) => {
         // 5. Simpan Bukti Scan (Hanya jika ada data struk) ke tabel receipt_scans
         if (receipt_data && receipt_data.image_url) {
             await client.query(
-                `INSERT INTO receipt_scans (user_id, transaction_id, image_url, raw_ai_output) 
-         VALUES ($1, $2, $3, $4)`,
-                [
-                    userId,
-                    transactionId,
-                    receipt_data.image_url,
-                    receipt_data.raw_ai_output || null
-                ]
+                `INSERT INTO receipt_scans (user_id, transaction_id, image_url) 
+         VALUES ($1, $2, $3)`,
+                [userId, transactionId, receipt_data.image_url]
             );
         }
 
@@ -143,36 +137,39 @@ const getTransactions = async (req, res) => {
 const deleteTransaction = async (req, res) => {
     const userId = req.user.id;
     const txId = req.params.id;
+    const client = await db.connect();
 
     try {
-        await db.query('BEGIN');
+        await client.query('BEGIN');
 
         // 1. Cek validitas transaksi
-        const txCheck = await db.query('SELECT * FROM transactions WHERE id = $1 AND user_id = $2', [txId, userId]);
+        const txCheck = await client.query('SELECT * FROM transactions WHERE id = $1 AND user_id = $2 FOR UPDATE', [txId, userId]);
         if (txCheck.rows.length === 0) {
-            await db.query('ROLLBACK');
+            await client.query('ROLLBACK');
             return res.status(404).json({ status: 'error', message: 'Transaksi tidak ditemukan.' });
         }
 
         const tx = txCheck.rows[0];
 
         // 2. Hapus baris transaksi dari buku besar
-        await db.query('DELETE FROM transactions WHERE id = $1', [txId]);
+        await client.query('DELETE FROM transactions WHERE id = $1', [txId]);
 
         // 3. Kembalikan saldo dompet (Reverse Logic)
         if (tx.type === 'EXPENSE') {
-            await db.query('UPDATE wallets SET balance = balance + $1 WHERE id = $2', [tx.total_amount, tx.wallet_id]);
+            await client.query('UPDATE wallets SET balance = balance + $1 WHERE id = $2', [tx.total_amount, tx.wallet_id]);
         } else if (tx.type === 'INCOME') {
-            await db.query('UPDATE wallets SET balance = balance - $1 WHERE id = $2', [tx.total_amount, tx.wallet_id]);
+            await client.query('UPDATE wallets SET balance = balance - $1 WHERE id = $2', [tx.total_amount, tx.wallet_id]);
         }
 
-        await db.query('COMMIT');
+        await client.query('COMMIT');
 
         res.status(200).json({ status: 'success', message: 'Transaksi berhasil dihapus dan saldo telah dikembalikan.' });
     } catch (error) {
-        await db.query('ROLLBACK');
+        await client.query('ROLLBACK');
         console.error('Error deleteTransaction:', error);
         res.status(500).json({ status: 'error', message: 'Terjadi kesalahan server saat menghapus transaksi.' });
+    } finally {
+        client.release();
     }
 };
 

@@ -3,43 +3,42 @@ const db = require('../config/db');
 const axios = require('axios');
 
 // Jalan tiap tanggal 1 jam 00:00 (Waktu Jakarta)
-cron.schedule('0 0 1 * *', async () => {
+const runMonthlyInsight = async () => {
     console.log('⏳ [CRON JOB] AI Insight mulai berjalan...');
-    
+
     try {
         // 1. Setup Tanggal Dinamis (Ambil "Bulan Lalu")
-        // Jika cron jalan 1 Juni 2026, maka lastMonth = "2026-05"
         const date = new Date();
         date.setMonth(date.getMonth() - 1);
-        const lastMonth = date.toISOString().slice(0, 7); 
+        const lastMonth = date.toISOString().slice(0, 7);
 
-        // 2. Ambil semua wallet_id (beserta user_id untuk narik budget nanti)
-        const wallets = await db.query('SELECT id, user_id FROM wallets');
+        // 2. FIXED: Ambil semua user_id (Bukan wallet_id)
+        const users = await db.query('SELECT id FROM users');
 
-        for (const wallet of wallets.rows) {
-            // 3. Tarik transaksi bulan lalu untuk dompet ini
-            // Tambahkan subcategory agar AI bisa menganalisis secara presisi
+        for (const user of users.rows) {
+            const userId = user.id;
+
+            // 3. Tarik transaksi bulan lalu untuk USER ini (Gabungan dari semua dompetnya)
             const transactions = await db.query(`
                 SELECT type, total_amount, category, subcategory 
                 FROM transactions 
-                WHERE wallet_id = $1 AND to_char(transaction_date, 'YYYY-MM') = $2
-            `, [wallet.id, lastMonth]);
+                WHERE user_id = $1 AND to_char(transaction_date, 'YYYY-MM') = $2
+            `, [userId, lastMonth]);
 
             // 4. COLD START BYPASS (Kalau user baru / 0 transaksi)
             if (transactions.rows.length === 0) {
-                // Gunakan UPSERT agar tidak error jika dijalankan ulang
-                await db.query(`
-                    INSERT INTO financial_insights 
-                    (wallet_id, period, health_score, ai_insight, total_spent, total_budget) 
-                    VALUES ($1, $2, 0, 'Yuk catat transaksi pertamamu bulan ini!', 0, 0)
-                    ON CONFLICT (wallet_id, period) 
-                    DO UPDATE SET 
-                        ai_insight = EXCLUDED.ai_insight,
-                        updated_at = CURRENT_TIMESTAMP
-                `, [wallet.id, lastMonth]);
-                
-                console.log(`   -> [SKIP] Wallet ${wallet.id} belum ada transaksi (Cold Start).`);
-                continue; // Lanjut ke dompet user berikutnya
+                const check = await db.query('SELECT id FROM financial_insights WHERE user_id = $1 AND period = $2', [userId, lastMonth]);
+
+                if (check.rows.length === 0) {
+                    await db.query(`
+                        INSERT INTO financial_insights 
+                        (user_id, period, health_score, ai_insight, total_spent, total_budget) 
+                        VALUES ($1, $2, 0, 'Yuk catat transaksi pertamamu bulan ini!', 0, 0)
+                    `, [userId, lastMonth]);
+                }
+
+                console.log(`   -> [SKIP] User ${userId} belum ada transaksi (Cold Start).`);
+                continue;
             }
 
             // 5. Tarik data limit budget user di bulan tersebut
@@ -47,67 +46,69 @@ cron.schedule('0 0 1 * *', async () => {
                 SELECT category, limit_amount 
                 FROM budgets 
                 WHERE user_id = $1 AND month_period = $2
-            `, [wallet.user_id, lastMonth]);
+            `, [userId, lastMonth]);
 
-            // 6. Nembak ke AI Service (Python FastAPI)
-            const payload = { 
+            // 6. Tarik transaction_item (OCR)
+            const transactionItems = await db.query(`
+                SELECT ti.id, ti.transaction_id, ti.item_name, ti.price, ti.category, ti.subcategory
+                FROM transaction_items ti
+                JOIN transactions t ON ti.transaction_id = t.id
+                WHERE t.user_id = $1 AND to_char(t.transaction_date, 'YYYY-MM') = $2
+            `, [userId, lastMonth]);
+
+            // 6. Susun payload JSON Nembak ke AI Service (Python FastAPI)
+            const payload = {
+                user_id: userId,
+                month_period: lastMonth,
                 transactions: transactions.rows,
+                transaction_items: transactionItems.rows,
                 budgets: budgets.rows
             };
-            
-            // Gunakan endpoint yang sesuai di Swagger
-            const aiResponse = await axios.post('http://localhost:8000/api/v1/ai/generate-monthly-report', payload);
-            
-            // 7. INSERT HASIL KE DATABASE 
-            const { 
-                health_score, 
-                predicted_cashflow, 
-                overbudget_risk, 
-                money_leak, 
-                ai_insight,
-                total_spent,
-                total_budget,
-                categories // Raw data untuk pie chart
-            } = aiResponse.data;
-            
-            // Gunakan UPSERT (ON CONFLICT DO UPDATE) 
-            // Agar kalau Cron error di tengah jalan, bisa di-run ulang tanpa bikin data duplikat.
-            await db.query(`
-                INSERT INTO financial_insights 
-                (wallet_id, period, health_score, predicted_cashflow, overbudget_risk, money_leak, ai_insight, total_spent, total_budget, raw_analysis_data) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-                ON CONFLICT (wallet_id, period) 
-                DO UPDATE SET 
-                    health_score = EXCLUDED.health_score,
-                    predicted_cashflow = EXCLUDED.predicted_cashflow,
-                    overbudget_risk = EXCLUDED.overbudget_risk,
-                    money_leak = EXCLUDED.money_leak,
-                    ai_insight = EXCLUDED.ai_insight,
-                    total_spent = EXCLUDED.total_spent,
-                    total_budget = EXCLUDED.total_budget,
-                    raw_analysis_data = EXCLUDED.raw_analysis_data,
-                    updated_at = CURRENT_TIMESTAMP
-            `, [
-                wallet.id, 
-                lastMonth, 
-                health_score, 
-                predicted_cashflow, 
-                overbudget_risk, 
-                money_leak, 
-                ai_insight,
-                total_spent,
-                total_budget,
-                JSON.stringify(categories) // Simpan JSON array ke database
-            ]);
 
-            console.log(`   -> [SUCCESS] Insight digenerate untuk Wallet ${wallet.id}.`);
+            // FIXED: URL Disesuaikan dengan Swagger API Docs 
+            const pythonUrl = process.env.PYTHON_API_URL || 'http://localhost:8000';
+            const aiResponse = await axios.post(`${pythonUrl}/api/v1/ai/insight/generate`, payload);
+
+            // 7. INSERT HASIL KE DATABASE 
+            const {
+                health_score, predicted_cashflow, overbudget_risk, money_leak,
+                ai_insight, total_spent, total_budget, categories
+            } = aiResponse.data;
+
+            // Cek apakah data bulan ini sudah ada (untuk antisipasi Cron run ulang)
+            const checkInsight = await db.query('SELECT id FROM financial_insights WHERE user_id = $1 AND period = $2', [userId, lastMonth]);
+
+            if (checkInsight.rows.length === 0) {
+                // Jika belum ada, INSERT
+                await db.query(`
+                    INSERT INTO financial_insights 
+                    (user_id, period, health_score, predicted_cashflow, overbudget_risk, money_leak, ai_insight, total_spent, total_budget, raw_analysis_data) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                `, [userId, lastMonth, health_score, predicted_cashflow, overbudget_risk, money_leak, ai_insight, total_spent, total_budget, JSON.stringify(categories)]);
+            } else {
+                // Jika sudah ada, UPDATE
+                await db.query(`
+                    UPDATE financial_insights SET 
+                        health_score = $1, predicted_cashflow = $2, overbudget_risk = $3, money_leak = $4,
+                        ai_insight = $5, total_spent = $6, total_budget = $7, raw_analysis_data = $8, updated_at = CURRENT_TIMESTAMP
+                    WHERE user_id = $9 AND period = $10
+                `, [health_score, predicted_cashflow, overbudget_risk, money_leak, ai_insight, total_spent, total_budget, JSON.stringify(categories), userId, lastMonth]);
+            }
+
+            console.log(`   -> [SUCCESS] Insight digenerate untuk User ${userId}.`);
         }
-        
+
         console.log(`✅ [CRON JOB] Selesai generate semua laporan bulan ${lastMonth}!`);
     } catch (error) {
         console.error('❌ [CRON JOB ERROR]:', error.message);
+        throw error;
     }
-}, {
+};
+
+// Jalan tiap tanggal 1 jam 00:00 (Waktu Jakarta)
+cron.schedule('0 0 1 * *', runMonthlyInsight, {
     scheduled: true,
-    timezone: "Asia/Jakarta" // Penting banget buat server cloud
+    timezone: "Asia/Jakarta"
 });
+
+module.exports = { runMonthlyInsight };

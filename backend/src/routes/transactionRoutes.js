@@ -4,8 +4,6 @@ const router = express.Router();
 const { createTransaction, getTransactions, deleteTransaction } = require('../controllers/transactionController');
 const authenticateToken = require('../middlewares/authMiddleware');
 
-router.use(authenticateToken); // Proteksi rute
-
 // Rute CRUD Transactions
 router.post('/', authenticateToken, createTransaction);
 router.get('/', authenticateToken, getTransactions);

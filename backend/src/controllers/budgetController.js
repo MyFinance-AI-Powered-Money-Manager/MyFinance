@@ -17,6 +17,13 @@ const createBudget = async (req, res) => {
 
         res.status(201).json({ status: 'success', data: newBudget.rows[0] });
     } catch (error) {
+        // Tangkap error UNIQUE CONSTRAINT
+        if (error.code === '23505') {
+            return res.status(400).json({
+                status: 'error',
+                message: `Anggaran untuk category ${category} pada periode ${month_period} sudah ada.`
+            })
+        }
         console.error(error);
         res.status(500).json({ status: 'error', message: 'Terjadi kesalahan server.' });
     }
@@ -32,10 +39,10 @@ const getBudgets = async (req, res) => {
 };
 
 const updateBudget = async (req, res) => {
-    const { limit_amount } = req.body; 
+    const { limit_amount } = req.body;
     try {
         const updated = await db.query(
-            'UPDATE budgets SET limit_amount = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
+            'UPDATE budgets SET limit_amount = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND user_id = $3 RETURNING *',
             [limit_amount, req.params.id, req.user.id]
         );
         if (updated.rows.length === 0) return res.status(404).json({ status: 'error', message: 'Anggaran tidak ditemukan.' });

@@ -1,18 +1,21 @@
 const db = require('../config/db');
+const { runMonthlyInsight } = require('../cronJob/insightWorker');
 
 const getFinancialInsights = async (req, res) => {
-    const { wallet_id, period } = req.query; 
+    // Hanya butuh period dari query URL, user_id diambil dari token JWT (Auth Middleware)
+    const { period } = req.query; 
+    const userId = req.user.id;
 
     try {
-        if (!wallet_id || !period) {
-            return res.status(400).json({ status: 'error', message: 'wallet_id dan period wajib disertakan.' });
+        if (!period) {
+            return res.status(400).json({ status: 'error', message: 'Parameter period (YYYY-MM) wajib disertakan.' });
         }
 
-        // CUMA NGE-QUERY SELECT 
+        // FIXED: Mencari berdasarkan user_id, 
         const insightData = await db.query(`
             SELECT * FROM financial_insights 
-            WHERE wallet_id = $1 AND period = $2
-        `, [wallet_id, period]);
+            WHERE user_id = $1 AND period = $2
+        `, [userId, period]);
 
         if (insightData.rows.length === 0) {
              return res.status(200).json({ 
@@ -22,7 +25,6 @@ const getFinancialInsights = async (req, res) => {
              });
         }
 
-        // Langsung return ke Frontend 
         res.status(200).json({
             status: 'success',
             message: 'Insight berhasil diambil',
@@ -35,4 +37,25 @@ const getFinancialInsights = async (req, res) => {
     }
 };
 
-module.exports = { getFinancialInsights };
+const triggerMonthlyInsight = async (req, res) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (token !== process.env.CRON_SECRET_KEY) {
+        return res.status(403).json({ status: 'error', message: 'Unauthorized. Invalid Cron Secret Key.' });
+    }
+
+    try {
+        // Trigger worker secara async (jangan ditunggu selesai kalau datanya banyak)
+        runMonthlyInsight(); 
+        
+        res.status(200).json({ 
+            status: 'success', 
+            message: 'Cron job manual berhasil dipicu. Proses berjalan di background.' 
+        });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Gagal memicu cron job.' });
+    }
+};
+
+module.exports = { getFinancialInsights, triggerMonthlyInsight };
