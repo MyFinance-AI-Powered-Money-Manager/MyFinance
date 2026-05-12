@@ -40,6 +40,10 @@ export const AuthProvider = ({ children }) => {
             const token = responseData.data?.token || responseData.token;
             const userData = responseData.data?.user || responseData.user;
 
+            if (!token || !userData) {
+                throw new Error('Token atau data pengguna tidak ditemukan dalam respons login');
+            }
+
             localStorage.setItem('auth_token', token);
             localStorage.setItem('user', JSON.stringify(userData));
 
@@ -48,11 +52,31 @@ export const AuthProvider = ({ children }) => {
 
             setUser(userData);
             setIsAuthenticated(true);
+            setError(null);
+
+            // Fetch full profile data after login
+            try {
+                const profileResponse = await api.get('/users/profile');
+                const fullUserData = profileResponse?.data?.data || profileResponse?.data || userData;
+                const normalizedUser = {
+                    ...userData,
+                    ...fullUserData,
+                    profile_picture: fullUserData?.profile_picture || userData?.profile_picture || null,
+                    full_name: fullUserData?.full_name || fullUserData?.name || userData?.full_name || userData?.name,
+                    email: fullUserData?.email || userData?.email,
+                };
+                setUser(normalizedUser);
+                localStorage.setItem('user', JSON.stringify(normalizedUser));
+            } catch (profileErr) {
+                // If profile fetch fails, use initial user data (not critical)
+                console.warn('Profile fetch after login failed:', profileErr);
+            }
 
             return responseData;
         } catch (err) {
-            const errorMessage = err.response?.data?.message || 'Login failed';
+            const errorMessage = err.response?.data?.message || err.message || 'Login failed';
             setError(errorMessage);
+            setLoading(false);
             throw err;
         } finally {
             setLoading(false);

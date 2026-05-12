@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { useWallets } from '../hooks/useFinance';
 import { showError } from '../lib/toast';
 
-const incomeCategories = ['bank', 'e-wallet', 'tabungan', 'investasi', 'lainnya'];
+const incomeCategories = [];
 const expenseCategories = ['makanan', 'transport', 'belanja', 'tagihan', 'lainnya'];
 
 const todayDate = () => new Date().toISOString().slice(0, 10);
@@ -56,7 +56,7 @@ export const TransactionFormModal = ({
             return;
         }
 
-        if (!category) {
+        if (type === 'expense' && !category) {
             showError('Kategori wajib dipilih');
             return;
         }
@@ -110,22 +110,24 @@ export const TransactionFormModal = ({
                         />
                     </div>
 
-                    <div>
-                        <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Kategori</label>
-                        <select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="finance-input"
-                            required
-                        >
-                            <option value="">Pilih kategori</option>
-                            {categories.map((item) => (
-                                <option key={item} value={item}>
-                                    {item}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    {type === 'expense' && (
+                        <div>
+                            <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Kategori</label>
+                            <select
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                className="finance-input"
+                                required
+                            >
+                                <option value="">Pilih kategori</option>
+                                {categories.map((item) => (
+                                    <option key={item} value={item}>
+                                        {item}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
 
                     <div>
                         <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Sumber Dana</label>

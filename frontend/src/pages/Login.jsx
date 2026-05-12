@@ -10,7 +10,7 @@ import { showError, showSuccess } from '../lib/toast';
 const Login = () => {
     const navigate = useNavigate();
     const { t } = useLanguage();
-    const { login, loading, error } = useAuth();
+    const { login, loading } = useAuth();
     const [showPassword, setShowPassword] = React.useState(false);
     const [formData, setFormData] = React.useState({ email: '', password: '' });
 
@@ -26,9 +26,11 @@ const Login = () => {
         try {
             await login(data.email, data.password);
             showSuccess('Login berhasil');
-            navigate('/dashboard');
+            // Delay navigation to ensure state is updated
+            setTimeout(() => navigate('/dashboard'), 100);
         } catch (authError) {
-            showError(authError.response?.data?.message || error || 'Login gagal');
+            const errorMsg = authError?.response?.data?.message || authError?.message || 'Login gagal';
+            showError(errorMsg);
         }
     };
 

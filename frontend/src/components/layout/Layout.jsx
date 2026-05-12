@@ -31,14 +31,14 @@ export const Sidebar = () => {
                     <div className="flex items-center gap-3">
                         <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#DDF4E2] text-sm font-bold text-finance-700 dark:bg-[#243225] dark:text-[#7CF38E]">
                             {avatarUrl ? (
-                                <img src={avatarUrl} alt={user?.full_name || 'Profil'} className="h-full w-full object-cover" />
+                                <img src={avatarUrl} alt={user?.full_name || 'Profil'} className="h-full w-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
                             ) : (
                                 initial
                             )}
                         </div>
                         <div>
-                            <p className="text-sm font-semibold text-zinc-900 dark:text-[#F0F1F3]">{user?.full_name || 'Financial Sanctuary'}</p>
-                            <p className="text-xs text-zinc-500 dark:text-[#8B92A9]">{user?.email || 'Kelola profil dan keamanan akun'}</p>
+                            <p className="text-sm font-semibold text-zinc-900 dark:text-[#F0F1F3]">{user?.full_name || 'User'}</p>
+                            <p className="text-xs text-zinc-500 dark:text-[#8B92A9]">{user?.email || 'user@email.com'}</p>
                         </div>
                     </div>
                 </div>
