@@ -30,6 +30,11 @@ const walletRoutes = require('./routes/walletRoutes');
 const budgetRoutes = require('./routes/budgetRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const insightRoutes = require('./routes/insightRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+
+
+// cron job
+require('./cronJob/insightWorker');
 
 // routing endpoint sesuai swagger 
 app.use('/api/v1/auth', authRoutes);
@@ -38,6 +43,8 @@ app.use('/api/v1/wallets', walletRoutes);
 app.use('/api/v1/budgets', budgetRoutes);
 app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/insights', insightRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
+
 
 // Server Listener
 app.listen(PORT, () => {
