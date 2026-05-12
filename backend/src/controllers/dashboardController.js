@@ -70,7 +70,7 @@ const getDashboardSummary = async (req, res) => {
             const aiResponse = await axios.post(`${pythonUrl}/api/v1/ai/ds/predict`, rawDataPayload);
             dsMetrics = aiResponse.data;
         } catch (aiError) {
-            console.error("⚠️ AI Service Offline: Menggunakan fallback data default.");
+            console.error("AI Service Offline: Menggunakan fallback data default.");
             // Response tetap dilanjutkan meskipun AI gagal merespon
         }
 

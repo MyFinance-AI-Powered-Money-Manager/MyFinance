@@ -1,6 +1,6 @@
 const defaultApiUrl = import.meta.env.DEV
   ? 'http://localhost:3000/api/v1'
-  : 'https://myfinance-backend-staging.up.railway.app/api/v1';
+  : 'https://myfinance-backend-production.up.railway.app/api/v1';
 
 export const config = {
   apiUrl: import.meta.env.VITE_API_URL || defaultApiUrl,
@@ -12,5 +12,5 @@ export const config = {
   scanEndpoint: import.meta.env.VITE_SCAN_ENDPOINT || '',
   overbudgetEndpoint: import.meta.env.VITE_OVERBUDGET_ENDPOINT || '',
   // Toggle whether to patch transactions cache after create (useful for mock servers)
-  useTransactionCachePatch: import.meta.env.VITE_USE_TRANSACTION_CACHE_PATCH !== 'false',
+  useTransactionCachePatch: import.meta.env.VITE_USE_TRANSACTION_CACHE_PATCH !== 'false', 
 };

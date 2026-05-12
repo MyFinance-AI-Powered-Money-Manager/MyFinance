@@ -3,6 +3,13 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
+// Keamanan: Cek apakah JWT_SECRET_KEY sudah diset di environment variable
+if (!process.env.JWT_SECRET_KEY) {
+    console.error('FATAL ERROR: JWT_SECRET_KEY tidak ada di environment variable.');
+    process.exit(1);
+}
+
+
 
 // Inisialisasi koneksi Database
 require('./config/db');

@@ -3,10 +3,10 @@ import { config } from './config';
 import { showError } from './toast';
 
 const api = axios.create({
-  baseURL: config.apiUrl || 'https://myfinance-backend-staging.up.railway.app/api',
+  baseURL: config.apiUrl || 'https://myfinance-backend-production.up.railway.app/api/v1',
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json', 
   },
 });
 

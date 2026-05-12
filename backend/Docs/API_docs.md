@@ -1,10 +1,11 @@
-# 📑 MyFinance API Documentation v1.0
+# 📑 MyFinance API Documentation v1
 
 Dokumentasi API
 
 ## 📌 Informasi Global
 
-- **Base URL:** `http://localhost:3000/api/v1` (Lokal) atau `https://myfinance-backend-staging.up.railway.app/api/v1` (Railway)
+- **Base URL:** `http://localhost:3000/api/v1` (Lokal) atau `https://myfinance-backend-production.up.railway.app/api/v1` (Railway)
+- **Backend Check Server:** https://myfinance-backend-production.up.railway.app/api/v1/health
 - **Format Data:** `JSON`
 - **Autentikasi:** Header `Authorization: Bearer <JWT_TOKEN>`
 
@@ -93,6 +94,24 @@ Dokumentasi API
 ---
 
 ## 💳 2. Wallets (Dompet)
+
+> **NOTE:** Pastikan pilihan Dropdown type/jenis wallet di UI sesuai dengan yang dikirim ke backend:
+> - BANK
+> - CASH
+> - E-WALLET
+
+> **NOTE:** di Frontend (saat menu Transfer Dana), Bang Robby cukup kirim data seperti ini:
+
+- Dropdown 1: Pilih source_wallet_id (Dompet asal).
+- Dropdown 2: Pilih destination_wallet_id (Dompet tujuan).
+- Input: Masukkan amount.
+- Jenis Transaksi: Secara implisit sistem akan mencatatnya sebagai type: 'TRANSFER'.
+
+### Tampilan di Riwayat Transaksi (History):
+
+- Nanti di halaman History, Bang Robby bisa bikin logika simpel:
+  - Jika type == 'TRANSFER' dan description == 'Transfer Keluar', kasih icon panah merah (Keluar).
+  - Jika type == 'TRANSFER' dan description == 'Transfer Masuk', kasih icon panah hijau (Masuk).
 
 ### 2.1 Get All Wallets
 `GET /wallets`
@@ -198,8 +217,14 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 | **WANTS** | Jajan & Nongkrong, Hobi & Self-Reward |
 | **OTHER** | Lain-lain & Darurat |
 
-> [!NOTE]
-> Jika transaksi spesifik pengguna tidak tersedia di subkategori, arahkan pengguna memilih opsi terdekat atau "Lain-lain", lalu minta pengguna menuliskan rinciannya di kolom Description (teks bebas).
+
+> [💡Frontend Note]: Hanya panggil endpoint ini saat:
+- **(1) User baru login/buka apps**
+- **(2) User selesai input transaksi**
+- **(3) User melakukan pull-to-refresh.**
+
+> Jika transaksi spesifik pengguna tidak tersedia di subkategori, arahkan pengguna memilih opsi terdekat atau "Lain-lain",
+> lalu minta pengguna menuliskan rinciannya di kolom Description (teks bebas).
 
 ### 4.1 Get All Transactions
 `GET /transactions`
@@ -281,6 +306,9 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
   "data": { "transaction_id": "uuid-trx-999" }
 }
 ```
+
+> [!NOTE]
+> Deskripsi: Field ini adalah hasil prediksi real-time dari model ML (BiLSTM) Bang Pascal. Frontend bisa menggunakan flag ini untuk menampilkan pop-up peringatan ke user jika transaksi tersebut membuat anggaran jebol.
 
 ### 4.5 Delete Transaction
 `DELETE /transactions/:id`

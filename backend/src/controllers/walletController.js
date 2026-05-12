@@ -51,7 +51,6 @@ const deleteWallet = async (req, res) => {
 const transferWallet = async (req, res) => {
     const { source_wallet_id, destination_wallet_id, amount } = req.body;
     const userId = req.user.id;
-    //  Wajib pakai client khusus transaksi
     const client = await db.connect();
 
     try {
@@ -59,12 +58,18 @@ const transferWallet = async (req, res) => {
             return res.status(400).json({ status: 'error', message: 'Data transfer tidak valid.' });
         }
 
+        // --- MULAI TRANSAKSI (WAJIB) ---
+        await client.query('BEGIN');
 
         // 1. Validasi saldo dompet sumber
-        const sourceWallet = await client.query('SELECT balance FROM wallets WHERE id = $1 AND user_id = $2', [source_wallet_id, userId]);
+        const sourceWallet = await client.query(
+            'SELECT balance FROM wallets WHERE id = $1 AND user_id = $2 FOR UPDATE',
+            [source_wallet_id, userId]
+        );
+
         if (sourceWallet.rows.length === 0 || parseFloat(sourceWallet.rows[0].balance) < amount) {
             await client.query('ROLLBACK');
-            return res.status(400).json({ status: 'error', message: 'Saldo tidak mencukupi.' });
+            return res.status(400).json({ status: 'error', message: 'Saldo tidak mencukupi atau dompet tidak ditemukan.' });
         }
 
         // 2. Validasi eksistensi dompet tujuan
@@ -78,29 +83,34 @@ const transferWallet = async (req, res) => {
         await client.query('UPDATE wallets SET balance = balance - $1 WHERE id = $2', [amount, source_wallet_id]);
         await client.query('UPDATE wallets SET balance = balance + $1 WHERE id = $2', [amount, destination_wallet_id]);
 
-        // 4. Catat riwayat di tabel Transaksi dengan transfer_id yang mengikat keduanya
+        // 4. Catat riwayat (Tambahkan transaction_date agar tidak error NOT NULL)
         const transferId = uuidv4();
+        const now = new Date();
 
+        // Catat Sisi Pengeluaran
         await client.query(
-            `INSERT INTO transactions (user_id, wallet_id, type, total_amount, category, description, transfer_id) 
-             VALUES ($1, $2, 'EXPENSE', $3, 'TRANSFER', 'Transfer Keluar', $4)`,
-            [userId, source_wallet_id, amount, transferId]
+            `INSERT INTO transactions (user_id, wallet_id, type, total_amount, category, description, transfer_id, transaction_date) 
+             VALUES ($1, $2, 'TRANSFER', $3, 'OTHER', 'Transfer Keluar', $4, $5)`,
+            [userId, source_wallet_id, amount, transferId, now]
         );
 
+        // Catat Sisi Pemasukan
         await client.query(
-            `INSERT INTO transactions (user_id, wallet_id, type, total_amount, category, description, transfer_id) 
-             VALUES ($1, $2, 'INCOME', $3, 'TRANSFER', 'Transfer Masuk', $4)`,
-            [userId, destination_wallet_id, amount, transferId]
+            `INSERT INTO transactions (user_id, wallet_id, type, total_amount, category, description, transfer_id, transaction_date) 
+             VALUES ($1, $2, 'TRANSFER', $3, 'OTHER', 'Transfer Masuk', $4, $5)`,
+            [userId, destination_wallet_id, amount, transferId, now]
         );
 
         await client.query('COMMIT');
         res.status(200).json({ status: 'success', message: 'Transfer berhasil dicatat.' });
+
     } catch (error) {
-        await client.query('ROLLBACK');
-        console.error(error);
-        res.status(500).json({ status: 'error', message: 'Terjadi kesalahan sistem.' });
+        // Cek jika client masih aktif sebelum rollback
+        if (client) await client.query('ROLLBACK');
+        console.error("DETAIL ERROR TRANSFER:", error.message); // Biar kelihatan di terminal VS Code
+        res.status(500).json({ status: 'error', message: 'Terjadi kesalahan sistem: ' + error.message });
     } finally {
-        client.release(); //lepaskan koneksi kembali ke pool
+        client.release(); // lepaskan koneksi kembali ke pool
     }
 };
 
