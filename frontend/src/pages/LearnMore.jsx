@@ -8,12 +8,12 @@ import { PageFooter } from '../components/PageFooter';
 const featureCards = [
     {
         icon: ScanLine,
-        title: 'Otomatisasi serba cepat',
+        title: 'Scan yang cepat',
         description: 'Unggah struk, baca data, dan simpan transaksi dalam hitungan detik tanpa input manual yang berulang.',
     },
     {
         icon: Workflow,
-        title: 'Alur kerja yang rapi',
+        title: 'Alur produk yang jelas',
         description: 'MyFinance memetakan pemasukan, pengeluaran, dan kategori dengan struktur yang mudah dibaca saat dibutuhkan.',
     },
     {
@@ -58,10 +58,10 @@ const LearnMore = () => {
                             <BookOpen className="h-4 w-4" /> Panduan produk
                         </div>
                         <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.05] tracking-tight text-zinc-900 sm:text-5xl lg:text-7xl">
-                            MyFinance membantu kamu mengelola keuangan dengan lebih terarah.
+                            Pelajari bagaimana MyFinance membantu pengelolaan keuangan berjalan lebih cepat dan rapi.
                         </h1>
                         <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-600 sm:text-lg">
-                            Halaman ini menjelaskan bagaimana aplikasi membaca transaksi, menyusun data, dan mengubah aktivitas harian menjadi insight yang mudah dipahami. Fokusnya adalah efisiensi, kejelasan, dan pengalaman yang terasa profesional sejak awal.
+                            Halaman ini menjelaskan alur kerja MyFinance dari proses scan, pencatatan transaksi, hingga insight yang membantu pengguna memahami kondisi keuangan dengan lebih cepat. Fokusnya adalah produk yang efisien, jelas, dan siap dipakai setiap hari.
                         </p>
 
                         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -97,7 +97,7 @@ const LearnMore = () => {
                             <div className="flex items-center justify-between gap-4">
                                 <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-400">Ringkasan aplikasi</p>
-                                    <h2 className="mt-3 text-2xl font-extrabold text-zinc-900">Didesain untuk pencatatan yang cepat dan rapi.</h2>
+                                    <h2 className="mt-3 text-2xl font-extrabold text-zinc-900">Semua fitur dirancang untuk alur keuangan yang ringkas dan mudah dipahami.</h2>
                                 </div>
                                 <div className="rounded-full bg-[#EDF8F0] p-3 text-finance-700">
                                     <Sparkles className="h-5 w-5" />
@@ -185,12 +185,12 @@ const LearnMore = () => {
                                 <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-400">Rute berikutnya</p>
                                     <h3 className="mt-3 text-2xl font-bold text-zinc-900">Jelajahi lebih banyak</h3>
-                                    <p className="mt-4 text-sm leading-7 text-zinc-500">Setelah memahami cara kerja aplikasi, Anda dapat melanjutkan ke bagian insight investasi atau langsung mulai menggunakan MyFinance.</p>
+                                    <p className="mt-4 text-sm leading-7 text-zinc-500">Setelah memahami cara kerja aplikasi, kamu dapat melanjutkan ke bagian insight investasi atau langsung mulai menggunakan MyFinance.</p>
                                 </div>
                                 <div className="mt-8 rounded-[24px] bg-[#FAFCF7] p-5">
                                     <div className="flex items-center gap-3 text-finance-700">
                                         <BookOpen className="h-5 w-5" />
-                                        <p className="text-sm font-semibold">Siap memulai perjalanan finansial Anda?</p>
+                                        <p className="text-sm font-semibold">Siap memulai perjalanan finansialmu?</p>
                                     </div>
                                     <p className="mt-3 text-sm leading-7 text-zinc-500">Bergabunglah dengan ribuan pengguna yang telah mempercayai MyFinance untuk mengelola keuangan mereka.</p>
                                 </div>

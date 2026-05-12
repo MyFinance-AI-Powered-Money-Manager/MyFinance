@@ -51,8 +51,8 @@ const Login = () => {
                     </div>
                     <div className="absolute inset-0 flex items-end p-10 lg:p-12">
                         <div className="max-w-md rounded-[28px] bg-black/40 p-8 text-white backdrop-blur-md ring-1 ring-white/10">
-                            <h2 className="text-3xl font-extrabold leading-tight lg:text-4xl">
-                                “Kelola keuanganmu atau ia akan meninggalkanmu!”
+                                <h2 className="text-3xl font-extrabold leading-tight lg:text-4xl">
+                                “Kelola keuanganmu hari ini, agar keputusan besok lebih tenang.”
                             </h2>
                             <div className="mt-6 flex items-center gap-3">
                                 <div className="h-0.5 w-12 bg-[#7AF19E]" />
@@ -68,9 +68,9 @@ const Login = () => {
                             <img src="/images/logo.png" alt="MyFinance" className="h-6 w-6 rounded-full object-cover" />
                             <span className="text-base font-extrabold tracking-tight dark:text-[#E8EAED]">MyFinance</span>
                         </div>
-                        <h1 className="text-xl font-extrabold leading-snug text-zinc-900 md:text-2xl dark:text-[#F0F1F3]">{t('login_welcome')}</h1>
+                        <h1 className="text-xl font-extrabold leading-snug text-zinc-900 md:text-2xl dark:text-[#F0F1F3]">Masuk ke MyFinance</h1>
                         <p className="mt-1 text-[12px] leading-5 text-zinc-600 dark:text-[#B0B8CC]">
-                            {t('login_sub')}
+                            Lanjutkan ke dashboard untuk melihat transaksi, laporan, dan insight kamu.
                         </p>
 
                         <form className="mt-4 space-y-2" onSubmit={handleSubmit}>
@@ -93,7 +93,7 @@ const Login = () => {
                         <div className="space-y-0.5">
                              <div className="flex items-center justify-between">
                                 <label className="text-[11px] font-semibold text-zinc-700 dark:text-[#D9DCE3]">{t('password')}</label>
-                                <button type="button" className="text-[10px] font-semibold text-finance-700">Lupa Password?</button>
+                                <button type="button" className="text-[10px] font-semibold text-finance-700">Lupa kata sandi?</button>
                             </div>
                             <div className="relative group">
                                 <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-finance-700">
@@ -117,7 +117,7 @@ const Login = () => {
                         </div>
 
                         <button disabled={loading} className="flex h-10 w-full items-center justify-center rounded-[22px] bg-finance-700 text-xs font-bold text-white shadow-soft transition hover:bg-finance-800 disabled:cursor-not-allowed disabled:opacity-60">
-                            {loading ? 'Memproses...' : t('login')}
+                            {loading ? 'Memproses...' : 'Masuk'}
                         </button>
 
                         <div className="relative py-1">
@@ -125,7 +125,7 @@ const Login = () => {
                                 <div className="w-full border-t border-zinc-200"></div>
                             </div>
                             <div className="relative flex justify-center text-[8px] uppercase tracking-[0.15em] text-zinc-400">
-                                <span className="bg-[#F7FBF3] px-2 font-bold">{t('or_login_with')}</span>
+                                <span className="bg-[#F7FBF3] px-2 font-bold">Atau masuk dengan</span>
                             </div>
                         </div>
 
@@ -136,7 +136,7 @@ const Login = () => {
                         </form>
 
                         <p className="mt-3 text-center text-[10px] text-zinc-500">
-                            {t('no_account')} <button onClick={() => navigate('/register')} className="font-bold text-finance-700">{t('register_now')}</button>
+                            Belum punya akun? <button onClick={() => navigate('/register')} className="font-bold text-finance-700">Daftar</button>
                         </p>
 
                         <div className="mt-4 hidden justify-between border-t border-[#E7EEDF] pt-3 text-[7px] font-bold uppercase tracking-[0.15em] text-zinc-400 md:flex">

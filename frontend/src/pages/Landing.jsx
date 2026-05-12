@@ -17,9 +17,9 @@ const Landing = () => {
     };
 
     const features = [
-        { icon: Shield, title: 'Aman & Terpercaya', desc: 'Data Anda dienkripsi dengan standar keamanan tinggi. Privasi Anda adalah prioritas kami.', color: 'bg-green-50 text-green-600' },
-        { icon: Zap, title: 'Cepat & Otomatis', desc: 'AI kami membaca struk dalam hitungan detik. Tidak perlu input manual yang memakan waktu.', color: 'bg-green-50 text-green-600' },
-        { icon: BarChart3, title: 'Analisis Mendalam', desc: 'Dapatkan insight tentang pola pengeluaran dan rekomendasi untuk menghemat lebih banyak.', color: 'bg-green-50 text-green-600' },
+        { icon: Shield, title: 'Aman dan terpercaya', desc: 'Data kamu dienkripsi dengan standar keamanan tinggi. Privasi tetap jadi prioritas.', color: 'bg-green-50 text-green-600' },
+        { icon: Zap, title: 'Cepat dan otomatis', desc: 'MyFinance membaca struk dalam hitungan detik tanpa input manual yang memakan waktu.', color: 'bg-green-50 text-green-600' },
+        { icon: BarChart3, title: 'Analisis yang berguna', desc: 'Dapatkan insight tentang pola pengeluaran dan area yang bisa dihemat.', color: 'bg-green-50 text-green-600' },
     ];
 
     return (
@@ -40,20 +40,20 @@ const Landing = () => {
                     transition={{ duration: 0.6 }}
                 >
                     <div className="inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#008744] mb-6">
-                        <Zap className="h-3 w-3" /> AI-powered Finance Management
+                        <Zap className="h-3 w-3" /> Manajemen keuangan berbasis AI
                     </div>
                     <h1 className="text-5xl lg:text-7xl font-bold leading-[1.1] mb-8">
-                        Kelola Keuangan Anda dengan <span className="text-[#008744]">Cerdas.</span>
+                        Kelola keuanganmu dengan <span className="text-[#008744]">lebih cerdas.</span>
                     </h1>
                     <p className="text-lg text-zinc-500 mb-10 max-w-lg leading-relaxed">
-                        MyFinance menggunakan teknologi AI untuk membaca struk belanja Anda secara otomatis. Hemat waktu, pantau pengeluaran, dan capai tujuan finansial dengan mudah.
+                        MyFinance menggunakan AI untuk membaca struk belanja secara otomatis. Hemat waktu, pantau pengeluaran, dan capai tujuan finansial dengan alur yang lebih rapi.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <button onClick={() => navigate('/register')} className="flex items-center justify-center gap-2 rounded-full bg-[#008744] px-8 py-4 text-lg font-bold text-white hover:bg-[#007038] transition-all group">
-                            Mulai Sekarang <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                            Buat Akun <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                         </button>
                         <button onClick={() => navigate('/learn-more')} className="flex items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white px-8 py-4 text-lg font-bold text-zinc-600 hover:border-[#008744] hover:bg-[#F3FBF5] transition-all">
-                            <BookOpen className="h-5 w-5" /> Pelajari Lebih Lanjut
+                            <BookOpen className="h-5 w-5" /> Pelajari Produk
                         </button>
                     </div>
                 </motion.div>
@@ -92,7 +92,7 @@ const Landing = () => {
             <section ref={featuresRef} id="features" className="scroll-mt-28 py-24 px-6 lg:px-12 max-w-7xl mx-auto mt-24">
                 <div className="text-center mb-16">
                     <h2 className="text-4xl font-bold mb-4">Mengapa Memilih <span className="text-[#008744]">MyFinance?</span></h2>
-                    <p className="text-zinc-500 max-w-2xl mx-auto italic">Tiga pilar manajemen kekayaan modern.</p>
+                        <p className="text-zinc-500 max-w-2xl mx-auto italic">Tiga pilar untuk pengalaman finansial yang cepat dan jelas.</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {features.map((f, i) => (
@@ -111,8 +111,8 @@ const Landing = () => {
             <section ref={testimonialsRef} id="testimonials" className="scroll-mt-28 py-24 px-6 lg:px-12 bg-[#F9FBF9]">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold mb-4">Kecerdasan di ujung jari Anda.</h2>
-                        <p className="text-zinc-500 max-w-2xl mx-auto">Lebih dari sekadar dompet digital, MyFinance adalah penasihat keuangan AI pribadi Anda.</p>
+                        <h2 className="text-4xl font-bold mb-4">Insight yang siap dipakai, langsung di depan mata.</h2>
+                        <p className="text-zinc-500 max-w-2xl mx-auto">MyFinance membantu kamu membaca transaksi, pola pengeluaran, dan arah finansial dengan lebih jelas.</p>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -121,7 +121,7 @@ const Landing = () => {
                             <div>
                                 <span className="inline-block text-[10px] font-bold text-[#008744] uppercase tracking-wider bg-[#F0FFF4] px-3 py-1 rounded-full">Mesin Utama</span>
                                 <h3 className="text-3xl font-bold text-zinc-900 mt-6 mb-4">Parsing Struk Neural</h3>
-                                <p className="text-zinc-500 italic mb-6">Cukup ambil foto. AI kami mengidentifikasi item, pajak, dan memprediksi kategori untuk memudahkan pelaporan dan analisis.</p>
+                                <p className="text-zinc-500 italic mb-6">Cukup ambil foto. Sistem akan membantu mengenali item, nominal, dan kategori untuk mempercepat pencatatan.</p>
                             </div>
                             <div className="flex gap-3 mt-4">
                                 <div className="flex-1 rounded-2xl border border-zinc-100 bg-[#F7FFF6] p-4 text-center">
@@ -143,8 +143,8 @@ const Landing = () => {
                         {/* Right: Predictive budget card */}
                         <div className="rounded-[40px] bg-[#004D2A] p-10 flex flex-col justify-between text-white">
                             <div>
-                                <h3 className="text-2xl font-bold mb-4">Penganggaran Prediktif</h3>
-                                <p className="text-green-200/80 italic text-sm leading-relaxed">Kami tidak hanya melacak apa yang Anda belanjakan; kami memprediksi pengeluaran Anda bulan depan berdasarkan tren musiman.</p>
+                                <h3 className="text-2xl font-bold mb-4">Penganggaran prediktif</h3>
+                                <p className="text-green-200/80 italic text-sm leading-relaxed">Bukan hanya melacak pengeluaran, MyFinance juga membantu membaca pola bulan berikutnya berdasarkan tren yang sudah tercatat.</p>
                             </div>
                             <div className="mt-8">
                                 <div className="flex items-end gap-2 h-32">
@@ -161,19 +161,19 @@ const Landing = () => {
                                 <div className="h-12 w-12 rounded-xl bg-[#008744] flex items-center justify-center text-white mb-6">
                                     <BarChart3 className="h-6 w-6" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-zinc-900 mb-4">Wawasan Investasi</h3>
-                                <p className="text-zinc-500 italic text-sm leading-relaxed">Kurasi personal dari tren pasar yang secara spesifik memengaruhi aset portofolio Anda.</p>
+                                <h3 className="text-2xl font-bold text-zinc-900 mb-4">Wawasan investasi</h3>
+                                <p className="text-zinc-500 italic text-sm leading-relaxed">Ringkasan tren pasar yang membantu kamu membaca kondisi portofolio dengan cepat.</p>
                             </div>
                             <button onClick={() => navigate('/investment-insights')} className="flex items-center gap-2 text-[#008744] font-bold group mt-6">
-                                Jelajahi Wawasan <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                Lihat insight <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                             </button>
                         </div>
 
                         {/* Bottom right: Brankas Data */}
                         <div className="lg:col-span-2 rounded-[40px] bg-[#216148] p-10 flex items-center justify-between overflow-hidden relative">
                             <div className="max-w-md">
-                                <h3 className="text-3xl font-bold text-white mb-4">Brankas Data</h3>
-                                <p className="text-green-100/80 italic text-sm leading-relaxed">Identitas finansial Anda terkunci dalam brankas terdesentralisasi yang aman. Kami menggunakan zero-knowledge proofs untuk memastikan bahkan kami tidak bisa melihat data Anda tanpa izin.</p>
+                                <h3 className="text-3xl font-bold text-white mb-4">Brankas data</h3>
+                                <p className="text-green-100/80 italic text-sm leading-relaxed">Data finansialmu disimpan dengan aman dan hanya dipakai untuk pengalaman yang kamu izinkan.</p>
                             </div>
                             <div className="hidden md:block">
                                 <Shield className="h-32 w-32 text-white/10" />
@@ -186,8 +186,8 @@ const Landing = () => {
             {/* Dipercaya & FAQ */}
             <section className="scroll-mt-28 py-20 px-6 lg:px-12 max-w-7xl mx-auto">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold">Dipercaya oleh Ribuan Pengguna</h2>
-                    <p className="text-zinc-500 mt-2">Kisah nyata dari pengguna kami.</p>
+                    <h2 className="text-3xl font-bold">Dipercaya oleh ribuan pengguna</h2>
+                    <p className="text-zinc-500 mt-2">Cerita dari pengguna yang sudah memakai MyFinance.</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
                     <div className="rounded-[20px] p-6 bg-white border border-zinc-100 shadow-sm">
@@ -196,9 +196,9 @@ const Landing = () => {
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className="text-sm font-bold">David Chen</span>
-                                    <span className="text-xs text-zinc-400">Pengusaha Teknologi</span>
+                                    <span className="text-xs text-zinc-400">Pemilik usaha teknologi</span>
                                 </div>
-                                <p className="text-zinc-600 italic">"MyFinance mengubah kecemasan saya menjadi kejelasan. Pemindaian struk AI-nya sangat rapi—menghemat 10 jam waktu saya selama musim pajak."</p>
+                                <p className="text-zinc-600 italic">"MyFinance mengubah kecemasan saya menjadi kejelasan. Pemindaian struknya rapi dan menghemat banyak waktu."</p>
                             </div>
                         </div>
                     </div>
@@ -208,9 +208,9 @@ const Landing = () => {
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className="text-sm font-bold">Sarah Jenkins</span>
-                                    <span className="text-xs text-zinc-400">Direktur Kreatif</span>
+                                    <span className="text-xs text-zinc-400">Direktur kreatif</span>
                                 </div>
-                                <p className="text-zinc-600 italic">"Antarmuka yang intuitif dan laporan investasinya memudahkan saya memonitor portofolio setiap pagi."</p>
+                                <p className="text-zinc-600 italic">"Antarmuka yang intuitif dan laporan investasinya memudahkan saya memantau portofolio setiap pagi."</p>
                             </div>
                         </div>
                     </div>
@@ -220,9 +220,9 @@ const Landing = () => {
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className="text-sm font-bold">Marcus Thorne</span>
-                                    <span className="text-xs text-zinc-400">Analis Keuangan</span>
+                                    <span className="text-xs text-zinc-400">Analis keuangan</span>
                                 </div>
-                                <p className="text-zinc-600 italic">"Fitur prediksi penganggaran membantu klien saya merencanakan kas dengan lebih baik. Hasilnya nyata."</p>
+                                <p className="text-zinc-600 italic">"Fitur prediksi penganggaran membantu klien saya merencanakan kas dengan lebih baik. Hasilnya terasa nyata."</p>
                             </div>
                         </div>
                     </div>
@@ -230,23 +230,23 @@ const Landing = () => {
 
                 {/* FAQ Section */}
                 <div ref={faqRef} id="faq" className="max-w-4xl mx-auto">
-                    <h3 className="text-2xl font-bold mb-6">Pertanyaan Umum</h3>
+                    <h3 className="text-2xl font-bold mb-6">Pertanyaan umum</h3>
                     <div className="space-y-3">
                         <details className="rounded-xl border border-zinc-100 bg-white p-4">
                             <summary className="cursor-pointer font-semibold">Seberapa aman data saya?</summary>
-                            <div className="mt-2 text-zinc-600 text-sm">Data Anda sangat aman bersama kami. Kami menggunakan HTTPS untuk mengamankan jalur komunikasi, enkripsi, dan kebijakan privasi yang ketat.</div>
+                            <div className="mt-2 text-zinc-600 text-sm">Data kamu aman bersama MyFinance. Kami menjaga jalur komunikasi dan privasi dengan perlindungan yang ketat.</div>
                         </details>
                         <details className="rounded-xl border border-zinc-100 bg-white p-4">
                             <summary className="cursor-pointer font-semibold">Apakah AI ini berfungsi untuk struk tulisan tangan?</summary>
-                            <div className="mt-2 text-zinc-600 text-sm">AI kami paling akurat pada struk cetak; dukungan tulisan tangan sedang dalam pengembangan dan akan diperbarui seiring waktu.</div>
+                            <div className="mt-2 text-zinc-600 text-sm">Fokus utama saat ini adalah struk cetak; dukungan tulisan tangan masih terus dikembangkan.</div>
                         </details>
                         <details className="rounded-xl border border-zinc-100 bg-white p-4">
                             <summary className="cursor-pointer font-semibold">Bisakah saya mengekspor data untuk akuntan saya?</summary>
-                            <div className="mt-2 text-zinc-600 text-sm">Ya — ekspor CSV dan integrasi akuntansi tersedia pada paket tertentu.</div>
+                            <div className="mt-2 text-zinc-600 text-sm">Ya, ekspor CSV dan integrasi akuntansi tersedia pada paket tertentu.</div>
                         </details>
                         <details className="rounded-xl border border-zinc-100 bg-white p-4">
                             <summary className="cursor-pointer font-semibold">Apa yang membuat MyFinance berbeda dari yang lain?</summary>
-                            <div className="mt-2 text-zinc-600 text-sm">Kombinasi parsing struk neural, privasi tingkat tinggi, dan prediksi penganggaran membuat MyFinance unik.</div>
+                            <div className="mt-2 text-zinc-600 text-sm">Kombinasi scan transaksi, privasi yang jelas, dan insight yang ringkas membuat MyFinance lebih mudah dipakai.</div>
                         </details>
                     </div>
                 </div>
@@ -255,10 +255,10 @@ const Landing = () => {
             {/* Get Started */}
             <section id="get-started" className="scroll-mt-28 py-24 px-6 lg:px-12 max-w-7xl mx-auto">
                 <div className="rounded-[60px] bg-[#004D2A] p-12 lg:p-24 text-center relative overflow-hidden shadow-2xl">
-                    <h2 className="text-4xl lg:text-6xl font-bold text-white mb-8 relative z-10">Mulai Kelola Uang Anda Hari Ini</h2>
-                    <p className="text-green-100 text-lg mb-12 max-w-2xl mx-auto relative z-10 italic">Bergabunglah dengan lebih dari 50.000 pengguna yang telah menemukan sanctuary finansial mereka.</p>
+                    <h2 className="text-4xl lg:text-6xl font-bold text-white mb-8 relative z-10">Mulai kelola uangmu hari ini</h2>
+                    <p className="text-green-100 text-lg mb-12 max-w-2xl mx-auto relative z-10 italic">Gabung dan mulai atur keuangan dengan alur yang lebih cepat dan jelas.</p>
                     <button onClick={() => navigate('/register')} className="rounded-full bg-white px-12 py-5 text-xl font-bold text-[#004D2A] hover:bg-green-50 transition-all relative z-10">
-                        Ayo Mulai Sekarang!
+                        Buat akun sekarang
                     </button>
                     {/* Background decorations */}
                     <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -17,6 +17,7 @@ const Transactions = lazy(() => import('./pages/Transactions'));
 const Reports = lazy(() => import('./pages/Reports'));
 const Scan = lazy(() => import('./pages/Scan'));
 const Profile = lazy(() => import('./pages/Profile'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -82,7 +83,7 @@ export default function App() {
                       </ProtectedRoute>
                     }
                   />
-                  <Route path="*" element={<Navigate to="/" />} />
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
             </Router>

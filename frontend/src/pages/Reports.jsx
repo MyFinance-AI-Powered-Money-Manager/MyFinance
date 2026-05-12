@@ -159,12 +159,12 @@ const Reports = () => {
                         <h1 className="text-[clamp(2.5rem,4vw,4.5rem)] font-extrabold leading-[0.92] tracking-tight text-finance-700 dark:text-[#7CF38E]">
                             {t('financial_reports')}
                         </h1>
-                        <p className="mt-2 text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('financial_overview')}</p>
+                        <p className="mt-2 text-sm text-zinc-500 dark:text-[#B0B8CC]">Ikhtisar transaksi dan pengeluaran kamu</p>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <button className="finance-pill border border-white/60 bg-white text-zinc-700 shadow-card dark:border-[#3F4959] dark:bg-[#2D3748] dark:text-[#E8EAED]">
-                            Oktober 2023 <ChevronDown className="h-4 w-4" />
+                            Bulan ini <ChevronDown className="h-4 w-4" />
                         </button>
                         <button className="finance-pill bg-[#7CF38E] text-finance-800 transition hover:-translate-y-0.5 dark:bg-[#7CF38E] dark:text-finance-800">
                             <Download className="h-4 w-4" /> {t('export')}

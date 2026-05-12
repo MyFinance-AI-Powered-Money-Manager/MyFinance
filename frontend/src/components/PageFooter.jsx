@@ -14,7 +14,7 @@ export const PageFooter = () => {
             <span className="text-2xl font-bold text-[#008744]">MyFinance</span>
           </div>
           <p className="text-zinc-500 max-w-sm italic mb-8">
-            Sanctuary Terpandu untuk kekayaan Anda. Kami mendefinisikan ulang manajemen kekayaan melalui estetika editorial dan kecerdasan buatan.
+            Ruang yang rapi untuk mengelola keuangan dengan cepat, jelas, dan aman.
           </p>
           <div className="flex gap-6">
             <Globe className="h-6 w-6 text-zinc-400 hover:text-[#008744] cursor-pointer" />
@@ -25,7 +25,7 @@ export const PageFooter = () => {
         <div>
           <h4 className="font-bold mb-6">PLATFORM</h4>
           <ul className="space-y-4 text-zinc-500">
-            <li><button type="button" onClick={() => navigate('/learn-more')} className="hover:text-[#008744]">Pelajari Lebih Lanjut</button></li>
+            <li><button type="button" onClick={() => navigate('/learn-more')} className="hover:text-[#008744]">Pelajari Produk</button></li>
             <li><button type="button" onClick={() => navigate('/investment-insights')} className="hover:text-[#008744]">Wawasan Investasi</button></li>
             <li className="hover:text-[#008744] cursor-pointer">Dokumentasi API</li>
           </ul>
@@ -41,10 +41,10 @@ export const PageFooter = () => {
         </div>
       </div>
       <div className="mt-20 pt-8 border-t border-zinc-100 flex flex-col md:flex-row justify-between items-center text-sm text-zinc-400">
-        <p>© 2024 MyFinance. Perlindungan Terpandu untuk kekayaan Anda.</p>
+        <p>© 2026 MyFinance. Pengelolaan keuangan yang cepat dan efisien.</p>
         <div className="flex items-center gap-2 mt-4 md:mt-0">
           <div className="h-2 w-2 rounded-full bg-[#008744]"></div>
-          <span>Layanan Beroperasi Normal</span>
+          <span>Layanan beroperasi normal</span>
         </div>
       </div>
     </footer>

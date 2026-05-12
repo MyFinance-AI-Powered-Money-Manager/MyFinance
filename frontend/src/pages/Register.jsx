@@ -2,14 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { registerSchema, validateData } from '../lib/validation';
 import { showError, showSuccess } from '../lib/toast';
 
 const Register = () => {
     const navigate = useNavigate();
-    const { t } = useLanguage();
     const { register, loading, error } = useAuth();
     const [showPassword, setShowPassword] = React.useState(false);
     const [formData, setFormData] = React.useState({
@@ -66,7 +64,7 @@ const Register = () => {
                     <div className="absolute inset-0 flex items-end p-10 lg:p-12">
                         <div className="max-w-md rounded-[28px] bg-black/40 p-8 text-white backdrop-blur-md ring-1 ring-white/10">
                             <h2 className="text-3xl font-extrabold leading-tight lg:text-4xl">
-                                “Kelola keuanganmu atau ia akan meninggalkanmu!”
+                                “Mulai lebih rapi hari ini agar keuangan besok lebih ringan.”
                             </h2>
                             <div className="mt-6 flex items-center gap-3">
                                 <div className="h-0.5 w-12 bg-[#7AF19E]" />
@@ -82,12 +80,12 @@ const Register = () => {
                             <img src="/images/logo.png" alt="MyFinance" className="h-6 w-6 rounded-full object-cover" />
                             <span className="text-base font-extrabold tracking-tight dark:text-[#E8EAED]">MyFinance</span>
                         </div>
-                        <h1 className="text-xl font-extrabold leading-snug text-zinc-900 md:text-2xl dark:text-[#F0F1F3]">{t('register')}</h1>
-                        <p className="mt-1.5 text-[12px] leading-5 text-zinc-600 dark:text-[#B0B8CC]">{t('register_sub')}</p>
+                        <h1 className="text-xl font-extrabold leading-snug text-zinc-900 md:text-2xl dark:text-[#F0F1F3]">Buat akun MyFinance</h1>
+                        <p className="mt-1.5 text-[12px] leading-5 text-zinc-600 dark:text-[#B0B8CC]">Daftar untuk mulai mencatat transaksi dan membaca insight dengan lebih cepat.</p>
 
                         <form className="mt-4 space-y-1" onSubmit={handleSubmit}>
                             <div className="space-y-0.5">
-                                <label className="text-[11px] font-semibold text-zinc-800 dark:text-[#D9DCE3]">Nama Lengkap</label>
+                                <label className="text-[11px] font-semibold text-zinc-800 dark:text-[#D9DCE3]">Nama lengkap</label>
                                 <div className="relative group">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-finance-700">
                                         <User className="h-3.5 w-3.5" />
@@ -142,7 +140,7 @@ const Register = () => {
                             </div>
 
                             <div className="space-y-0.5">
-                                <label className="text-[11px] font-semibold text-zinc-800">Konfirmasi Password</label>
+                                <label className="text-[11px] font-semibold text-zinc-800">Konfirmasi kata sandi</label>
                                 <div className="relative group">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-finance-700">
                                         <Lock className="h-3.5 w-3.5" />
@@ -174,12 +172,12 @@ const Register = () => {
                                     />
                                 </div>
                                 <p className="text-[9px] leading-tight text-zinc-600">
-                                    Saya setuju dengan <span className="font-bold text-finance-700">Syarat</span> & <span className="font-bold text-finance-700">Privasi</span>
+                                    Saya setuju dengan <span className="font-bold text-finance-700">Syarat</span> dan <span className="font-bold text-finance-700">Privasi</span>
                                 </p>
                             </div>
 
                             <button disabled={loading} className="flex h-10 w-full items-center justify-center rounded-[20px] bg-gradient-to-r from-finance-700 to-finance-800 text-xs font-bold text-white shadow-md hover:shadow-lg transition hover:from-finance-800 hover:to-finance-900 disabled:cursor-not-allowed disabled:opacity-60">
-                                {loading ? 'Memproses...' : 'Daftar'}
+                                {loading ? 'Memproses...' : 'Buat akun'}
                             </button>
 
                             <div className="relative py-1">
@@ -187,7 +185,7 @@ const Register = () => {
                                     <div className="w-full border-t border-zinc-200" />
                                 </div>
                                 <div className="relative flex justify-center text-[7px] uppercase tracking-[0.1em] text-zinc-400">
-                                    <span className="bg-[#F7FBF3] px-2 font-bold">Atau</span>
+                                    <span className="bg-[#F7FBF3] px-2 font-bold">Atau daftar dengan</span>
                                 </div>
                             </div>
 

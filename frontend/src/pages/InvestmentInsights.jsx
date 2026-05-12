@@ -8,7 +8,7 @@ import { PageFooter } from '../components/PageFooter';
 const insightCards = [
   {
     icon: TrendingUp,
-    title: 'Tren yang mudah dibaca',
+    title: 'Tren portofolio',
     description: 'Wawasan investasi menyajikan pergerakan dan arah perubahan agar pengguna lebih cepat memahami konteks portofolio.',
   },
   {
@@ -49,10 +49,10 @@ const InvestmentInsights = () => {
               <BarChart3 className="h-4 w-4" /> Insight investasi
             </div>
             <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.05] tracking-tight text-zinc-900 sm:text-5xl lg:text-7xl">
-              Wawasan investasi yang membuat data terasa lebih berguna.
+              Wawasan investasi yang membantu membaca portofolio dengan lebih jelas.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-600 sm:text-lg">
-              Halaman ini menjelaskan bagaimana MyFinance mempresentasikan sinyal investasi, memudahkan pembacaan portofolio, dan membantu pengguna memahami konteks di balik angka. Bukan sekadar grafik, tetapi narasi finansial yang lebih terarah.
+              Halaman ini menjelaskan bagaimana MyFinance mempresentasikan tren, komposisi aset, dan sinyal penting agar pengguna bisa membaca kondisi investasi tanpa harus menebak-nebak dari angka mentah.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -88,7 +88,7 @@ const InvestmentInsights = () => {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-400">Visual ringkasan</p>
-                  <h2 className="mt-3 text-2xl font-extrabold text-zinc-900">Insight investasi yang terasa informatif, bukan ramai.</h2>
+                  <h2 className="mt-3 text-2xl font-extrabold text-zinc-900">Ringkasan investasi dibuat singkat, jelas, dan mudah ditindaklanjuti.</h2>
                 </div>
                 <div className="rounded-full bg-[#EDF8F0] p-3 text-finance-700">
                   <Sparkles className="h-5 w-5" />
@@ -126,7 +126,7 @@ const InvestmentInsights = () => {
               <Compass className="h-5 w-5" />
               <p className="text-xs font-semibold uppercase tracking-[0.24em]">Apa yang ditampilkan</p>
             </div>
-            <h2 className="mt-4 text-3xl font-extrabold text-zinc-900">Wawasan dibuat untuk membantu keputusan yang lebih disiplin.</h2>
+            <h2 className="mt-4 text-3xl font-extrabold text-zinc-900">Semua komponen disusun untuk mempercepat pembacaan investasi.</h2>
             <p className="mt-4 text-sm leading-7 text-zinc-500">Pengguna mendapatkan tampilan yang menyorot arah perubahan, komposisi aset, dan rangkuman performa. Dengan begitu, aplikasi tetap sederhana tetapi terasa bernilai untuk perencanaan keuangan jangka panjang.</p>
 
             <div className="mt-6 space-y-3">
