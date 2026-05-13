@@ -80,12 +80,12 @@ const buildChartData = (transactions) => {
 
     transactions.forEach((tx, index) => {
         const amount = Number(tx.amount ?? 0);
-        const type = tx.type || (amount >= 0 ? 'income' : 'expense');
+        const type = String(tx.type || '').toUpperCase() || (amount >= 0 ? 'INCOME' : 'EXPENSE');
         const date = getDateValue(tx);
         const bucketIndex = date ? Math.min(3, Math.max(0, Math.ceil(date.getDate() / 7) - 1)) : index % 4;
         const bucket = buckets[bucketIndex];
 
-        if (type === 'income') {
+        if (type === 'INCOME') {
             bucket.income += Math.abs(amount);
         } else {
             bucket.expense += Math.abs(amount);
@@ -125,9 +125,9 @@ const Reports = () => {
     const totals = transactions.reduce(
         (accumulator, tx) => {
             const amount = Number(tx.amount ?? 0);
-            const type = tx.type || (amount >= 0 ? 'income' : 'expense');
+            const type = String(tx.type || '').toUpperCase() || (amount >= 0 ? 'INCOME' : 'EXPENSE');
 
-            if (type === 'income') {
+            if (type === 'INCOME') {
                 accumulator.income += Math.abs(amount);
             } else {
                 accumulator.expense += Math.abs(amount);
@@ -227,7 +227,7 @@ const Reports = () => {
                         <div className="mb-6 flex items-start justify-between gap-4">
                             <div>
                                 <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('income_vs_expense')}</h3>
-                                <p className="mt-1 text-sm text-zinc-500 dark:text-[#B0B8CC]">Oktober 2023</p>
+                                <p className="mt-1 text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('this_month')}</p>
                             </div>
                             <div className="flex items-center gap-4 text-xs font-semibold text-zinc-500 dark:text-[#B0B8CC]">
                                 <span className="flex items-center gap-2">
@@ -284,7 +284,7 @@ const Reports = () => {
                     <div className="space-y-5">
                         {recentTransactions.length > 0 ? recentTransactions.map((tx, index) => {
                             const amount = Number(tx.amount ?? 0);
-                            const isIncome = tx.type === 'income' || amount > 0;
+                            const isIncome = String(tx.type || '').toUpperCase() === 'INCOME';
                             const Icon = getCategoryIcon(tx.category);
 
                             return (

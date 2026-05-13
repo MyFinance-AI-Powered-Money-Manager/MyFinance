@@ -1,17 +1,25 @@
 import React from 'react';
-import { UserCircle2, LockKeyhole, Mail, CalendarDays, Camera } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { UserCircle2, LockKeyhole, Mail, CalendarDays, Camera, Trash2, AlertTriangle } from 'lucide-react';
 import { Layout } from '../components/layout/Layout';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { useAuth } from '../context/AuthContext';
-import { useProfile, useUpdatePassword, useUpdateProfile } from '../hooks/useProfile';
+import { useLanguage } from '../context/LanguageContext';
+import { useProfile, useUpdatePassword, useUpdateProfile, useDeleteAccount } from '../hooks/useProfile';
 import { resolveMediaUrl } from '../lib/utils';
 import { showError } from '../lib/toast';
 
 const Profile = () => {
+    const navigate = useNavigate();
     const { user: authUser } = useAuth();
     const { data: profile, isLoading, error } = useProfile();
     const updateProfile = useUpdateProfile();
     const updatePassword = useUpdatePassword();
+    const deleteAccount = useDeleteAccount();
+    const { t } = useLanguage();
+
+    const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
+    const [deleteConfirmText, setDeleteConfirmText] = React.useState('');
 
     const [fullName, setFullName] = React.useState('');
     const [selectedFile, setSelectedFile] = React.useState(null);
@@ -133,202 +141,201 @@ const Profile = () => {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        if (deleteConfirmText !== 'HAPUS') {
+            showError('Ketik HAPUS untuk mengkonfirmasi penghapusan akun.');
+            return;
+        }
+
+        try {
+            await deleteAccount.mutateAsync();
+            navigate('/');
+        } catch {
+            // Error handled by mutation
+        }
+    };
+
     return (
         <Layout>
-            <div className="space-y-6">
-                <div className="overflow-hidden rounded-[32px] border border-[#DDE6CF] bg-white shadow-card dark:border-[#2D3748] dark:bg-[#1F2733]">
-                    <div className="bg-gradient-to-r from-finance-700 via-[#0E7A35] to-[#0A5F29] px-6 py-7 text-white md:px-8">
-                        <p className="text-xs font-bold uppercase tracking-[0.28em] text-white/70">Profil Akun</p>
-                        <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                            <div>
-                                <h1 className="text-3xl font-extrabold leading-tight md:text-4xl">Kelola Profil</h1>
-                                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">
-                                    Atur nama, foto profil, dan keamanan akun dari satu tempat.
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-3 rounded-[24px] bg-white/10 px-4 py-3 backdrop-blur-sm">
-                                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-white/15 text-lg font-bold text-white">
-                                    {avatarUrl && !previewLoadFailed ? (
-                                        <img
-                                            src={avatarUrl}
-                                            alt={activeUser.full_name || 'Profil'}
-                                            className="h-full w-full object-cover"
-                                            onError={() => setPreviewLoadFailed(true)}
-                                        />
-                                    ) : (
-                                        initial
-                                    )}
-                                </div>
-                                <div>
-                                    <p className="text-sm font-semibold">{activeUser.full_name || 'Pengguna'}</p>
-                                    <p className="text-xs text-white/70">{activeUser.email || 'Email belum tersedia'}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div className="mx-auto max-w-6xl">
+                <div className="mb-8">
+                    <h1 className="bg-gradient-to-r from-finance-700 to-[#00A86B] bg-clip-text text-3xl font-extrabold text-transparent md:text-4xl">
+                        {t('account_settings')}
+                    </h1>
                 </div>
 
-                <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-                    <section className="finance-card p-6 md:p-8">
-                        <div className="mb-6 flex items-center gap-3">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#DDF4E2] text-finance-700">
-                                <UserCircle2 className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-extrabold text-zinc-900 dark:text-[#F0F1F3]">Data Profil</h2>
-                                <p className="text-sm text-zinc-500 dark:text-[#B0B8CC]">Ubah nama dan foto profil menggunakan unggahan multipart.</p>
-                            </div>
-                        </div>
-
-                        <form className="space-y-5" onSubmit={handleProfileSubmit}>
-                            <div>
-                                <label className="mb-3 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Foto Profil</label>
-                                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                                    <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-[#DDF4E2] text-2xl font-bold text-finance-700 dark:bg-[#243225] dark:text-[#7CF38E]">
-                                        {avatarUrl && !previewLoadFailed ? (
-                                            <img
-                                                src={avatarUrl}
-                                                alt={activeUser.full_name || 'Profil'}
-                                                className="h-full w-full object-cover"
-                                                onError={() => setPreviewLoadFailed(true)}
-                                            />
-                                        ) : (
-                                            initial
-                                        )}
-                                    </div>
-                                    <label className="cursor-pointer">
-                                        <div className="flex items-center gap-2 rounded-[18px] border border-[#D9E5CF] bg-white px-4 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-[#F6FAF1] dark:border-[#3F4959] dark:bg-[#2D3748] dark:text-[#E8EAED]">
-                                            <Camera className="h-4 w-4" />
-                                            Pilih Gambar Baru
-                                        </div>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleFileChange}
-                                            className="hidden"
-                                        />
-                                    </label>
-                                </div>
-                                <p className="mt-2 text-xs text-zinc-500 dark:text-[#8B92A9]">
-                                    JPG atau PNG, maksimal 5MB. Jika unggahan gagal, sistem akan mempertahankan foto lama.
-                                </p>
-                            </div>
-
-                            <div>
-                                <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Nama Lengkap</label>
-                                <input
-                                    type="text"
-                                    className="finance-input"
-                                    value={fullName}
-                                    onChange={(event) => setFullName(event.target.value)}
-                                    placeholder="Contoh: Robby Hermawan"
-                                />
-                            </div>
-
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="rounded-[22px] bg-[#FAFCF7] p-4 dark:bg-[#2A3341]">
-                                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-[#8B92A9]">
-                                        <Mail className="h-4 w-4" /> Email
-                                    </div>
-                                    <p className="mt-3 text-sm font-semibold text-zinc-900 dark:text-[#F0F1F3]">{activeUser.email || '-'}</p>
-                                </div>
-                                <div className="rounded-[22px] bg-[#FAFCF7] p-4 dark:bg-[#2A3341]">
-                                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-[#8B92A9]">
-                                        <CalendarDays className="h-4 w-4" /> Bergabung
-                                    </div>
-                                    <p className="mt-3 text-sm font-semibold text-zinc-900 dark:text-[#F0F1F3]">
-                                        {activeUser.created_at ? new Date(activeUser.created_at).toLocaleDateString('id-ID', {
-                                            day: '2-digit',
-                                            month: 'long',
-                                            year: 'numeric',
-                                        }) : '-'}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={updateProfile.isPending}
-                                className="flex h-12 w-full items-center justify-center rounded-[20px] bg-finance-700 font-semibold text-white transition hover:bg-finance-800 disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                                {updateProfile.isPending ? 'Menyimpan...' : 'Simpan Profil'}
-                            </button>
-                        </form>
-                    </section>
-
-                    <div className="space-y-6">
+                <div className="grid gap-8 lg:grid-cols-[1fr_350px]">
+                    <div className="space-y-8">
                         <section className="finance-card p-6 md:p-8">
-                            <div className="mb-6 flex items-center gap-3">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FBE5EA] text-[#D1496F]">
-                                    <LockKeyhole className="h-5 w-5" />
-                                </div>
+                            <h3 className="mb-6 text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('personal_info')}</h3>
+                            <form onSubmit={handleProfileSubmit} className="space-y-6">
                                 <div>
-                                    <h2 className="text-xl font-extrabold text-zinc-900 dark:text-[#F0F1F3]">Ubah Password</h2>
-                                    <p className="text-sm text-zinc-500 dark:text-[#B0B8CC]">Gunakan password yang kuat untuk keamanan akun.</p>
+                                    <label className="mb-2 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">{t('full_name_label')}</label>
+                                    <input
+                                        type="text"
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                        className="finance-input"
+                                        placeholder={t('full_name_label')}
+                                    />
                                 </div>
-                            </div>
+                                <button
+                                    type="submit"
+                                    disabled={updateProfile.isPending}
+                                    className="flex h-12 w-full items-center justify-center rounded-[20px] bg-finance-700 font-semibold text-white transition hover:bg-finance-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:px-8"
+                                >
+                                    {updateProfile.isPending ? t('saving') : t('update_profile')}
+                                </button>
+                            </form>
+                        </section>
 
-                            <form className="space-y-4" onSubmit={handlePasswordSubmit}>
-                                <div>
-                                    <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Password Lama</label>
-                                    <input
-                                        type="password"
-                                        className="finance-input"
-                                        value={oldPassword}
-                                        onChange={(event) => setOldPassword(event.target.value)}
-                                        placeholder="••••••••"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Password Baru</label>
-                                    <input
-                                        type="password"
-                                        className="finance-input"
-                                        value={newPassword}
-                                        onChange={(event) => setNewPassword(event.target.value)}
-                                        placeholder="••••••••"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Konfirmasi Password Baru</label>
-                                    <input
-                                        type="password"
-                                        className="finance-input"
-                                        value={confirmPassword}
-                                        onChange={(event) => setConfirmPassword(event.target.value)}
-                                        placeholder="••••••••"
-                                    />
+                        <section className="finance-card p-6 md:p-8">
+                            <h3 className="mb-6 text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('change_password')}</h3>
+                            <form onSubmit={handlePasswordSubmit} className="space-y-6">
+                                <div className="grid gap-6 sm:grid-cols-2">
+                                    <div className="sm:col-span-2">
+                                        <label className="mb-2 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">{t('old_password')}</label>
+                                        <input
+                                            type="password"
+                                            value={oldPassword}
+                                            onChange={(e) => setOldPassword(e.target.value)}
+                                            className="finance-input"
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-2 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">{t('new_password')}</label>
+                                        <input
+                                            type="password"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className="finance-input"
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-2 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">{t('confirm_new_password')}</label>
+                                        <input
+                                            type="password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="finance-input"
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
                                 </div>
                                 <button
                                     type="submit"
                                     disabled={updatePassword.isPending}
                                     className="flex h-12 w-full items-center justify-center rounded-[20px] bg-finance-700 font-semibold text-white transition hover:bg-finance-800 disabled:cursor-not-allowed disabled:opacity-60"
                                 >
-                                    {updatePassword.isPending ? 'Menyimpan...' : 'Ubah Password'}
+                                    {updatePassword.isPending ? t('saving') : t('update_password')}
                                 </button>
                             </form>
                         </section>
+                    </div>
 
+                    <div className="space-y-8">
                         <section className="finance-card p-6 md:p-8">
-                            <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">Ringkasan Akun</h3>
+                            <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('account_summary')}</h3>
                             <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
                                 <div className="rounded-[22px] bg-[#FAFCF7] p-4 dark:bg-[#2A3341]">
-                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-[#8B92A9]">Nama</p>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-[#8B92A9]">{t('full_name_label')}</p>
                                     <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-[#F0F1F3]">{activeUser.full_name || '-'}</p>
                                 </div>
                                 <div className="rounded-[22px] bg-[#FAFCF7] p-4 dark:bg-[#2A3341]">
-                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-[#8B92A9]">Email</p>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-[#8B92A9]">{t('email')}</p>
                                     <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-[#F0F1F3]">{activeUser.email || '-'}</p>
                                 </div>
                                 <div className="rounded-[22px] bg-[#FAFCF7] p-4 dark:bg-[#2A3341] sm:col-span-2 xl:col-span-1">
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-[#8B92A9]">Status</p>
-                                    <p className="mt-2 text-sm font-semibold text-finance-700 dark:text-[#7CF38E]">Akun aktif dan tersambung ke backend</p>
+                                    <p className="mt-2 text-sm font-semibold text-finance-700 dark:text-[#7CF38E]">{t('status_active')}</p>
                                 </div>
                             </div>
+                        </section>
+
+                        <section className="overflow-hidden rounded-[28px] border-2 border-red-200 bg-white p-6 md:p-8 dark:border-red-900/50 dark:bg-[#1F2733]">
+                            <div className="mb-4 flex items-center gap-3">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-red-100 text-red-600 dark:bg-red-900/30">
+                                    <Trash2 className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-extrabold text-red-600">{t('danger_zone')}</h2>
+                                    <p className="text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('danger_zone_desc')}</p>
+                                </div>
+                            </div>
+                            <p className="mb-4 text-sm leading-6 text-zinc-600 dark:text-[#B0B8CC]">
+                                {t('delete_account_desc')}
+                            </p>
+                            <button
+                                type="button"
+                                onClick={() => setShowDeleteConfirm(true)}
+                                className="flex h-12 w-full items-center justify-center gap-2 rounded-[20px] border-2 border-red-300 bg-red-50 font-semibold text-red-600 transition hover:bg-red-100 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
+                            >
+                                <Trash2 className="h-4 w-4" />
+                                {t('delete_account_permanently')}
+                            </button>
                         </section>
                     </div>
                 </div>
             </div>
+
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-md rounded-[28px] bg-white p-6 shadow-2xl dark:bg-[#1F2733] md:p-8">
+                        <div className="mb-5 flex items-center gap-3">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30">
+                                <AlertTriangle className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('confirm_delete_account')}</h3>
+                                <p className="text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('permanent_action_warning')}</p>
+                            </div>
+                        </div>
+                        <div className="mb-4 rounded-[16px] bg-red-50 p-4 dark:bg-red-900/10">
+                            <p className="text-sm font-bold leading-6 text-red-700 dark:text-red-400">
+                                {t('delete_warning_list')}
+                            </p>
+                            <ul className="mt-2 list-disc pl-5 text-sm text-red-600 dark:text-red-400/80">
+                                <li>{t('data_list_item_1')}</li>
+                                <li>{t('data_list_item_2')}</li>
+                                <li>{t('data_list_item_3')}</li>
+                                <li>{t('data_list_item_4')}</li>
+                            </ul>
+                        </div>
+                        <div className="mb-4">
+                            <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">
+                                {t('type_to_confirm', { confirm: <span className="font-mono font-bold text-red-600">{t('delete_confirm_keyword')}</span> })}
+                            </label>
+                            <input
+                                type="text"
+                                value={deleteConfirmText}
+                                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                                className="finance-input border-red-200 focus:border-red-400 focus:ring-red-400 dark:border-red-900/30"
+                                placeholder={t('delete_confirm_keyword')}
+                                autoComplete="off"
+                            />
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                type="button"
+                                onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); }}
+                                className="flex h-12 flex-1 items-center justify-center rounded-[20px] border border-zinc-200 bg-white font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-[#3F4959] dark:bg-[#2D3748] dark:text-[#B0B8CC] dark:hover:bg-[#3F4959]"
+                            >
+                                {t('cancel')}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleDeleteAccount}
+                                disabled={deleteConfirmText !== t('delete_confirm_keyword') || deleteAccount.isPending}
+                                className="flex h-12 flex-1 items-center justify-center rounded-[20px] bg-red-600 font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {deleteAccount.isPending ? t('deleting') : t('delete_now')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </Layout>
     );
 };

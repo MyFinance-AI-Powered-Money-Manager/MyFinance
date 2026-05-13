@@ -127,3 +127,21 @@ export const useUpdatePassword = () => {
         },
     });
 };
+
+// Delete account (cascade: wallets, transactions, budgets)
+export const useDeleteAccount = () => {
+    const { logout } = useAuth();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: () => api.delete('/users/profile'),
+        onSuccess: () => {
+            queryClient.clear();
+            logout();
+            showSuccess('Akun berhasil dihapus. Semua data telah dihapus permanen.');
+        },
+        onError: (error) => {
+            showError(error.response?.data?.message || 'Gagal menghapus akun');
+        },
+    });
+};

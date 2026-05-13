@@ -1,36 +1,52 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowDown, ArrowRight, ArrowUp, Banknote, Car, CreditCard, Landmark, Minus, Plus, Scan, Sparkles, Utensils, Wallet } from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUp, Banknote, Car, CreditCard, Edit3, Landmark, Minus, Plus, Repeat, Scan, Sparkles, Target, Trash2, Utensils, Wallet } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Layout } from '../components/layout/Layout';
 import { DashboardHeader } from '../components/dashboard/DashboardHeader';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { TransactionFormModal } from '../components/TransactionFormModal';
 import { WalletFormModal } from '../components/WalletFormModal';
+import { TransferFormModal } from '../components/TransferFormModal';
+import { BudgetFormModal } from '../components/BudgetFormModal';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { useBudgets, useCreateTransaction, useTransactions, useWallets } from '../hooks/useFinance';
+import { useBudgets, useCreateBudget, useCreateTransaction, useDashboardSummary, useDeleteBudget, useTransactions, useUpdateBudget, useWallets } from '../hooks/useFinance';
 import { cn, formatCurrency } from '../lib/utils';
 
+const WALLET_ICON_MAP = {
+    BANK: Landmark,
+    'E-WALLET': CreditCard,
+    CASH: Wallet,
+};
+
 const Dashboard = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
-    const [formType, setFormType] = React.useState('income');
+    const [formType, setFormType] = React.useState('INCOME');
     const [openTransactionModal, setOpenTransactionModal] = React.useState(false);
     const [openWalletModal, setOpenWalletModal] = React.useState(false);
+    const [openTransferModal, setOpenTransferModal] = React.useState(false);
+    const [openBudgetModal, setOpenBudgetModal] = React.useState(false);
+    const [editingBudget, setEditingBudget] = React.useState(null);
+
     const { data: walletsData, isLoading: walletsLoading, error: walletsError } = useWallets();
-    const { data: budgetsData, isLoading: budgetsLoading, error: budgetsError } = useBudgets();
+    const { data: budgetsData, isLoading: budgetsLoading } = useBudgets();
     const { data: transactionsData, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
+    const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useDashboardSummary();
     const createTransaction = useCreateTransaction();
+    const createBudget = useCreateBudget();
+    const updateBudget = useUpdateBudget();
+    const deleteBudget = useDeleteBudget();
 
     const wallets = Array.isArray(walletsData) ? walletsData : walletsData?.data ?? [];
     const budgets = Array.isArray(budgetsData) ? budgetsData : budgetsData?.data ?? [];
     const transactions = Array.isArray(transactionsData) ? transactionsData : transactionsData?.data ?? [];
 
-    const isLoading = walletsLoading || budgetsLoading || transactionsLoading;
-    const error = walletsError || budgetsError || transactionsError;
+    const isLoading = walletsLoading || transactionsLoading || dashboardLoading;
+    const error = walletsError || transactionsError || dashboardError;
 
     React.useEffect(() => {
         if (location.state?.openWalletModal) {
@@ -59,38 +75,70 @@ const Dashboard = () => {
         );
     }
 
-    const walletFallbacks = [
-        { name: t('bank'), balance: 0, icon: Landmark },
-        { name: t('emergency_fund'), balance: 0, icon: Banknote },
-        { name: t('e_wallet'), balance: 0, icon: CreditCard },
-        { name: t('cash'), balance: 0, icon: Wallet },
-        { name: t('savings'), balance: 0, icon: Wallet },
-    ];
+    // Use backend dashboard summary (accurate server-side calculation)
+    const totalBalance = dashboardData?.current_balance ?? wallets.reduce((sum, w) => sum + Number(w.balance ?? 0), 0);
+    const totalIncome = dashboardData?.total_income ?? 0;
+    const totalExpense = dashboardData?.total_expense ?? 0;
 
-    const accountCards = (wallets.length ? wallets : walletFallbacks)
+    const accountCards = wallets
         .slice(0, 5)
-        .map((wallet, index) => ({
-            icon: wallet.icon || [Landmark, Banknote, CreditCard, Wallet, Wallet][index] || Wallet,
-            name: wallet.name || wallet.label || wallet.type || walletFallbacks[index]?.name || 'Wallet',
-            amount: Number(wallet.balance ?? wallet.amount ?? walletFallbacks[index]?.balance ?? 0),
+        .map((wallet) => ({
+            icon: WALLET_ICON_MAP[wallet.type] || Wallet,
+            name: wallet.name || wallet.label || wallet.type || 'Wallet',
+            amount: Number(wallet.balance ?? 0),
+            type: wallet.type,
         }));
 
-    const totalBalance = accountCards.reduce((sum, item) => sum + item.amount, 0);
-    const totalIncome = transactions.reduce((sum, tx) => sum + (tx.type === 'income' || Number(tx.amount) > 0 ? Number(tx.amount) : 0), 0);
-    const totalExpense = transactions.reduce((sum, tx) => sum + (tx.type === 'expense' || Number(tx.amount) < 0 ? Math.abs(Number(tx.amount)) : 0), 0);
     const activeBudget = budgets[0];
+
+    // Get current month budgets
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const currentBudgets = budgets.filter((b) => (b.month_period || b.monthPeriod) === currentMonth);
 
     const recentTransactions = [...transactions]
         .slice(0, 3)
-        .map((tx, index) => ({
-            id: tx.id ?? index,
-            icon: tx.category?.toLowerCase().includes('makan') ? Utensils : tx.category?.toLowerCase().includes('transport') ? Car : Wallet,
-            label: tx.label || tx.description || 'Transaksi',
-            category: tx.category || tx.type || 'Kategori',
-            date: tx.date || tx.createdAt || 'Hari ini',
-            amount: Number(tx.amount ?? 0),
-            type: tx.type || (Number(tx.amount ?? 0) >= 0 ? 'income' : 'expense'),
-        }));
+        .map((tx, index) => {
+            const txType = String(tx.type).toUpperCase();
+            const isTransferOut = txType === 'TRANSFER' && tx.description === 'Transfer Keluar';
+            const isTransferIn = txType === 'TRANSFER' && tx.description === 'Transfer Masuk';
+
+            return {
+                id: tx.id ?? index,
+                icon: isTransferOut
+                    ? ArrowUp
+                    : isTransferIn
+                        ? ArrowDown
+                        : tx.category?.toLowerCase().includes('makan') || tx.subcategory?.toLowerCase().includes('makan')
+                            ? Utensils
+                            : tx.category?.toLowerCase().includes('transport') || tx.subcategory?.toLowerCase().includes('transport')
+                                ? Car
+                                : Wallet,
+                label: tx.label || tx.description || 'Transaksi',
+                category: tx.subcategory || tx.category || tx.type || 'Kategori',
+                date: tx.date
+                    ? new Date(tx.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })
+                    : 'Hari ini',
+                amount: Number(tx.amount ?? 0),
+                type: txType,
+                isTransferOut,
+                isTransferIn,
+            };
+        });
+
+    const getTransactionColor = (tx) => {
+        if (tx.type === 'EXPENSE' || tx.isTransferOut) return 'text-[#D1496F]';
+        return 'text-finance-700';
+    };
+
+    const getTransactionBg = (tx) => {
+        if (tx.type === 'EXPENSE' || tx.isTransferOut) return 'bg-[#FBE5EA] text-[#D1496F]';
+        return 'bg-[#7CF38E] text-zinc-900';
+    };
+
+    const getTransactionPrefix = (tx) => {
+        if (tx.type === 'EXPENSE' || tx.isTransferOut) return '-';
+        return '+';
+    };
 
     const handleCreateTransaction = async (payload) => {
         try {
@@ -115,6 +163,29 @@ const Dashboard = () => {
 
     const handleWalletCreated = () => {
         setOpenWalletModal(false);
+    };
+
+    const handleBudgetSubmit = async (payload) => {
+        try {
+            if (payload.id) {
+                await updateBudget.mutateAsync({ id: payload.id, data: payload.data });
+            } else {
+                await createBudget.mutateAsync(payload);
+            }
+            setOpenBudgetModal(false);
+            setEditingBudget(null);
+        } catch {
+            // Error already handled by the mutation callback.
+        }
+    };
+
+    const handleDeleteBudget = async (budgetId) => {
+        if (!window.confirm('Yakin ingin menghapus anggaran ini?')) return;
+        try {
+            await deleteBudget.mutateAsync(budgetId);
+        } catch {
+            // Error already handled by the mutation callback.
+        }
     };
 
     return (
@@ -145,7 +216,7 @@ const Dashboard = () => {
                     </div>
                 </section>
 
-                <section className="hidden gap-4 lg:grid">
+                <section className="hidden gap-3 lg:grid">
                     <button
                         onClick={() => {
                             if (wallets.length === 0) {
@@ -153,13 +224,13 @@ const Dashboard = () => {
                                 return;
                             }
 
-                            setFormType('income');
+                            setFormType('INCOME');
                             setOpenTransactionModal(true);
                         }}
-                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-5 text-finance-700 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-4 text-finance-700 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
                         disabled={wallets.length === 0}
                     >
-                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#DDF4E2]">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#DDF4E2]">
                             <Plus className="h-5 w-5" />
                         </div>
                         <span className="text-sm font-semibold">{t('catat_pemasukan')}</span>
@@ -171,16 +242,32 @@ const Dashboard = () => {
                                 return;
                             }
 
-                            setFormType('expense');
+                            setFormType('EXPENSE');
                             setOpenTransactionModal(true);
                         }}
-                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-5 text-red-500 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-4 text-red-500 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
                         disabled={wallets.length === 0}
                     >
-                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FBE5EA]">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FBE5EA]">
                             <Minus className="h-5 w-5" />
                         </div>
                         <span className="text-sm font-semibold">{t('catat_pengeluaran')}</span>
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (wallets.length < 2) {
+                                setOpenWalletModal(true);
+                                return;
+                            }
+                            setOpenTransferModal(true);
+                        }}
+                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-4 text-blue-600 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                        disabled={wallets.length < 2}
+                    >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
+                            <Repeat className="h-5 w-5" />
+                        </div>
+                        <span className="text-sm font-semibold">Transfer Dana</span>
                     </button>
                 </section>
             </div>
@@ -198,6 +285,7 @@ const Dashboard = () => {
                             <account.icon className="h-5 w-5" />
                         </div>
                         <h4 className="mt-4 text-sm font-bold text-zinc-900 dark:text-[#F0F1F3]">{account.name}</h4>
+                        <p className="mt-1 text-xs text-zinc-500 dark:text-[#8B92A9]">{account.type}</p>
                         <p className="mt-1 text-sm font-semibold text-finance-700">
                             {formatCurrency(account.amount).replace('Rp', '').trim()}
                         </p>
@@ -214,6 +302,88 @@ const Dashboard = () => {
                 </button>
             </div>
 
+            {/* ── Budget Progress ── */}
+            <section className="finance-card mt-4 p-6 md:p-8">
+                <div className="mb-5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#DDF4E2] text-finance-700">
+                            <Target className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('this_month_budgets')}</h3>
+                            <p className="text-xs text-zinc-500 dark:text-[#8B92A9]">{currentMonth}</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => { setEditingBudget(null); setOpenBudgetModal(true); }}
+                        className="flex items-center gap-1.5 rounded-full bg-[#7CF38E] px-4 py-2 text-xs font-semibold text-finance-800 transition hover:-translate-y-0.5"
+                    >
+                        <Plus className="h-3.5 w-3.5" /> {t('create_budget')}
+                    </button>
+                </div>
+
+                {currentBudgets.length > 0 ? (
+                    <div className="space-y-4">
+                        {currentBudgets.map((budget) => {
+                            const spent = Number(budget.spent ?? 0);
+                            const limit = Number(budget.limit_amount ?? budget.limit ?? 0);
+                            const percentage = limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
+                            const isOver = spent > limit;
+
+                            return (
+                                <div key={budget.id} className="group rounded-[22px] bg-[#FAFCF7] p-4 transition hover:bg-[#F3F8EE] dark:bg-[#2A3341]">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-bold text-zinc-900 dark:text-[#F0F1F3]">{budget.category}</p>
+                                            <p className="mt-0.5 text-xs text-zinc-500 dark:text-[#8B92A9]">
+                                                {formatCurrency(spent)} / {formatCurrency(limit)}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className={cn(
+                                                'rounded-full px-2.5 py-1 text-[11px] font-bold',
+                                                isOver ? 'bg-red-100 text-red-600' : percentage >= 80 ? 'bg-amber-100 text-amber-700' : 'bg-[#DDF4E2] text-finance-700'
+                                            )}>
+                                                {percentage}%
+                                            </span>
+                                            <button
+                                                onClick={() => { setEditingBudget(budget); setOpenBudgetModal(true); }}
+                                                className="rounded-full p-1.5 text-zinc-400 opacity-0 transition hover:bg-white hover:text-finance-700 group-hover:opacity-100"
+                                                title={t('edit_budget')}
+                                            >
+                                                <Edit3 className="h-3.5 w-3.5" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteBudget(budget.id)}
+                                                className="rounded-full p-1.5 text-zinc-400 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
+                                                title={t('delete')}
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-[#3F4959]">
+                                        <div
+                                            className={cn(
+                                                'h-full rounded-full transition-all duration-500',
+                                                isOver ? 'bg-red-500' : percentage >= 80 ? 'bg-amber-500' : 'bg-finance-600'
+                                            )}
+                                            style={{ width: `${Math.min(100, percentage)}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div className="rounded-[22px] border border-dashed border-[#D9E5CF] p-8 text-center dark:border-[#3F4959]">
+                        <Target className="mx-auto mb-3 h-8 w-8 text-zinc-300 dark:text-[#8B92A9]" />
+                        <p className="text-sm font-semibold text-zinc-500 dark:text-[#B0B8CC]">{t('no_budget_this_month')}</p>
+                        <p className="mt-1 text-xs text-zinc-400 dark:text-[#8B92A9]">{t('click_to_create_budget')}</p>
+                    </div>
+                )}
+            </section>
+
             <div className="mt-4 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
                 <section className="relative overflow-hidden rounded-[30px] border border-finance-200 bg-white p-6 shadow-card md:p-8 lg:col-start-1 lg:row-start-1">
                     <div className="flex items-start gap-4">
@@ -221,7 +391,7 @@ const Dashboard = () => {
                             <Sparkles className="h-5 w-5" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('smart_insight')}</h3>
+                            <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('AI_insight')}</h3>
                             <p className="mt-3 max-w-xl text-sm leading-7 text-zinc-500 dark:text-[#B0B8CC]">
                                 {activeBudget
                                     ? `Pengeluaran kamu minggu ini 15% lebih rendah dari rata-rata bulanan. Pertahankan tren ini untuk mencapai target tabungan akhir tahun!`
@@ -246,8 +416,8 @@ const Dashboard = () => {
                             <div key={tx.id} className="flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-4">
                                     <div className={cn(
-                                        'flex h-12 w-12 items-center justify-center rounded-full text-zinc-900 dark:text-zinc-900',
-                                        tx.type === 'expense' ? 'bg-[#FBE5EA] text-[#D1496F]' : 'bg-[#7CF38E] text-zinc-900'
+                                        'flex h-12 w-12 items-center justify-center rounded-full',
+                                        getTransactionBg(tx)
                                     )}>
                                         <tx.icon className="h-5 w-5" />
                                     </div>
@@ -256,8 +426,8 @@ const Dashboard = () => {
                                         <p className="text-[11px] text-zinc-500 dark:text-[#8B92A9]">{tx.category} • {tx.date}</p>
                                     </div>
                                 </div>
-                                <p className={cn('text-sm font-bold md:text-base', tx.type === 'expense' ? 'text-[#D1496F]' : 'text-finance-700')}>
-                                    {tx.type === 'expense' ? '-' : '+'} {formatCurrency(Math.abs(tx.amount))}
+                                <p className={cn('text-sm font-bold md:text-base', getTransactionColor(tx))}>
+                                    {getTransactionPrefix(tx)} {formatCurrency(Math.abs(tx.amount))}
                                 </p>
                             </div>
                         )) : (
@@ -267,30 +437,41 @@ const Dashboard = () => {
                 </section>
             </div>
 
-            <div className="mt-4 grid gap-4 md:grid-cols-2 lg:hidden">
+            {/* Mobile action buttons */}
+            <div className="mt-4 grid grid-cols-3 gap-3 lg:hidden">
                 <button
                     onClick={() => {
-                        setFormType('income');
+                        setFormType('INCOME');
                         setOpenTransactionModal(true);
                     }}
-                    className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-5 text-finance-700 shadow-card"
+                    className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-finance-700 shadow-card"
                 >
                     <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#DDF4E2]">
                         <Plus className="h-5 w-5" />
                     </div>
-                    <span className="text-sm font-semibold">{t('catat_pemasukan')}</span>
+                    <span className="text-xs font-semibold">{t('catat_pemasukan')}</span>
                 </button>
                 <button
                     onClick={() => {
-                        setFormType('expense');
+                        setFormType('EXPENSE');
                         setOpenTransactionModal(true);
                     }}
-                    className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-5 text-red-500 shadow-card"
+                    className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-red-500 shadow-card"
                 >
                     <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FBE5EA]">
                         <Minus className="h-5 w-5" />
                     </div>
-                    <span className="text-sm font-semibold">{t('catat_pengeluaran')}</span>
+                    <span className="text-xs font-semibold">{t('catat_pengeluaran')}</span>
+                </button>
+                <button
+                    onClick={() => setOpenTransferModal(true)}
+                    className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-blue-600 shadow-card"
+                    disabled={wallets.length < 2}
+                >
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50">
+                        <Repeat className="h-5 w-5" />
+                    </div>
+                    <span className="text-xs font-semibold">Transfer</span>
                 </button>
             </div>
 
@@ -316,8 +497,8 @@ const Dashboard = () => {
                         <div key={tx.id} className="flex items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
                                 <div className={cn(
-                                    'flex h-12 w-12 items-center justify-center rounded-full text-zinc-900 dark:text-zinc-900',
-                                    tx.type === 'expense' ? 'bg-[#FBE5EA] text-[#D1496F]' : 'bg-[#7CF38E] text-zinc-900'
+                                    'flex h-12 w-12 items-center justify-center rounded-full',
+                                    getTransactionBg(tx)
                                 )}>
                                     <tx.icon className="h-5 w-5" />
                                 </div>
@@ -326,8 +507,8 @@ const Dashboard = () => {
                                     <p className="text-[11px] text-zinc-500 dark:text-[#8B92A9]">{tx.category} • {tx.date}</p>
                                 </div>
                             </div>
-                            <p className={cn('text-sm font-bold md:text-base', tx.type === 'expense' ? 'text-[#D1496F]' : 'text-finance-700')}>
-                                {tx.type === 'expense' ? '-' : '+'} {formatCurrency(Math.abs(tx.amount))}
+                            <p className={cn('text-sm font-bold md:text-base', getTransactionColor(tx))}>
+                                {getTransactionPrefix(tx)} {formatCurrency(Math.abs(tx.amount))}
                             </p>
                         </div>
                     )) : (
@@ -350,6 +531,19 @@ const Dashboard = () => {
                 required={wallets.length === 0}
                 onClose={handleCloseWalletModal}
                 onCreated={handleWalletCreated}
+            />
+
+            <TransferFormModal
+                open={openTransferModal}
+                onClose={() => setOpenTransferModal(false)}
+            />
+
+            <BudgetFormModal
+                open={openBudgetModal}
+                onClose={() => { setOpenBudgetModal(false); setEditingBudget(null); }}
+                onSubmit={handleBudgetSubmit}
+                isSubmitting={createBudget.isPending || updateBudget.isPending}
+                editingBudget={editingBudget}
             />
         </Layout>
     );

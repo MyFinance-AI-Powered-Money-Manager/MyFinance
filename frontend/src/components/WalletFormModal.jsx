@@ -4,17 +4,15 @@ import { useCreateWallet } from '../hooks/useFinance';
 import { showError } from '../lib/toast';
 
 const walletTypes = [
-    { value: 'bank', label: 'Bank' },
-    { value: 'e-wallet', label: 'E-Wallet' },
-    { value: 'cash', label: 'Cash' },
-    { value: 'savings', label: 'Savings' },
-    { value: 'emergency_fund', label: 'Emergency Fund' },
+    { value: 'BANK', label: 'Bank' },
+    { value: 'E-WALLET', label: 'E-Wallet' },
+    { value: 'CASH', label: 'Cash' },
 ];
 
 export const WalletFormModal = ({ open, required = false, onClose, onCreated }) => {
     const createWallet = useCreateWallet();
     const [name, setName] = React.useState('');
-    const [type, setType] = React.useState('bank');
+    const [type, setType] = React.useState('BANK');
     const [balance, setBalance] = React.useState('0');
 
     React.useEffect(() => {
@@ -23,7 +21,7 @@ export const WalletFormModal = ({ open, required = false, onClose, onCreated }) 
         }
 
         setName('');
-        setType('bank');
+        setType('BANK');
         setBalance('0');
     }, [open]);
 
@@ -88,7 +86,7 @@ export const WalletFormModal = ({ open, required = false, onClose, onCreated }) 
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             className="finance-input"
-                            placeholder="Contoh: Dompet Utama"
+                            placeholder="Contoh: BCA Utama"
                             required
                         />
                     </div>
