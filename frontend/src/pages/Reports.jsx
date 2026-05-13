@@ -7,11 +7,11 @@ import { useTransactions } from '../hooks/useFinance';
 import { useLanguage } from '../context/LanguageContext';
 import { cn, formatCurrency } from '../lib/utils';
 
-const fallbackChartData = [
-    { name: 'W1', income: 5600000, expense: 4600000 },
-    { name: 'W2', income: 7800000, expense: 3900000 },
-    { name: 'W3', income: 5100000, expense: 5600000 },
-    { name: 'W4', income: 9200000, expense: 2800000 },
+const emptyChartData = [
+    { name: 'W1', income: 0, expense: 0 },
+    { name: 'W2', income: 0, expense: 0 },
+    { name: 'W3', income: 0, expense: 0 },
+    { name: 'W4', income: 0, expense: 0 },
 ];
 
 const getDateValue = (tx) => {
@@ -22,6 +22,71 @@ const getDateValue = (tx) => {
 
     const parsedDate = new Date(rawDate);
     return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+};
+
+const getMonthKey = (value) => {
+    const date = value ? new Date(value) : null;
+
+    if (!date || Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}`;
+};
+
+const getCurrentMonthKey = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}`;
+};
+
+const getPreviousMonthKey = (monthKey) => {
+    const [year, month] = monthKey.split('-').map(Number);
+    const previousDate = new Date(year, month - 2, 1);
+    const previousYear = previousDate.getFullYear();
+    const previousMonth = String(previousDate.getMonth() + 1).padStart(2, '0');
+    return `${previousYear}-${previousMonth}`;
+};
+
+const getTransactionMonthKey = (tx) => getMonthKey(tx.date || tx.createdAt);
+
+const calculatePercentageChange = (currentValue, previousValue) => {
+    if (previousValue <= 0) {
+        return currentValue > 0 ? 100 : 0;
+    }
+
+    return ((currentValue - previousValue) / previousValue) * 100;
+};
+
+const formatTrend = (value, language) => {
+    const roundedValue = Math.round(Math.abs(value));
+
+    if (value > 0) {
+        return language === 'id' ? `+${roundedValue}% dari bulan lalu` : `+${roundedValue}% from last month`;
+    }
+
+    if (value < 0) {
+        return language === 'id' ? `-${roundedValue}% dari bulan lalu` : `-${roundedValue}% from last month`;
+    }
+
+    return language === 'id' ? '0% dari bulan lalu' : '0% from last month';
+};
+
+const formatAxisValue = (value) => {
+    if (value >= 1000000) {
+        const millions = value / 1000000;
+        return `${Number.isInteger(millions) ? millions : millions.toFixed(1)}M`;
+    }
+
+    if (value >= 1000) {
+        const thousands = value / 1000;
+        return `${Number.isInteger(thousands) ? thousands : thousands.toFixed(1)}K`;
+    }
+
+    return value;
 };
 
 const formatRelativeDate = (value, language) => {
@@ -68,7 +133,7 @@ const getCategoryIcon = (category) => {
 
 const buildChartData = (transactions) => {
     if (!transactions.length) {
-        return fallbackChartData;
+        return emptyChartData;
     }
 
     const buckets = [
@@ -92,7 +157,7 @@ const buildChartData = (transactions) => {
         }
     });
 
-    return buckets.some((bucket) => bucket.income > 0 || bucket.expense > 0) ? buckets : fallbackChartData;
+    return buckets.some((bucket) => bucket.income > 0 || bucket.expense > 0) ? buckets : emptyChartData;
 };
 
 const Reports = () => {
@@ -100,6 +165,8 @@ const Reports = () => {
     const { data: transactionsData, isLoading, error } = useTransactions();
 
     const transactions = Array.isArray(transactionsData) ? transactionsData : transactionsData?.data ?? [];
+    const currentMonthKey = getCurrentMonthKey();
+    const previousMonthKey = getPreviousMonthKey(currentMonthKey);
 
     if (isLoading) {
         return <LoadingScreen />;
@@ -122,7 +189,10 @@ const Reports = () => {
         return rightDate - leftDate;
     });
 
-    const totals = transactions.reduce(
+    const currentMonthTransactions = sortedTransactions.filter((tx) => getTransactionMonthKey(tx) === currentMonthKey);
+    const previousMonthTransactions = sortedTransactions.filter((tx) => getTransactionMonthKey(tx) === previousMonthKey);
+
+    const currentTotals = currentMonthTransactions.reduce(
         (accumulator, tx) => {
             const amount = Number(tx.amount ?? 0);
             const type = String(tx.type || '').toUpperCase() || (amount >= 0 ? 'INCOME' : 'EXPENSE');
@@ -145,11 +215,39 @@ const Reports = () => {
         { income: 0, expense: 0, count: 0, days: new Set() }
     );
 
-    const activeDays = Math.max(1, totals.days.size || 1);
-    const savingsRate = totals.income > 0 ? Math.max(0, ((totals.income - totals.expense) / totals.income) * 100) : 0;
-    const averageExpense = totals.expense / activeDays;
-    const chartData = buildChartData(sortedTransactions);
-    const recentTransactions = sortedTransactions.slice(0, 3);
+    const previousTotals = previousMonthTransactions.reduce(
+        (accumulator, tx) => {
+            const amount = Number(tx.amount ?? 0);
+            const type = String(tx.type || '').toUpperCase() || (amount >= 0 ? 'INCOME' : 'EXPENSE');
+
+            if (type === 'INCOME') {
+                accumulator.income += Math.abs(amount);
+            } else {
+                accumulator.expense += Math.abs(amount);
+            }
+
+            accumulator.count += 1;
+
+            const dateKey = getDateValue(tx)?.toDateString();
+            if (dateKey) {
+                accumulator.days.add(dateKey);
+            }
+
+            return accumulator;
+        },
+        { income: 0, expense: 0, count: 0, days: new Set() }
+    );
+
+    const currentActiveDays = Math.max(1, currentTotals.days.size || 1);
+    const previousActiveDays = Math.max(1, previousTotals.days.size || 1);
+    const savingsRate = currentTotals.income > 0 ? Math.max(0, ((currentTotals.income - currentTotals.expense) / currentTotals.income) * 100) : 0;
+    const averageExpense = currentTotals.expense / currentActiveDays;
+    const previousAverageExpense = previousTotals.expense / previousActiveDays;
+    const transactionTrend = calculatePercentageChange(currentTotals.count, previousTotals.count);
+    const expenseTrend = calculatePercentageChange(averageExpense, previousAverageExpense);
+    const chartData = buildChartData(currentMonthTransactions);
+    const recentTransactions = currentMonthTransactions.slice(0, 3);
+    const hasCurrentMonthData = currentMonthTransactions.length > 0;
 
     return (
         <Layout>
@@ -179,9 +277,9 @@ const Reports = () => {
                             <div className="relative flex items-start justify-between gap-4">
                                 <div>
                                     <p className="text-sm text-zinc-500 dark:text-[#B0B8CC]">{t('total_transactions')}</p>
-                                    <h2 className="mt-4 text-3xl font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{totals.count}</h2>
+                                    <h2 className="mt-4 text-3xl font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{currentTotals.count}</h2>
                                     <p className="mt-3 flex items-center gap-1 text-sm font-semibold text-finance-700">
-                                        <TrendingUp className="h-4 w-4" /> +12% dari bulan lalu
+                                        <TrendingUp className="h-4 w-4" /> {formatTrend(transactionTrend, language)}
                                     </p>
                                 </div>
                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E5F6E8] text-finance-700">
@@ -199,7 +297,7 @@ const Reports = () => {
                                         {formatCurrency(averageExpense)}<span className="text-base font-medium text-zinc-400 dark:text-[#8B92A9]">/hari</span>
                                     </h2>
                                     <p className="mt-3 flex items-center gap-1 text-sm font-semibold text-[#D1496F]">
-                                        <TrendingDown className="h-4 w-4" /> -5% dari bulan lalu
+                                        <TrendingDown className="h-4 w-4" /> {formatTrend(expenseTrend, language)}
                                     </p>
                                 </div>
                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FBE5EA] text-[#D1496F]">
@@ -250,17 +348,7 @@ const Reports = () => {
                                         axisLine={false}
                                         tickLine={false}
                                         tick={{ fontSize: 11, fill: '#6B7280' }}
-                                        tickFormatter={(value) => {
-                                            if (value >= 1000000) {
-                                                return `${Math.round(value / 1000000)}M`;
-                                            }
-
-                                            if (value >= 1000) {
-                                                return `${Math.round(value / 1000)}K`;
-                                            }
-
-                                            return value;
-                                        }}
+                                        tickFormatter={formatAxisValue}
                                     />
                                     <Tooltip
                                         cursor={{ fill: '#F7FBF3' }}
@@ -272,6 +360,11 @@ const Reports = () => {
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
+                        {!hasCurrentMonthData && (
+                            <p className="mt-4 text-sm text-zinc-500 dark:text-[#8B92A9]">
+                                Belum ada transaksi bulan ini, jadi grafik menampilkan nilai 0.
+                            </p>
+                        )}
                     </div>
                 </div>
 
