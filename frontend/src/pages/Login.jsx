@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Globe, Mail, Lock } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { loginSchema, validateData } from '../lib/validation';
-import { showError, showSuccess } from '../lib/toast';
+import { showError } from '../lib/toast';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -13,23 +13,25 @@ const Login = () => {
     const { login, loading } = useAuth();
     const [showPassword, setShowPassword] = React.useState(false);
     const [formData, setFormData] = React.useState({ email: '', password: '' });
+    const [formError, setFormError] = React.useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setFormError('');
 
         const { data, error: validationError } = validateData(loginSchema, formData);
         if (validationError) {
+            setFormError(validationError);
             showError(validationError);
             return;
         }
 
         try {
             await login(data.email, data.password);
-            showSuccess('Login berhasil');
-            // Delay navigation to ensure state is updated
-            setTimeout(() => navigate('/dashboard'), 100);
+            navigate('/dashboard');
         } catch (authError) {
             const errorMsg = authError?.response?.data?.message || authError?.message || 'Login gagal';
+            setFormError(errorMsg);
             showError(errorMsg);
         }
     };
@@ -73,6 +75,13 @@ const Login = () => {
                             Lanjutkan ke dashboard untuk melihat transaksi, laporan, dan insight kamu.
                         </p>
 
+                        {formError ? (
+                            <div className="mt-4 flex items-start gap-3 rounded-[18px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                                <p className="leading-6">{formError}</p>
+                            </div>
+                        ) : null}
+
                         <form className="mt-4 space-y-2" onSubmit={handleSubmit}>
                         <div className="space-y-0.5">
                             <label className="text-[11px] font-semibold text-zinc-700 dark:text-[#D9DCE3]">{t('email')}</label>
@@ -84,7 +93,10 @@ const Login = () => {
                                     type="email"
                                     placeholder="nama@email.com"
                                     value={formData.email}
-                                    onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                                    onChange={(e) => {
+                                        setFormError('');
+                                        setFormData((prev) => ({ ...prev, email: e.target.value }));
+                                    }}
                                     className="finance-input pl-9 text-xs py-1.5"
                                 />
                             </div>
@@ -103,7 +115,10 @@ const Login = () => {
                                     type={showPassword ? "text" : "password"}
                                     placeholder="••••••••"
                                     value={formData.password}
-                                    onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
+                                    onChange={(e) => {
+                                        setFormError('');
+                                        setFormData((prev) => ({ ...prev, password: e.target.value }));
+                                    }}
                                     className="finance-input pl-9 pr-9 text-xs py-1.5"
                                 />
                                 <button
@@ -120,19 +135,6 @@ const Login = () => {
                             {loading ? 'Memproses...' : 'Masuk'}
                         </button>
 
-                        <div className="relative py-1">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-zinc-200"></div>
-                            </div>
-                            <div className="relative flex justify-center text-[8px] uppercase tracking-[0.15em] text-zinc-400">
-                                <span className="bg-[#F7FBF3] px-2 font-bold">Atau masuk dengan</span>
-                            </div>
-                        </div>
-
-                        <button type="button" className="flex h-9 w-full items-center justify-center gap-1.5 rounded-[22px] border border-[#E7EEDF] bg-white text-zinc-700 text-[10px] font-semibold transition hover:bg-zinc-50 dark:border-[#3F4959] dark:bg-[#2D3748] dark:text-[#E8EAED] dark:hover:bg-[#3F4959]">
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="h-3.5 w-3.5" />
-                            {t('google')}
-                        </button>
                         </form>
 
                         <p className="mt-3 text-center text-[10px] text-zinc-500">

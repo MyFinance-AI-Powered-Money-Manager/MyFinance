@@ -21,7 +21,7 @@ const WALLET_ICON_MAP = {
 };
 
 const Dashboard = () => {
-    const { t, language } = useLanguage();
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
@@ -33,7 +33,7 @@ const Dashboard = () => {
     const [editingBudget, setEditingBudget] = React.useState(null);
 
     const { data: walletsData, isLoading: walletsLoading, error: walletsError } = useWallets();
-    const { data: budgetsData, isLoading: budgetsLoading } = useBudgets();
+    const { data: budgetsData } = useBudgets();
     const { data: transactionsData, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
     const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useDashboardSummary();
     const createTransaction = useCreateTransaction();
@@ -216,7 +216,7 @@ const Dashboard = () => {
                     </div>
                 </section>
 
-                <section className="hidden gap-3 lg:grid">
+                <section className="mt-4 grid grid-cols-3 gap-3 lg:hidden">
                     <button
                         onClick={() => {
                             if (wallets.length === 0) {
@@ -227,13 +227,13 @@ const Dashboard = () => {
                             setFormType('INCOME');
                             setOpenTransactionModal(true);
                         }}
-                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-4 text-finance-700 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-finance-700 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
                         disabled={wallets.length === 0}
                     >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#DDF4E2]">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#DDF4E2]">
                             <Plus className="h-5 w-5" />
                         </div>
-                        <span className="text-sm font-semibold">{t('catat_pemasukan')}</span>
+                        <span className="text-xs font-semibold">{t('catat_pemasukan')}</span>
                     </button>
                     <button
                         onClick={() => {
@@ -245,13 +245,13 @@ const Dashboard = () => {
                             setFormType('EXPENSE');
                             setOpenTransactionModal(true);
                         }}
-                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-4 text-red-500 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-red-500 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
                         disabled={wallets.length === 0}
                     >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FBE5EA]">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FBE5EA]">
                             <Minus className="h-5 w-5" />
                         </div>
-                        <span className="text-sm font-semibold">{t('catat_pengeluaran')}</span>
+                        <span className="text-xs font-semibold">{t('catat_pengeluaran')}</span>
                     </button>
                     <button
                         onClick={() => {
@@ -261,13 +261,13 @@ const Dashboard = () => {
                             }
                             setOpenTransferModal(true);
                         }}
-                        className="flex items-center justify-center gap-3 rounded-[24px] bg-white px-5 py-4 text-blue-600 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-blue-600 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
                         disabled={wallets.length < 2}
                     >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50">
                             <Repeat className="h-5 w-5" />
                         </div>
-                        <span className="text-sm font-semibold">Transfer Dana</span>
+                        <span className="text-xs font-semibold">Transfer</span>
                     </button>
                 </section>
             </div>
@@ -318,7 +318,7 @@ const Dashboard = () => {
                         onClick={() => { setEditingBudget(null); setOpenBudgetModal(true); }}
                         className="flex items-center gap-1.5 rounded-full bg-[#7CF38E] px-4 py-2 text-xs font-semibold text-finance-800 transition hover:-translate-y-0.5"
                     >
-                        <Plus className="h-3.5 w-3.5" /> {t('create_budget')}
+                        <Plus className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{t('create_budget')}</span>
                     </button>
                 </div>
 
@@ -435,44 +435,6 @@ const Dashboard = () => {
                         )}
                     </div>
                 </section>
-            </div>
-
-            {/* Mobile action buttons */}
-            <div className="mt-4 grid grid-cols-3 gap-3 lg:hidden">
-                <button
-                    onClick={() => {
-                        setFormType('INCOME');
-                        setOpenTransactionModal(true);
-                    }}
-                    className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-finance-700 shadow-card"
-                >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#DDF4E2]">
-                        <Plus className="h-5 w-5" />
-                    </div>
-                    <span className="text-xs font-semibold">{t('catat_pemasukan')}</span>
-                </button>
-                <button
-                    onClick={() => {
-                        setFormType('EXPENSE');
-                        setOpenTransactionModal(true);
-                    }}
-                    className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-red-500 shadow-card"
-                >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FBE5EA]">
-                        <Minus className="h-5 w-5" />
-                    </div>
-                    <span className="text-xs font-semibold">{t('catat_pengeluaran')}</span>
-                </button>
-                <button
-                    onClick={() => setOpenTransferModal(true)}
-                    className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-blue-600 shadow-card"
-                    disabled={wallets.length < 2}
-                >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50">
-                        <Repeat className="h-5 w-5" />
-                    </div>
-                    <span className="text-xs font-semibold">Transfer</span>
-                </button>
             </div>
 
             <div className="fixed bottom-24 right-6 z-50 md:hidden">

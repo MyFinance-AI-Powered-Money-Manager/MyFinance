@@ -33,7 +33,7 @@ const Landing = () => {
             </nav>
 
             {/* Hero Section */}
-            <section className="pt-40 lg:pt-52 px-6 lg:px-12 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <section className="pt-28 md:pt-32 lg:pt-40 px-6 lg:px-12 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
                 <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -48,7 +48,7 @@ const Landing = () => {
                     <p className="text-lg text-zinc-500 mb-10 max-w-lg leading-relaxed">
                         MyFinance menggunakan AI untuk membaca struk belanja secara otomatis. Hemat waktu, pantau pengeluaran, dan capai tujuan finansial dengan alur yang lebih rapi.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                         <button onClick={() => navigate('/register')} className="flex items-center justify-center gap-2 rounded-full bg-[#008744] px-8 py-4 text-lg font-bold text-white hover:bg-[#007038] transition-all group">
                             Buat Akun <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                         </button>

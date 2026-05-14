@@ -6,6 +6,7 @@ import { EXPENSE_CATEGORIES } from '../lib/categories';
 import { config } from '../lib/config';
 import { formatCurrency } from '../lib/utils';
 import { useLanguage } from '../context/LanguageContext';
+import { showError, showSuccess } from '../lib/toast';
 
 const coalesce = (...values) => values.find((value) => value !== undefined && value !== null);
 
@@ -71,6 +72,7 @@ const Scan = () => {
   const [editDate, setEditDate] = React.useState('');
   const [editCategory, setEditCategory] = React.useState('NEEDS');
   const [editSubcategory, setEditSubcategory] = React.useState('');
+  const fileInputRef = React.useRef(null);
 
   const scanReceipt = useScanReceipt();
   const createTransaction = useCreateTransaction();
@@ -118,6 +120,7 @@ const Scan = () => {
     setFile(pickedFile);
     setResult(null);
     setEditItems([]);
+    event.target.value = '';
 
     const localUrl = URL.createObjectURL(pickedFile);
     setPreviewUrl((prev) => {
@@ -217,6 +220,9 @@ const Scan = () => {
       setPreviewUrl('');
       setResult(null);
       setEditItems([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch {
       // Error already handled by the mutation callback.
     }
@@ -243,14 +249,43 @@ const Scan = () => {
             {t('upload_receipt')}
           </h2>
 
-          <label className="mb-4 flex h-48 cursor-pointer flex-col items-center justify-center rounded-[22px] border-2 border-dashed border-[#D9E5CF] bg-[#FAFCF7] p-4 text-center transition hover:border-finance-500 hover:bg-[#F3F8EE] dark:border-[#3F4959] dark:bg-[#2D3748] dark:hover:border-[#7CF38E]">
-            <FileImage className="mb-3 h-10 w-10 text-zinc-400 dark:text-[#8B92A9]" />
-            <span className="text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">
-              {file ? file.name : t('click_to_upload')}
-            </span>
-            <span className="mt-1 text-xs text-zinc-500 dark:text-[#8B92A9]">{t('max_size')}</span>
-            <input type="file" className="hidden" accept="image/jpeg,image/png,image/webp" onChange={handlePickFile} />
-          </label>
+          <div className="mb-4 rounded-[22px] border-2 border-dashed border-[#D9E5CF] bg-[#FAFCF7] p-4 transition hover:border-finance-500 hover:bg-[#F3F8EE] dark:border-[#3F4959] dark:bg-[#2D3748] dark:hover:border-[#7CF38E]">
+            <div className="flex min-h-48 flex-col items-center justify-center text-center">
+              <FileImage className="mb-3 h-10 w-10 text-zinc-400 dark:text-[#8B92A9]" />
+              <span className="text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">
+                {file ? file.name : '1 foto struk saja'}
+              </span>
+              <span className="mt-1 text-xs text-zinc-500 dark:text-[#8B92A9]">JPG, PNG, WEBP · Maks 10 MB</span>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-finance-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-finance-800"
+                >
+                  <Upload className="h-4 w-4" />
+                  {file ? 'Ganti foto' : 'Pilih foto'}
+                </button>
+                {file ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFile(null);
+                      setPreviewUrl('');
+                      setResult(null);
+                      setEditItems([]);
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                      }
+                    }}
+                    className="inline-flex items-center justify-center rounded-full border border-[#D9E5CF] bg-white px-5 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-[#3F4959] dark:bg-[#253044] dark:text-[#E8EAED] dark:hover:bg-[#2D3748]"
+                  >
+                    Hapus
+                  </button>
+                ) : null}
+              </div>
+              <input ref={fileInputRef} type="file" className="hidden" accept="image/jpeg,image/png,image/webp" onChange={handlePickFile} />
+            </div>
+          </div>
 
           {previewUrl ? (
             <img src={previewUrl} alt="Preview struk" className="mb-4 max-h-72 w-full rounded-[22px] bg-zinc-50 object-contain dark:bg-[#2D3748]" />
@@ -268,7 +303,7 @@ const Scan = () => {
               : !aiConfigured
                 ? t('ai_server_not_configured')
                 : !file
-                  ? t('select_photo_first')
+                  ? 'Pilih foto terlebih dahulu'
                   : t('scan_with_ai')}
           </button>
 
