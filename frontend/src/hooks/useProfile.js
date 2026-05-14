@@ -74,18 +74,22 @@ export const useUpdateProfile = () => {
     const { updateUser } = useAuth();
 
     return useMutation({
-        mutationFn: async ({ full_name, profile_picture }) => {
-            let profilePictureValue = profile_picture;
+        mutationFn: async (payload) => {
+            const { full_name } = payload || {};
+            const body = { full_name };
 
-            if (profile_picture instanceof File) {
-                profilePictureValue = await fileToCompressedDataUrl(profile_picture);
+            // Only include profile_picture when explicitly provided in payload
+            if (Object.prototype.hasOwnProperty.call(payload || {}, 'profile_picture')) {
+                const incoming = payload.profile_picture;
+                if (incoming instanceof File) {
+                    body.profile_picture = await fileToCompressedDataUrl(incoming);
+                } else {
+                    // allow null to explicitly remove picture
+                    body.profile_picture = incoming || null;
+                }
             }
 
-            const response = await api.put('/users/profile', {
-                full_name,
-                profile_picture: profilePictureValue || null,
-            });
-
+            const response = await api.put('/users/profile', body);
             return response;
         },
         onSuccess: (response) => {
