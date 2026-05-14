@@ -14,10 +14,10 @@ export const Sidebar = () => {
 
     const navItems = [
         { icon: LayoutDashboard, label: t('home'), path: '/dashboard' },
-        { icon: UserCircle2, label: t('profile'), path: '/profile' },
-        { icon: Scan, label: t('scan'), path: '/scan' },
         { icon: History, label: t('transactions'), path: '/transactions' },
+        { icon: Scan, label: t('scan'), path: '/scan' },
         { icon: BarChart3, label: t('reports'), path: '/reports' },
+        { icon: UserCircle2, label: t('profile'), path: '/profile' },
     ];
 
     return (
@@ -71,10 +71,10 @@ export const MobileNav = () => {
     const { t } = useLanguage();
     const navItems = [
         { icon: LayoutDashboard, label: t('home'), path: '/dashboard' },
-        { icon: UserCircle2, label: t('profile'), path: '/profile' },
-        { icon: Scan, label: t('scan'), path: '/scan' },
         { icon: History, label: t('transactions'), path: '/transactions' },
+        { icon: Scan, label: t('scan'), path: '/scan' },
         { icon: BarChart3, label: t('reports'), path: '/reports' },
+        { icon: UserCircle2, label: t('profile'), path: '/profile' },
     ];
 
     return (

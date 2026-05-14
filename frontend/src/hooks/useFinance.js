@@ -6,28 +6,32 @@ import { showError, showSuccess, showWarning } from '../lib/toast';
 
 const unwrapData = (response) => response?.data?.data ?? response?.data ?? response;
 
+const firstDefined = (...values) => values.find((value) => value !== undefined && value !== null);
+
+const toNumber = (...values) => Number(firstDefined(...values) ?? 0);
+
 const normalizeWallet = (wallet) => ({
   ...wallet,
   id: wallet?.id,
-  name: wallet?.name ?? wallet?.label ?? wallet?.type ?? 'Wallet',
+  name: firstDefined(wallet?.name, wallet?.label, wallet?.type, 'Wallet'),
   type: wallet?.type ?? 'CASH',
-  balance: Number(wallet?.balance ?? wallet?.amount ?? 0),
+  balance: toNumber(wallet?.balance, wallet?.amount),
 });
 
 const normalizeBudget = (budget) => ({
   ...budget,
   id: budget?.id,
   category: budget?.category ?? 'OTHER',
-  limit_amount: Number(budget?.limit_amount ?? budget?.limit ?? budget?.amount ?? 0),
-  limit: Number(budget?.limit_amount ?? budget?.limit ?? budget?.amount ?? 0),
-  month_period: budget?.month_period ?? budget?.monthPeriod ?? null,
-  monthPeriod: budget?.month_period ?? budget?.monthPeriod ?? null,
-  spent: Number(budget?.spent ?? budget?.used ?? 0),
+  limit_amount: toNumber(budget?.limit_amount, budget?.limit, budget?.amount),
+  limit: toNumber(budget?.limit_amount, budget?.limit, budget?.amount),
+  month_period: firstDefined(budget?.month_period, budget?.monthPeriod, null),
+  monthPeriod: firstDefined(budget?.month_period, budget?.monthPeriod, null),
+  spent: toNumber(budget?.spent, budget?.used),
 });
 
 const normalizeTransaction = (tx) => {
-  const totalAmount = Number(tx?.total_amount ?? tx?.amount ?? 0);
-  const transactionDate = tx?.transaction_date ?? tx?.date ?? tx?.created_at ?? tx?.createdAt ?? null;
+  const totalAmount = toNumber(tx?.total_amount, tx?.amount);
+  const transactionDate = firstDefined(tx?.transaction_date, tx?.date, tx?.created_at, tx?.createdAt, null);
   const rawType = String(tx?.type ?? 'EXPENSE').toUpperCase();
 
   return {
@@ -51,7 +55,7 @@ const normalizeTransaction = (tx) => {
 const normalizeTransactionPayload = (data) => ({
   wallet_id: data?.wallet_id ?? data?.walletId ?? null,
   type: String(data?.type ?? 'EXPENSE').toUpperCase(),
-  total_amount: Number(data?.total_amount ?? data?.amount ?? 0),
+  total_amount: toNumber(data?.total_amount, data?.amount),
   category: String(data?.category ?? 'OTHER').toUpperCase(),
   subcategory: data?.subcategory ?? '',
   description: data?.description ?? '',
@@ -71,7 +75,7 @@ const normalizeInsight = (insight) => {
     return null;
   }
 
-  return raw.data ?? raw.ai_insight ?? raw.insight ?? raw.message ?? raw.recommendation ?? raw.text ?? raw;
+  return firstDefined(raw.data, raw.ai_insight, raw.insight, raw.message, raw.recommendation, raw.text, raw);
 };
 
 // ────────────── Wallets ──────────────
@@ -276,7 +280,6 @@ export const useCreateTransaction = () => {
 
       showSuccess('Transaksi berhasil dicatat');
 
-      // Handle overbudget warning from backend
       if (responseData?.is_overbudget) {
         setTimeout(() => {
           showWarning(
@@ -331,7 +334,7 @@ export const useDashboardSummary = (options = {}) => {
   });
 };
 
-// ────────────── AI Services ──────────────
+// Scan and insights
 
 export const useScanReceipt = () => {
   return useMutation({
@@ -340,7 +343,6 @@ export const useScanReceipt = () => {
         throw new Error('Endpoint scan AI belum dikonfigurasi. Cek VITE_AI_API_URL dan VITE_SCAN_ENDPOINT.');
       }
 
-      // Direct call to AI server — NOT through backend (faster, no double-hop)
       const url = `${config.aiApiUrl.replace(/\/+$/, '')}/${config.scanEndpoint}`;
 
       const response = await axios.post(url, formData, {
@@ -348,7 +350,7 @@ export const useScanReceipt = () => {
           'Content-Type': 'multipart/form-data',
           'x-internal-service-key': config.aiServiceKey,
         },
-        timeout: 30000, // OCR can be slow
+        timeout: 30000,
       });
 
       return response.data;

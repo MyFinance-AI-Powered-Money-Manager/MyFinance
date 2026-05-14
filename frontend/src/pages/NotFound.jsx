@@ -69,7 +69,7 @@ export default function NotFound() {
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">404</p>
                 <h2 className="mt-4 text-3xl font-extrabold leading-tight">Link mungkin salah, atau halaman sudah dipindahkan.</h2>
                 <p className="mt-4 text-sm leading-7 text-white/80">
-                  MyFinance tetap menjaga pengalaman tetap rapi: ketika sebuah alamat tidak valid, kami mengarahkan pengguna ke jalur yang paling relevan dan jelas.
+                  Halaman ini tidak tersedia. Gunakan tautan di bawah untuk kembali ke beranda, membuka penjelasan produk, atau masuk ke akun.
                 </p>
 
                 <div className="mt-6 rounded-[24px] bg-white/10 p-4 backdrop-blur-sm">

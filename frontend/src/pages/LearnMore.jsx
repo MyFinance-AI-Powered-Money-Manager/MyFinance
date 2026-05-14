@@ -9,32 +9,32 @@ const featureCards = [
     {
         icon: ScanLine,
         title: 'Scan yang cepat',
-        description: 'Unggah struk, baca data, dan simpan transaksi dalam hitungan detik tanpa input manual yang berulang.',
+        description: 'Unggah struk, tinjau item yang terdeteksi, lalu simpan transaksi setelah detailnya benar.',
     },
     {
         icon: Workflow,
         title: 'Alur produk yang jelas',
-        description: 'MyFinance memetakan pemasukan, pengeluaran, dan kategori dengan struktur yang mudah dibaca saat dibutuhkan.',
+        description: 'Pemasukan, pengeluaran, kategori, dan dompet ditampilkan dalam alur yang tidak membuat pengguna bolak-balik.',
     },
     {
         icon: ShieldCheck,
         title: 'Privasi yang diprioritaskan',
-        description: 'Data keuangan dirancang untuk tetap aman, sehingga pengalaman pengguna tetap nyaman dan profesional.',
+        description: 'Data disimpan untuk kebutuhan aplikasi dan hanya dibuka lewat jalur yang memang dipakai pengguna.',
     },
 ];
 
 const steps = [
     {
         title: 'Ambil foto struk',
-        description: 'Satu foto saja cukup untuk memulai pencatatan tanpa pengisian form yang panjang.',
+        description: 'Satu foto cukup untuk menampilkan item, nominal, dan tanggal yang bisa diedit sebelum disimpan.',
     },
     {
         title: 'Sistem mengelompokkan data',
-        description: 'AI membantu menandai nominal, kategori, dan ringkasan transaksi secara terstruktur.',
+        description: 'AI menandai nominal, kategori, dan ringkasan supaya pengguna tidak mulai dari form kosong.',
     },
     {
         title: 'Lihat insight yang relevan',
-        description: 'Dashboard dan laporan memudahkan kamu membaca pola pengeluaran dari waktu ke waktu.',
+        description: 'Dashboard dan laporan menyorot perubahan yang paling terlihat dari periode ke periode.',
     },
 ];
 
@@ -61,7 +61,7 @@ const LearnMore = () => {
                             Pelajari bagaimana MyFinance membantu pengelolaan keuangan berjalan lebih cepat dan rapi.
                         </h1>
                         <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-600 sm:text-lg">
-                            Halaman ini menjelaskan alur kerja MyFinance dari proses scan, pencatatan transaksi, hingga insight yang membantu pengguna memahami kondisi keuangan dengan lebih cepat. Fokusnya adalah produk yang efisien, jelas, dan siap dipakai setiap hari.
+                            Halaman ini menunjukkan alur kerja MyFinance dari scan struk, pengecekan item, sampai laporan yang dipakai untuk evaluasi harian. Fokusnya ada pada langkah yang singkat dan hasil yang mudah ditinjau.
                         </p>
 
                         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -185,14 +185,14 @@ const LearnMore = () => {
                                 <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-400">Rute berikutnya</p>
                                     <h3 className="mt-3 text-2xl font-bold text-zinc-900">Jelajahi lebih banyak</h3>
-                                    <p className="mt-4 text-sm leading-7 text-zinc-500">Setelah memahami cara kerja aplikasi, kamu dapat melanjutkan ke bagian insight investasi atau langsung mulai menggunakan MyFinance.</p>
+                                    <p className="mt-4 text-sm leading-7 text-zinc-500">Setelah memahami alurnya, kamu bisa lanjut ke insight investasi atau langsung masuk ke aplikasi untuk mencoba fiturnya.</p>
                                 </div>
                                 <div className="mt-8 rounded-[24px] bg-[#FAFCF7] p-5">
                                     <div className="flex items-center gap-3 text-finance-700">
                                         <BookOpen className="h-5 w-5" />
                                         <p className="text-sm font-semibold">Siap memulai perjalanan finansialmu?</p>
                                     </div>
-                                    <p className="mt-3 text-sm leading-7 text-zinc-500">Bergabunglah dengan ribuan pengguna yang telah mempercayai MyFinance untuk mengelola keuangan mereka.</p>
+                                    <p className="mt-3 text-sm leading-7 text-zinc-500">Mulai dari satu struk, lalu lihat bagaimana transaksi tersusun dan bisa dicek ulang kapan saja.</p>
                                 </div>
                             </div>
                         </div>

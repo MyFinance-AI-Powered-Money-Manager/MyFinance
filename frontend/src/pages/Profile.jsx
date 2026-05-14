@@ -24,7 +24,7 @@ const Profile = () => {
     const [fullName, setFullName] = React.useState('');
     const [selectedFile, setSelectedFile] = React.useState(null);
     const [previewUrl, setPreviewUrl] = React.useState('');
-    const [_previewLoadFailed, setPreviewLoadFailed] = React.useState(false);
+    const [previewLoadFailed, setPreviewLoadFailed] = React.useState(false);
     const [oldPassword, setOldPassword] = React.useState('');
     const [newPassword, setNewPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
@@ -34,6 +34,7 @@ const Profile = () => {
         setFullName(activeUser.full_name || '');
         setPreviewUrl(resolveMediaUrl(activeUser.profile_picture));
         setPreviewLoadFailed(false);
+        setRemovePhoto(false);
     }, [profile, authUser]);
 
     React.useEffect(() => {
@@ -86,6 +87,17 @@ const Profile = () => {
         setSelectedFile(file);
         setPreviewUrl(objectUrl);
         setPreviewLoadFailed(false);
+        setRemovePhoto(false);
+    };
+
+    const handleRemovePhoto = () => {
+        if (previewUrl?.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl);
+        }
+
+        setSelectedFile(null);
+        setPreviewUrl('');
+        setRemovePhoto(true);
     };
 
     const handleProfileSubmit = async (event) => {
@@ -97,11 +109,17 @@ const Profile = () => {
         }
 
         try {
-            await updateProfile.mutateAsync({
-                full_name: fullName.trim(),
-                profile_picture: selectedFile,
-            });
+            const payload = { full_name: fullName.trim() };
+
+            if (selectedFile) {
+                payload.profile_picture = selectedFile;
+            } else if (removePhoto) {
+                payload.profile_picture = null;
+            }
+
+            await updateProfile.mutateAsync(payload);
             setSelectedFile(null);
+            setRemovePhoto(false);
         } catch {
             // Error already handled by the mutation callback.
         }
@@ -168,6 +186,42 @@ const Profile = () => {
                         <section className="finance-card p-6 md:p-8">
                             <h3 className="mb-6 text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('personal_info')}</h3>
                             <form onSubmit={handleProfileSubmit} className="space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-20 w-20 shrink-0 rounded-full overflow-hidden bg-zinc-100 dark:bg-[#252a33] flex items-center justify-center text-2xl font-bold text-zinc-700 dark:text-[#B0B8CC]">
+                                        {avatarUrl && !previewLoadFailed ? (
+                                            <img
+                                                src={avatarUrl}
+                                                alt="avatar"
+                                                className="h-full w-full object-cover"
+                                                onError={() => setPreviewLoadFailed(true)}
+                                            />
+                                        ) : (
+                                            <span>{initial}</span>
+                                        )}
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="flex items-center gap-2 rounded-[14px] border px-3 py-2 text-sm font-semibold"
+                                            >
+                                                <Camera className="h-4 w-4" /> Unggah Foto
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={handleRemovePhoto}
+                                                className="flex items-center gap-2 rounded-[14px] border px-3 py-2 text-sm font-semibold text-red-600"
+                                            >
+                                                <Trash2 className="h-4 w-4" /> Hapus Foto
+                                            </button>
+                                        </div>
+                                        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+                                        {previewLoadFailed && <p className="mt-2 text-sm text-red-600">Gagal memuat preview gambar.</p>}
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label className="mb-2 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">{t('full_name_label')}</label>
                                     <input

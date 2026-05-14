@@ -116,21 +116,20 @@ const Landing = () => {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Left: Parsing Struk Neural card */}
                         <div className="rounded-[40px] bg-white p-8 border border-zinc-100 shadow-sm flex flex-col justify-between">
                             <div>
-                                <span className="inline-block text-[10px] font-bold text-[#008744] uppercase tracking-wider bg-[#F0FFF4] px-3 py-1 rounded-full">Mesin Utama</span>
-                                <h3 className="text-3xl font-bold text-zinc-900 mt-6 mb-4">Parsing Struk Neural</h3>
-                                <p className="text-zinc-500 italic mb-6">Cukup ambil foto. Sistem akan membantu mengenali item, nominal, dan kategori untuk mempercepat pencatatan.</p>
+                                <span className="inline-block text-[10px] font-bold text-[#008744] uppercase tracking-wider bg-[#F0FFF4] px-3 py-1 rounded-full">Scan struk</span>
+                                <h3 className="text-3xl font-bold text-zinc-900 mt-6 mb-4">Foto, baca, lalu simpan.</h3>
+                                <p className="text-zinc-500 italic mb-6">Satu foto struk diproses menjadi item, nominal, dan kategori yang bisa langsung ditinjau sebelum disimpan.</p>
                             </div>
                             <div className="flex gap-3 mt-4">
                                 <div className="flex-1 rounded-2xl border border-zinc-100 bg-[#F7FFF6] p-4 text-center">
-                                    <p className="font-bold text-sm text-[#008744]">Instan</p>
-                                    <p className="text-[10px] text-zinc-500 uppercase mt-1">Kecepatan Parsing</p>
+                                    <p className="font-bold text-sm text-[#008744]">Cepat</p>
+                                    <p className="text-[10px] text-zinc-500 uppercase mt-1">Hasil scan</p>
                                 </div>
                                 <div className="flex-1 rounded-2xl border border-zinc-100 bg-[#F7FFF6] p-4 text-center">
-                                    <p className="font-bold text-sm text-[#008744]">Otomatis</p>
-                                    <p className="text-[10px] text-zinc-500 uppercase mt-1">Kategorisasi</p>
+                                    <p className="font-bold text-sm text-[#008744]">Terstruktur</p>
+                                    <p className="text-[10px] text-zinc-500 uppercase mt-1">Item siap edit</p>
                                 </div>
                             </div>
                         </div>
@@ -144,7 +143,7 @@ const Landing = () => {
                         <div className="rounded-[40px] bg-[#004D2A] p-10 flex flex-col justify-between text-white">
                             <div>
                                 <h3 className="text-2xl font-bold mb-4">Penganggaran prediktif</h3>
-                                <p className="text-green-200/80 italic text-sm leading-relaxed">Bukan hanya melacak pengeluaran, MyFinance juga membantu membaca pola bulan berikutnya berdasarkan tren yang sudah tercatat.</p>
+                                <p className="text-green-200/80 italic text-sm leading-relaxed">Lihat tren pengeluaran yang sudah tercatat, lalu gunakan ringkasannya untuk menyiapkan batas bulan berikutnya.</p>
                             </div>
                             <div className="mt-8">
                                 <div className="flex items-end gap-2 h-32">
@@ -198,7 +197,7 @@ const Landing = () => {
                                     <span className="text-sm font-bold">David Chen</span>
                                     <span className="text-xs text-zinc-400">Pemilik usaha teknologi</span>
                                 </div>
-                                <p className="text-zinc-600 italic">"MyFinance mengubah kecemasan saya menjadi kejelasan. Pemindaian struknya rapi dan menghemat banyak waktu."</p>
+                                <p className="text-zinc-600 italic">"Saya bisa cek detail belanja tanpa harus input ulang satu per satu."</p>
                             </div>
                         </div>
                     </div>
@@ -210,7 +209,7 @@ const Landing = () => {
                                     <span className="text-sm font-bold">Sarah Jenkins</span>
                                     <span className="text-xs text-zinc-400">Direktur kreatif</span>
                                 </div>
-                                <p className="text-zinc-600 italic">"Antarmuka yang intuitif dan laporan investasinya memudahkan saya memantau portofolio setiap pagi."</p>
+                                <p className="text-zinc-600 italic">"Ringkasan transaksi dan laporan bulanannya cepat dibaca saat saya butuh evaluasi."</p>
                             </div>
                         </div>
                     </div>
@@ -222,7 +221,7 @@ const Landing = () => {
                                     <span className="text-sm font-bold">Marcus Thorne</span>
                                     <span className="text-xs text-zinc-400">Analis keuangan</span>
                                 </div>
-                                <p className="text-zinc-600 italic">"Fitur prediksi penganggaran membantu klien saya merencanakan kas dengan lebih baik. Hasilnya terasa nyata."</p>
+                                <p className="text-zinc-600 italic">"Saya lebih mudah memisahkan transaksi penting dan pengeluaran harian."</p>
                             </div>
                         </div>
                     </div>
@@ -234,7 +233,7 @@ const Landing = () => {
                     <div className="space-y-3">
                         <details className="rounded-xl border border-zinc-100 bg-white p-4">
                             <summary className="cursor-pointer font-semibold">Seberapa aman data saya?</summary>
-                            <div className="mt-2 text-zinc-600 text-sm">Data kamu aman bersama MyFinance. Kami menjaga jalur komunikasi dan privasi dengan perlindungan yang ketat.</div>
+                            <div className="mt-2 text-zinc-600 text-sm">Data dikirim lewat koneksi aman dan hanya dipakai untuk fitur yang kamu jalankan di aplikasi.</div>
                         </details>
                         <details className="rounded-xl border border-zinc-100 bg-white p-4">
                             <summary className="cursor-pointer font-semibold">Apakah AI ini berfungsi untuk struk tulisan tangan?</summary>
@@ -246,7 +245,7 @@ const Landing = () => {
                         </details>
                         <details className="rounded-xl border border-zinc-100 bg-white p-4">
                             <summary className="cursor-pointer font-semibold">Apa yang membuat MyFinance berbeda dari yang lain?</summary>
-                            <div className="mt-2 text-zinc-600 text-sm">Kombinasi scan transaksi, privasi yang jelas, dan insight yang ringkas membuat MyFinance lebih mudah dipakai.</div>
+                            <div className="mt-2 text-zinc-600 text-sm">Fokusnya ada di scan struk, laporan yang bisa dibaca cepat, dan alur input yang pendek.</div>
                         </details>
                     </div>
                 </div>
