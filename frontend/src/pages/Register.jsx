@@ -64,11 +64,11 @@ const Register = () => {
                     <div className="absolute inset-0 flex items-end p-10 lg:p-12">
                         <div className="max-w-md rounded-[28px] bg-black/40 p-8 text-white backdrop-blur-md ring-1 ring-white/10">
                             <h2 className="text-3xl font-extrabold leading-tight lg:text-4xl">
-                                “Mulai lebih rapi hari ini agar keuangan besok lebih ringan.”
+                                “Satu akun untuk scan, catat, dan baca ringkasan keuangan.”
                             </h2>
                             <div className="mt-6 flex items-center gap-3">
                                 <div className="h-0.5 w-12 bg-[#7AF19E]" />
-                                <span className="text-xs font-semibold tracking-[0.24em] text-[#B7F5C7]">ROBERT KIYOSAKI</span>
+                                <span className="text-xs font-semibold tracking-[0.24em] text-[#B7F5C7]">MYFINANCE</span>
                             </div>
                         </div>
                     </div>

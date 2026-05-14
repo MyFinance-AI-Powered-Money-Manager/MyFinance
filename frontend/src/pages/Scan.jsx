@@ -1,21 +1,39 @@
 import React from 'react';
-import { Upload, FileImage, Sparkles, Save, Edit3, Trash2, Plus, ShoppingCart, X } from 'lucide-react';
+import { Upload, FileImage, Save, Edit3, Plus, ShoppingCart, X } from 'lucide-react';
 import { Layout } from '../components/layout/Layout';
 import { useScanReceipt, useCreateTransaction, useWallets } from '../hooks/useFinance';
+import { EXPENSE_CATEGORIES } from '../lib/categories';
 import { config } from '../lib/config';
 import { formatCurrency } from '../lib/utils';
 import { useLanguage } from '../context/LanguageContext';
 
-// EXPENSE categories matching TransactionFormModal
-const EXPENSE_CATEGORIES = {
-  NEEDS: ['Makan & Minum Harian', 'Kebutuhan Rumah & Mandi', 'Transport & Rutinitas', 'Tagihan & Kewajiban'],
-  WANTS: ['Jajan & Hiburan', 'Hobi & Self-Rewerd', 'Shopping'],
-  OTHER: ['Darurat & Tak Terduga', 'Lainnya'],
+const coalesce = (...values) => values.find((value) => value !== undefined && value !== null);
+
+const toNumber = (...values) => Number(coalesce(...values) ?? 0);
+
+const toDateInputValue = (...values) => {
+  const rawValue = coalesce(...values);
+
+  if (!rawValue) {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  const parsedDate = new Date(rawValue);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  return parsedDate.toISOString().slice(0, 10);
 };
 
-const ALL_SUBCATEGORIES = Object.entries(EXPENSE_CATEGORIES).flatMap(
-  ([cat, subs]) => subs.map((sub) => ({ category: cat, subcategory: sub }))
-);
+const normalizeScanItem = (item, index) => ({
+  id: index,
+  item_name: coalesce(item?.item_name, item?.name, item?.product, `Item ${index + 1}`),
+  price: toNumber(item?.price, item?.amount, item?.total),
+  quantity: toNumber(item?.quantity, item?.qty, 1),
+  category: String(item?.category ?? 'NEEDS').toUpperCase(),
+  subcategory: item?.subcategory ?? '',
+});
 
 const normalizeScanResult = (data) => {
   const raw = data?.data ?? data;
@@ -23,30 +41,19 @@ const normalizeScanResult = (data) => {
     return null;
   }
 
-  // Parse items array if available
   const items = Array.isArray(raw.items)
-    ? raw.items.map((item, i) => ({
-        id: i,
-        item_name: item.item_name || item.name || item.product || `Item ${i + 1}`,
-        price: Number(item.price ?? item.amount ?? item.total ?? 0),
-        quantity: Number(item.quantity ?? item.qty ?? 1),
-        category: String(item.category || 'NEEDS').toUpperCase(),
-        subcategory: item.subcategory || '',
-      }))
+    ? raw.items.map(normalizeScanItem)
     : [];
 
-  // Total from AI or sum items
-  const totalFromAI = Number(
-    raw.total_amount ?? raw.totalAmount ?? raw.total ?? raw.amount ?? raw.nominal ?? raw.grandTotal ?? 0
-  );
+  const totalFromAI = toNumber(raw.total_amount, raw.totalAmount, raw.total, raw.amount, raw.nominal, raw.grandTotal);
   const totalFromItems = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
   const total = totalFromItems > 0 ? totalFromItems : totalFromAI;
 
   return {
     items,
     total: Number.isFinite(total) ? Math.abs(total) : 0,
-    merchant: raw.merchant || raw.store_name || raw.storeName || raw.description || '',
-    date: (raw.date || raw.transaction_date || raw.transactionDate || new Date().toISOString()).slice(0, 10),
+    merchant: coalesce(raw.merchant, raw.store_name, raw.storeName, raw.description, ''),
+    date: toDateInputValue(raw.date, raw.transaction_date, raw.transactionDate),
     raw,
   };
 };
@@ -145,7 +152,6 @@ const Scan = () => {
 
       setResult(normalized);
 
-      // Auto-fill editable fields
       setEditItems(normalized.items.length > 0
         ? normalized.items
         : [{ id: 0, item_name: normalized.merchant || 'Pembelian', price: normalized.total, quantity: 1, category: 'NEEDS', subcategory: '' }]
@@ -207,7 +213,6 @@ const Scan = () => {
       await createTransaction.mutateAsync(payload);
       showSuccess(t('save_scan_success'));
 
-      // Reset state
       setFile(null);
       setPreviewUrl('');
       setResult(null);

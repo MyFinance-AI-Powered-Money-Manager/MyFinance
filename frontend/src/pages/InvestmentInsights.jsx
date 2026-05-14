@@ -9,17 +9,17 @@ const insightCards = [
   {
     icon: TrendingUp,
     title: 'Tren portofolio',
-    description: 'Wawasan investasi menyajikan pergerakan dan arah perubahan agar pengguna lebih cepat memahami konteks portofolio.',
+    description: 'Tampilkan perubahan nilai dari waktu ke waktu supaya pengguna tahu apa yang benar-benar bergerak.',
   },
   {
     icon: PieChart,
     title: 'Komposisi aset',
-    description: 'Distribusi aset dapat ditampilkan secara jelas sehingga pengguna tahu porsi risiko dan peluang yang dimiliki.',
+    description: 'Perlihatkan porsi tiap aset agar risiko dan konsentrasi mudah dibaca tanpa hitung manual.',
   },
   {
     icon: ShieldCheck,
     title: 'Peringatan yang relevan',
-    description: 'Sinyal penting ditampilkan secara ringkas supaya fokus tetap pada keputusan yang paling berdampak.',
+    description: 'Sorot sinyal penting yang perlu ditindaklanjuti, bukan semua angka sekaligus.',
   },
 ];
 
@@ -52,7 +52,7 @@ const InvestmentInsights = () => {
               Wawasan investasi yang membantu membaca portofolio dengan lebih jelas.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-600 sm:text-lg">
-              Halaman ini menjelaskan bagaimana MyFinance mempresentasikan tren, komposisi aset, dan sinyal penting agar pengguna bisa membaca kondisi investasi tanpa harus menebak-nebak dari angka mentah.
+              Halaman ini menunjukkan cara MyFinance merangkum tren, komposisi aset, dan sinyal penting menjadi tampilan yang lebih mudah dibaca dibanding angka mentah.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -112,7 +112,7 @@ const InvestmentInsights = () => {
                   <BadgeInfo className="mt-0.5 h-5 w-5 text-[#7CF38E]" />
                   <div>
                     <p className="font-semibold">Fokus utamanya adalah membantu pengguna membaca arah, bukan menebak pasar.</p>
-                    <p className="mt-2 text-sm leading-7 text-green-100/80">Pendekatan ini membuat wawasan lebih layak dipakai sebagai referensi awal sebelum mengambil tindakan lanjutan.</p>
+                    <p className="mt-2 text-sm leading-7 text-green-100/80">Tujuannya adalah memberi konteks awal yang cukup sebelum pengguna membuka laporan atau mengambil langkah lanjutan.</p>
                   </div>
                 </div>
               </div>
@@ -127,7 +127,7 @@ const InvestmentInsights = () => {
               <p className="text-xs font-semibold uppercase tracking-[0.24em]">Apa yang ditampilkan</p>
             </div>
             <h2 className="mt-4 text-3xl font-extrabold text-zinc-900">Semua komponen disusun untuk mempercepat pembacaan investasi.</h2>
-            <p className="mt-4 text-sm leading-7 text-zinc-500">Pengguna mendapatkan tampilan yang menyorot arah perubahan, komposisi aset, dan rangkuman performa. Dengan begitu, aplikasi tetap sederhana tetapi terasa bernilai untuk perencanaan keuangan jangka panjang.</p>
+            <p className="mt-4 text-sm leading-7 text-zinc-500">Pengguna bisa melihat arah perubahan, komposisi aset, dan ringkasan performa tanpa harus memindai tabel angka yang panjang.</p>
 
             <div className="mt-6 space-y-3">
               {signals.map((item) => (
@@ -145,7 +145,7 @@ const InvestmentInsights = () => {
                 <LineChart className="h-5 w-5" />
               </div>
               <h3 className="mt-5 text-xl font-bold text-zinc-900">Analisis pergerakan</h3>
-              <p className="mt-3 text-sm leading-7 text-zinc-500">Membantu membaca apakah nilai bergerak stabil, melambat, atau menunjukkan momentum tertentu.</p>
+              <p className="mt-3 text-sm leading-7 text-zinc-500">Membantu melihat apakah nilai naik, turun, atau stagnan dalam periode tertentu.</p>
             </div>
 
             <div className="finance-card p-6 sm:p-7">
@@ -169,7 +169,7 @@ const InvestmentInsights = () => {
                 <TrendingUp className="h-5 w-5" />
               </div>
               <h3 className="mt-5 text-xl font-bold text-zinc-900">Arah berikutnya</h3>
-              <p className="mt-3 text-sm leading-7 text-zinc-500">Membantu menyiapkan langkah lanjutan, baik untuk evaluasi portofolio maupun tindak lanjut laporan.</p>
+              <p className="mt-3 text-sm leading-7 text-zinc-500">Membantu menentukan bagian mana yang perlu dicek lagi sebelum keputusan dibuat.</p>
             </div>
           </div>
         </section>
@@ -180,7 +180,7 @@ const InvestmentInsights = () => {
               <div className="bg-gradient-to-br from-finance-700 via-finance-600 to-finance-500 p-6 text-white sm:p-8">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">Cara pakai</p>
                 <h3 className="mt-4 text-3xl font-extrabold leading-tight">Gabungkan wawasan ini dengan laporan transaksi.</h3>
-                <p className="mt-4 text-sm leading-7 text-white/80">Kombinasi dua halaman ini memberi pengguna konteks yang cukup untuk memahami pengeluaran, tabungan, dan area yang perlu diperbaiki.</p>
+                <p className="mt-4 text-sm leading-7 text-white/80">Gabungan halaman ini memberi konteks yang cukup untuk membaca perubahan pengeluaran, tabungan, dan area yang perlu diperbaiki.</p>
                 <button onClick={() => navigate('/reports')} className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-finance-700 transition hover:-translate-y-0.5">
                   Buka Laporan <ArrowRight className="h-4 w-4" />
                 </button>
@@ -189,7 +189,7 @@ const InvestmentInsights = () => {
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-400">Catatan penting</p>
                   <h3 className="mt-3 text-2xl font-bold text-zinc-900">Insight tetap perlu divalidasi oleh konteks pengguna.</h3>
-                  <p className="mt-4 text-sm leading-7 text-zinc-500">Halaman ini dirancang sebagai penjelas produk dan bukan nasihat investasi final. Tujuannya adalah memberi arahan yang lebih jelas sebelum pengguna membuat keputusan.</p>
+                  <p className="mt-4 text-sm leading-7 text-zinc-500">Halaman ini berfungsi sebagai penjelas produk, bukan rekomendasi investasi final.</p>
                 </div>
                 <div className="mt-8 rounded-[24px] bg-[#FAFCF7] p-5">
                   <div className="flex items-center gap-3 text-finance-700">
@@ -208,7 +208,7 @@ const InvestmentInsights = () => {
               <p className="text-xs font-semibold uppercase tracking-[0.24em]">Saran penggunaan</p>
             </div>
             <h3 className="mt-4 text-2xl font-bold text-zinc-900">Gunakan halaman ini sebagai jembatan ke pemahaman produk.</h3>
-            <p className="mt-4 text-sm leading-7 text-zinc-500">Wawasan investasi bekerja paling baik ketika dipasangkan dengan penjelasan umum mengenai cara kerja aplikasi. Karena itu, kedua page baru ini saling terhubung dan berperan sebagai alur onboarding yang lebih matang.</p>
+            <p className="mt-4 text-sm leading-7 text-zinc-500">Wawasan investasi paling berguna ketika dibaca bersama laporan transaksi dan ringkasan keuangan di dashboard.</p>
             <div className="mt-6 flex">
               <button onClick={() => navigate('/register')} className="inline-flex items-center justify-center gap-2 rounded-full bg-finance-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-finance-600">
                 Mulai Sekarang <ArrowRight className="h-4 w-4" />
