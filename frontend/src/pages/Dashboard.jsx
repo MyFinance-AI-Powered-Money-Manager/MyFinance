@@ -21,7 +21,7 @@ const WALLET_ICON_MAP = {
 };
 
 const Dashboard = () => {
-    const { t, language } = useLanguage();
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
@@ -33,7 +33,7 @@ const Dashboard = () => {
     const [editingBudget, setEditingBudget] = React.useState(null);
 
     const { data: walletsData, isLoading: walletsLoading, error: walletsError } = useWallets();
-    const { data: budgetsData, isLoading: budgetsLoading } = useBudgets();
+    const { data: budgetsData } = useBudgets();
     const { data: transactionsData, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
     const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useDashboardSummary();
     const createTransaction = useCreateTransaction();

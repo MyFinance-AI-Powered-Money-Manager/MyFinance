@@ -24,7 +24,7 @@ const Profile = () => {
     const [fullName, setFullName] = React.useState('');
     const [selectedFile, setSelectedFile] = React.useState(null);
     const [previewUrl, setPreviewUrl] = React.useState('');
-    const [previewLoadFailed, setPreviewLoadFailed] = React.useState(false);
+    const [_previewLoadFailed, setPreviewLoadFailed] = React.useState(false);
     const [oldPassword, setOldPassword] = React.useState('');
     const [newPassword, setNewPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
@@ -60,9 +60,8 @@ const Profile = () => {
     }
 
     const activeUser = profile || authUser || {};
-    const avatarUrl = previewUrl || resolveMediaUrl(activeUser.profile_picture);
-    const initial = activeUser.full_name?.trim()?.charAt(0)?.toUpperCase() || 'U';
 
+    // eslint-disable-next-line no-unused-vars
     const handleFileChange = (event) => {
         const file = event.target.files?.[0];
         if (!file) {

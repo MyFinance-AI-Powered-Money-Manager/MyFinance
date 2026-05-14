@@ -5,6 +5,7 @@ import { useScanReceipt, useCreateTransaction, useWallets } from '../hooks/useFi
 import { config } from '../lib/config';
 import { formatCurrency } from '../lib/utils';
 import { useLanguage } from '../context/LanguageContext';
+import { showError, showSuccess } from '../lib/toast';
 
 // EXPENSE categories matching TransactionFormModal
 const EXPENSE_CATEGORIES = {

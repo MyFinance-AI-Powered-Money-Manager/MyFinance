@@ -24,7 +24,6 @@ import {
 } from "../hooks/useFinance";
 import { TransactionFormModal } from "../components/TransactionFormModal";
 import { Layout } from "../components/layout/Layout";
-import { showError } from "../lib/toast";
 
 const Transactions = () => {
   const { t, language } = useLanguage();
