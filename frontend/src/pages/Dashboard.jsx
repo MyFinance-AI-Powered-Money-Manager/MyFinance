@@ -126,13 +126,13 @@ const Dashboard = () => {
         });
 
     const getTransactionColor = (tx) => {
-        if (tx.type === 'EXPENSE' || tx.isTransferOut) return 'text-[#D1496F]';
-        return 'text-finance-700';
+        if (tx.type === 'EXPENSE' || tx.isTransferOut) return 'text-[#D1496F] dark:text-[#F47A97]';
+        return 'text-finance-700 dark:text-[#7CF38E]';
     };
 
     const getTransactionBg = (tx) => {
-        if (tx.type === 'EXPENSE' || tx.isTransferOut) return 'bg-[#FBE5EA] text-[#D1496F]';
-        return 'bg-[#7CF38E] text-zinc-900';
+        if (tx.type === 'EXPENSE' || tx.isTransferOut) return 'bg-[#FBE5EA] text-[#D1496F] dark:bg-[#402233] dark:text-[#F47A97]';
+        return 'bg-[#7CF38E] text-zinc-900 dark:bg-[#1F5B3A] dark:text-[#9AF2AF]';
     };
 
     const getTransactionPrefix = (tx) => {
@@ -413,7 +413,7 @@ const Dashboard = () => {
                     </div>
                     <div className="space-y-5">
                         {recentTransactions.length > 0 ? recentTransactions.map((tx) => (
-                            <div key={tx.id} className="flex items-center justify-between gap-4">
+                            <div key={tx.id} className="flex items-center justify-between gap-4 rounded-[20px] bg-[#FAFCF7] px-3 py-3 transition hover:bg-[#F3F8EE] dark:bg-[#253044] dark:hover:bg-[#2D3A52]">
                                 <div className="flex items-center gap-4">
                                     <div className={cn(
                                         'flex h-12 w-12 items-center justify-center rounded-full',
@@ -494,7 +494,7 @@ const Dashboard = () => {
                 </div>
                 <div className="space-y-5">
                     {recentTransactions.length > 0 ? recentTransactions.map((tx) => (
-                        <div key={tx.id} className="flex items-center justify-between gap-4">
+                        <div key={tx.id} className="flex items-center justify-between gap-4 rounded-[20px] bg-[#FAFCF7] px-3 py-3 transition hover:bg-[#F3F8EE] dark:bg-[#253044] dark:hover:bg-[#2D3A52]">
                             <div className="flex items-center gap-4">
                                 <div className={cn(
                                     'flex h-12 w-12 items-center justify-center rounded-full',

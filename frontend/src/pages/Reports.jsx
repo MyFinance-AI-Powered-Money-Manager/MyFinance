@@ -377,13 +377,21 @@ const Reports = () => {
                     <div className="space-y-5">
                         {recentTransactions.length > 0 ? recentTransactions.map((tx, index) => {
                             const amount = Number(tx.amount ?? 0);
-                            const isIncome = String(tx.type || '').toUpperCase() === 'INCOME';
+                            const txType = String(tx.type || '').toUpperCase();
+                            const isTransferOut = txType === 'TRANSFER' && tx.description === 'Transfer Keluar';
+                            const isTransferIn = txType === 'TRANSFER' && tx.description === 'Transfer Masuk';
+                            const isIncome = txType === 'INCOME' || isTransferIn;
                             const Icon = getCategoryIcon(tx.category);
 
                             return (
-                                <div key={tx.id ?? index} className="flex items-center justify-between gap-4 rounded-[20px] px-1 py-1 sm:px-2 sm:py-2">
+                                <div key={tx.id ?? index} className="flex items-center justify-between gap-4 rounded-[20px] bg-[#FAFCF7] px-3 py-3 transition hover:bg-[#F3F8EE] dark:bg-[#253044] dark:hover:bg-[#2D3A52] sm:px-3 sm:py-3">
                                     <div className="flex items-center gap-4">
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7CF38E] text-zinc-900 shadow-sm">
+                                        <div className={cn(
+                                            'flex h-12 w-12 items-center justify-center rounded-full shadow-sm',
+                                            (txType === 'EXPENSE' || isTransferOut)
+                                                ? 'bg-[#FBE5EA] text-[#D1496F] dark:bg-[#402233] dark:text-[#F47A97]'
+                                                : 'bg-[#7CF38E] text-zinc-900 dark:bg-[#1F5B3A] dark:text-[#9AF2AF]'
+                                        )}>
                                             <Icon className="h-5 w-5" />
                                         </div>
                                         <div>
@@ -393,7 +401,7 @@ const Reports = () => {
                                             </p>
                                         </div>
                                     </div>
-                                    <p className={cn('text-sm font-bold md:text-base', isIncome ? 'text-finance-700' : 'text-[#D1496F]')}>
+                                    <p className={cn('text-sm font-bold md:text-base', isIncome ? 'text-finance-700 dark:text-[#7CF38E]' : 'text-[#D1496F] dark:text-[#F47A97]')}>
                                         {isIncome ? '+' : '-'} {formatCurrency(Math.abs(amount))}
                                     </p>
                                 </div>

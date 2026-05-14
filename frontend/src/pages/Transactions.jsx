@@ -228,14 +228,15 @@ const Transactions = () => {
   ];
 
   const getColor = (tx) => {
-    if (tx.type === "EXPENSE" || tx.isTransferOut) return "text-[#D1496F]";
-    return "text-finance-700";
+    if (tx.type === "EXPENSE" || tx.isTransferOut)
+      return "text-[#D1496F] dark:text-[#F47A97]";
+    return "text-finance-700 dark:text-[#7CF38E]";
   };
 
   const getBg = (tx) => {
     if (tx.type === "EXPENSE" || tx.isTransferOut)
-      return "bg-[#FBE5EA] text-[#D1496F]";
-    return "bg-[#7CF38E] text-zinc-900";
+      return "bg-[#FBE5EA] text-[#D1496F] dark:bg-[#402233] dark:text-[#F47A97]";
+    return "bg-[#7CF38E] text-zinc-900 dark:bg-[#1F5B3A] dark:text-[#9AF2AF]";
   };
 
   const getPrefix = (tx) => {
@@ -373,7 +374,7 @@ const Transactions = () => {
                 {txs.map((tx) => (
                   <div
                     key={tx.id}
-                    className="group flex items-center justify-between gap-4 rounded-[22px] bg-[#FAFCF7] px-4 py-4 transition hover:bg-[#F3F8EE]"
+                    className="group flex items-center justify-between gap-4 rounded-[22px] bg-[#FAFCF7] px-4 py-4 transition hover:bg-[#F3F8EE] dark:bg-[#253044] dark:hover:bg-[#2D3A52]"
                   >
                     <div className="flex items-center gap-4">
                       <div
@@ -407,7 +408,7 @@ const Transactions = () => {
                         <button
                           onClick={() => handleDeleteTransaction(tx.id)}
                           disabled={deletingId === tx.id}
-                          className="rounded-full p-2 text-zinc-400 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 disabled:opacity-50"
+                          className="rounded-full p-2 text-zinc-400 opacity-0 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-[#482233] dark:hover:text-[#F47A97] group-hover:opacity-100 disabled:opacity-50"
                           title="Hapus transaksi"
                         >
                           <Trash2 className="h-4 w-4" />
