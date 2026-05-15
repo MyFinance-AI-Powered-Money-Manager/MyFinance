@@ -61,7 +61,7 @@ const runMonthlyInsight = async () => {
                 INSERT INTO financial_insights 
                 (user_id, period, health_score, predicted_cashflow, overbudget_risk, money_leak, ai_insight, total_spent, total_budget, raw_analysis_data)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-                ON CONFLICT (user_id, period) 
+                ON CONFLICT (user_id, month_period) 
                 DO UPDATE SET 
                     health_score = EXCLUDED.health_score,
                     predicted_cashflow = EXCLUDED.predicted_cashflow,
