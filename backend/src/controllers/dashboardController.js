@@ -66,12 +66,15 @@ const getDashboardSummary = async (req, res) => {
 
         try {
             // Tembak ke API Data Science Python
-            const pythonUrl = process.env.PYTHON_API_URL || 'http://localhost:8000';
-            const aiResponse = await axios.post(`${pythonUrl}/api/v1/ai/ds/predict`, rawDataPayload);
-            dsMetrics = aiResponse.data;
-        } catch (aiError) {
-            console.error("AI Service Offline: Menggunakan fallback data default.");
-            // Response tetap dilanjutkan meskipun AI gagal merespon
+            const pythonUrl = process.env.PYTHON_API_URL || 'http://96.9.210.207:8000/api/v1';
+            const dsResponse = await axios.post(`${pythonUrl}/ds/predict`, rawDataPayload);
+            dsMetrics = dsResponse.data;
+        } catch (dsError) {
+            if (dsError.response) {
+                console.error(`DS Service Error: ${dsError.response.status} - ${JSON.stringify(dsError.response.data)}`);
+            } else {
+                console.error("DS Service Offline/Unreachable: Menggunakan fallback data default.");
+            }
         }
 
         // 5. Kirim Response Final ke Frontend

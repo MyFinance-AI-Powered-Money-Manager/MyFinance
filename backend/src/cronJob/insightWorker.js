@@ -12,7 +12,7 @@ const runMonthlyInsight = async () => {
         const lastMonth = date.toISOString().slice(0, 7);
 
         const users = await db.query('SELECT id FROM users');
-        const pythonUrl = process.env.PYTHON_API_URL || 'http://localhost:8000';
+        const pythonUrl = process.env.PYTHON_API_URL || 'http://96.9.210.207:8000/api/v1';
 
         for (const user of users.rows) {
             const userId = user.id;
@@ -36,10 +36,10 @@ const runMonthlyInsight = async () => {
 
             // 2. LOGIKA PARALEL: Tembak Bang Pascal (DS) & Bang Hafizh (AI) secara bersamaan
             console.log(`   -> Menghubungi API DS & AI untuk User: ${userId}`);
-            
+
             const [dsRes, aiRes] = await Promise.all([
-                axios.post(`${pythonUrl}/api/v1/ds/predict`, payload),
-                axios.post(`${pythonUrl}/api/v1/ai/insight/generate`, payload)
+                axios.post(`${pythonUrl}/ds/predict`, payload),
+                axios.post(`${pythonUrl}/ai/financial-insights/monthly`, payload)
             ]);
 
             // 3. Gabungkan hasil dari kedua tim
@@ -67,7 +67,13 @@ const runMonthlyInsight = async () => {
             console.log(`Rapor berhasil disimpan untuk User: ${userId}`);
         }
     } catch (error) {
-        console.error('Error pada Insight Worker:', error.message);
+        if (error.response) {
+            console.error(` [Insight Worker] API Error (${error.config.url}):`, error.response.status, error.response.data);
+        } else if (error.request) {
+            console.error(` [Insight Worker] No Response from AI Service (${error.config.url}). Check IP/Port & Firewall.`);
+        } else {
+            console.error(' [Insight Worker] Error:', error.message);
+        }
     }
 };
 
