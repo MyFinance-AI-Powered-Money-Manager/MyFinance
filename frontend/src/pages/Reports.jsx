@@ -5,7 +5,7 @@ import { Layout } from '../components/layout/Layout';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { useTransactions } from '../hooks/useFinance';
 import { useLanguage } from '../context/LanguageContext';
-import { cn, formatCurrency } from '../lib/utils';
+import { formatCurrency } from '../lib/utils';
 
 const emptyChartData = [
     { name: 'W1', income: 0, expense: 0 },
@@ -87,48 +87,6 @@ const formatAxisValue = (value) => {
     }
 
     return value;
-};
-
-const formatRelativeDate = (value, language) => {
-    const date = value ? new Date(value) : null;
-
-    if (!date || Number.isNaN(date.getTime())) {
-        return language === 'id' ? 'Hari ini' : 'Today';
-    }
-
-    const diffInDays = Math.floor((Date.now() - date.getTime()) / 86400000);
-
-    if (diffInDays <= 0) {
-        return language === 'id' ? 'Hari ini' : 'Today';
-    }
-
-    if (diffInDays === 1) {
-        return language === 'id' ? 'Kemarin' : 'Yesterday';
-    }
-
-    if (diffInDays < 7) {
-        return language === 'id' ? `${diffInDays} Hari lalu` : `${diffInDays} days ago`;
-    }
-
-    return date.toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-    });
-};
-
-const getCategoryIcon = (category) => {
-    const normalizedCategory = String(category || '').toLowerCase();
-
-    if (normalizedCategory.includes('makan') || normalizedCategory.includes('food') || normalizedCategory.includes('meal')) {
-        return Utensils;
-    }
-
-    if (normalizedCategory.includes('transport') || normalizedCategory.includes('car') || normalizedCategory.includes('jalan')) {
-        return Car;
-    }
-
-    return Wallet;
 };
 
 const buildChartData = (transactions) => {

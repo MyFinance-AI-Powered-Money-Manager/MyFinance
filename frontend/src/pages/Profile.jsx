@@ -36,11 +36,11 @@ const Profile = () => {
     const initial = (activeUser.full_name || activeUser.name || 'U').trim().charAt(0).toUpperCase();
 
     React.useEffect(() => {
-        setFullName(activeUser.full_name || '');
+        setFullName(activeUser.full_name || activeUser.name || '');
         setPreviewUrl(resolveMediaUrl(activeUser.profile_picture));
         setPreviewLoadFailed(false);
         setRemovePhoto(false);
-    }, [profile, authUser]);
+    }, [activeUser.full_name, activeUser.name, activeUser.profile_picture]);
 
     React.useEffect(() => {
         return () => {
@@ -65,7 +65,6 @@ const Profile = () => {
         );
     }
 
-    // eslint-disable-next-line no-unused-vars
     const handleFileChange = (event) => {
         const file = event.target.files?.[0];
         if (!file) {
