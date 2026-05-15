@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Home, SearchX, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 import { PageHeader } from '../components/PageHeader';
-import { PageFooter } from '../components/PageFooter';
 
 const quickLinks = [
   { label: 'Beranda', href: '/' },
@@ -83,8 +82,6 @@ export default function NotFound() {
           </motion.div>
         </motion.section>
       </main>
-
-      <PageFooter />
     </div>
   );
 }

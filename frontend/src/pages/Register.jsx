@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { registerSchema, validateData } from '../lib/validation';
@@ -8,8 +8,9 @@ import { showError, showSuccess } from '../lib/toast';
 
 const Register = () => {
     const navigate = useNavigate();
-    const { register, loading, error } = useAuth();
+    const { register, loading } = useAuth();
     const [showPassword, setShowPassword] = React.useState(false);
+    const [formError, setFormError] = React.useState('');
     const [formData, setFormData] = React.useState({
         name: '',
         email: '',
@@ -20,14 +21,18 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setFormError('');
 
         if (!formData.agree) {
-            showError('Anda harus menyetujui syarat dan ketentuan');
+            const message = 'Anda harus menyetujui syarat dan ketentuan';
+            setFormError(message);
+            showError(message);
             return;
         }
 
         const { data, error: validationError } = validateData(registerSchema, formData);
         if (validationError) {
+            setFormError(validationError);
             showError(validationError);
             return;
         }
@@ -42,7 +47,9 @@ const Register = () => {
             showSuccess('Registrasi berhasil! Silakan login.');
             navigate('/login');
         } catch (authError) {
-            showError(authError.response?.data?.message || error || 'Registrasi gagal');
+            const message = authError.response?.data?.message || authError.message || 'Registrasi gagal';
+            setFormError(message);
+            showError(message);
         }
     };
 
@@ -83,6 +90,13 @@ const Register = () => {
                         <h1 className="text-xl font-extrabold leading-snug text-zinc-900 md:text-2xl dark:text-[#F0F1F3]">Buat akun MyFinance</h1>
                         <p className="mt-1.5 text-[12px] leading-5 text-zinc-600 dark:text-[#B0B8CC]">Daftar untuk mulai mencatat transaksi dan membaca insight dengan lebih cepat.</p>
 
+                        {formError ? (
+                            <div className="mt-4 flex items-start gap-3 rounded-[18px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                                <p className="leading-6">{formError}</p>
+                            </div>
+                        ) : null}
+
                         <form className="mt-4 space-y-1" onSubmit={handleSubmit}>
                             <div className="space-y-0.5">
                                 <label className="text-[11px] font-semibold text-zinc-800 dark:text-[#D9DCE3]">Nama lengkap</label>
@@ -94,7 +108,10 @@ const Register = () => {
                                         type="text"
                                         placeholder="Nama lengkap"
                                         value={formData.name}
-                                        onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                                        onChange={(e) => {
+                                            setFormError('');
+                                            setFormData((prev) => ({ ...prev, name: e.target.value }));
+                                        }}
                                         className="finance-input pl-10 text-xs py-0.5 border-2 border-zinc-200 focus:border-finance-700"
                                     />
                                 </div>
@@ -110,7 +127,10 @@ const Register = () => {
                                         type="email"
                                         placeholder="email@example.com"
                                         value={formData.email}
-                                        onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                                        onChange={(e) => {
+                                            setFormError('');
+                                            setFormData((prev) => ({ ...prev, email: e.target.value }));
+                                        }}
                                         className="finance-input pl-10 text-xs py-0.5 border-2 border-zinc-200 focus:border-finance-700"
                                     />
                                 </div>
@@ -126,7 +146,10 @@ const Register = () => {
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="••••••"
                                         value={formData.password}
-                                        onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
+                                        onChange={(e) => {
+                                            setFormError('');
+                                            setFormData((prev) => ({ ...prev, password: e.target.value }));
+                                        }}
                                         className="finance-input pl-10 pr-10 text-xs py-0.5 border-2 border-zinc-200 focus:border-finance-700"
                                     />
                                     <button
@@ -149,7 +172,10 @@ const Register = () => {
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="••••••"
                                         value={formData.confirmPassword}
-                                        onChange={(e) => setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                                        onChange={(e) => {
+                                            setFormError('');
+                                            setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }));
+                                        }}
                                         className="finance-input pl-10 pr-10 text-xs py-0.5 border-2 border-zinc-200 focus:border-finance-700"
                                     />
                                     <button
@@ -180,19 +206,6 @@ const Register = () => {
                                 {loading ? 'Memproses...' : 'Buat akun'}
                             </button>
 
-                            <div className="relative py-1">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-zinc-200" />
-                                </div>
-                                <div className="relative flex justify-center text-[7px] uppercase tracking-[0.1em] text-zinc-400">
-                                    <span className="bg-[#F7FBF3] px-2 font-bold">Atau daftar dengan</span>
-                                </div>
-                            </div>
-
-                            <button type="button" className="flex h-9 w-full items-center justify-center gap-2 rounded-[20px] border-2 border-zinc-200 bg-white text-[10px] font-semibold text-zinc-700 transition hover:bg-zinc-50 hover:border-finance-700 dark:border-[#3F4959] dark:bg-[#2D3748] dark:text-[#E8EAED] dark:hover:bg-[#3F4959] dark:hover:border-[#7CF38E]">
-                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="h-3.5 w-3.5" />
-                                Google
-                            </button>
                         </form>
 
                         <p className="mt-2 text-center text-[9px] text-zinc-500">

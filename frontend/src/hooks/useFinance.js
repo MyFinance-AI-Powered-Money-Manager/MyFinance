@@ -78,6 +78,27 @@ const normalizeInsight = (insight) => {
   return firstDefined(raw.data, raw.ai_insight, raw.insight, raw.message, raw.recommendation, raw.text, raw);
 };
 
+const normalizeMonthlyInsight = (insight) => {
+  const raw = insight?.data?.data ?? insight?.data ?? insight;
+
+  if (!raw || typeof raw !== 'object') {
+    return null;
+  }
+
+  return {
+    ...raw,
+    period: firstDefined(raw.period, null),
+    health_score: toNumber(raw.health_score),
+    predicted_cashflow: toNumber(raw.predicted_cashflow),
+    total_spent: toNumber(raw.total_spent),
+    total_budget: toNumber(raw.total_budget),
+    overbudget_risk: firstDefined(raw.overbudget_risk, 'unknown'),
+    money_leak: firstDefined(raw.money_leak, ''),
+    ai_insight: firstDefined(raw.ai_insight, raw.insight, raw.message, raw.recommendation, raw.text, ''),
+    categories: firstDefined(raw.categories, raw.raw_analysis_data, []),
+  };
+};
+
 // ────────────── Wallets ──────────────
 
 export const useWallets = (options = {}) => {
@@ -368,6 +389,18 @@ export const useFinancialInsights = (walletId, period = 'monthly', options = {})
     queryKey: ['insights', walletId, period],
     queryFn: async () => normalizeInsight(await api.get('/insights', { params: { wallet_id: walletId, period } })),
     enabled: Boolean(walletId) && optionEnabled,
+    ...restOptions,
+  });
+};
+
+export const useMonthlyFinancialInsight = (period, options = {}) => {
+  const { enabled: optionEnabled = true, ...restOptions } = options;
+
+  return useQuery({
+    queryKey: ['monthly-insight', period],
+    queryFn: async () => normalizeMonthlyInsight(await api.get('/insights', { params: { period } })),
+    enabled: Boolean(period) && optionEnabled,
+    staleTime: 5 * 60 * 1000,
     ...restOptions,
   });
 };
