@@ -11,6 +11,7 @@ import { showError } from '../lib/toast';
 
 const Profile = () => {
     const navigate = useNavigate();
+    const fileInputRef = React.useRef(null);
     const { user: authUser } = useAuth();
     const { data: profile, isLoading, error } = useProfile();
     const updateProfile = useUpdateProfile();
@@ -28,6 +29,8 @@ const Profile = () => {
     const [oldPassword, setOldPassword] = React.useState('');
     const [newPassword, setNewPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
+    const [removePhoto, setRemovePhoto] = React.useState(false);
+
 
     React.useEffect(() => {
         const activeUser = profile || authUser || {};
@@ -61,6 +64,8 @@ const Profile = () => {
     }
 
     const activeUser = profile || authUser || {};
+    const initial = (fullName || activeUser.full_name || 'U').charAt(0).toUpperCase();
+
 
     // eslint-disable-next-line no-unused-vars
     const handleFileChange = (event) => {
@@ -159,8 +164,8 @@ const Profile = () => {
     };
 
     const handleDeleteAccount = async () => {
-        if (deleteConfirmText !== 'HAPUS') {
-            showError('Ketik HAPUS untuk mengkonfirmasi penghapusan akun.');
+        if (deleteConfirmText !== t('delete_confirm_keyword')) {
+            showError(t('type_to_confirm', { confirm: t('delete_confirm_keyword') }));
             return;
         }
 
@@ -188,9 +193,9 @@ const Profile = () => {
                             <form onSubmit={handleProfileSubmit} className="space-y-6">
                                 <div className="flex items-center gap-4">
                                     <div className="h-20 w-20 shrink-0 rounded-full overflow-hidden bg-zinc-100 dark:bg-[#252a33] flex items-center justify-center text-2xl font-bold text-zinc-700 dark:text-[#B0B8CC]">
-                                        {avatarUrl && !previewLoadFailed ? (
+                                        {previewUrl && !previewLoadFailed ? (
                                             <img
-                                                src={avatarUrl}
+                                                src={previewUrl}
                                                 alt="avatar"
                                                 className="h-full w-full object-cover"
                                                 onError={() => setPreviewLoadFailed(true)}
@@ -358,7 +363,8 @@ const Profile = () => {
                         </div>
                         <div className="mb-4">
                             <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">
-                                {t('type_to_confirm', { confirm: <span className="font-mono font-bold text-red-600">{t('delete_confirm_keyword')}</span> })}
+                                {t('type_to_confirm').replace('{confirm}', '')}
+                                <span className="font-mono font-bold text-red-600">{t('delete_confirm_keyword')}</span>
                             </label>
                             <input
                                 type="text"
