@@ -163,7 +163,7 @@ const Profile = () => {
 
     const handleDeleteAccount = async () => {
         if (deleteConfirmText !== 'HAPUS') {
-            showError('Ketik HAPUS untuk mengkonfirmasi penghapusan akun.');
+            showError(`Ketik 'HAPUS' untuk mengkonfirmasi penghapusan akun.`);
             return;
         }
 

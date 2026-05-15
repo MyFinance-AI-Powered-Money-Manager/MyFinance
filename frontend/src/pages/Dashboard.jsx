@@ -145,6 +145,59 @@ const Dashboard = () => {
         return '+';
     };
 
+    const quickActions = [
+        {
+            key: 'income',
+            label: t('catat_pemasukan'),
+            icon: Plus,
+            iconClassName: 'bg-[#DDF4E2] text-finance-700',
+            textClassName: 'text-finance-700',
+            onClick: () => {
+                if (wallets.length === 0) {
+                    setOpenWalletModal(true);
+                    return;
+                }
+
+                setFormType('INCOME');
+                setOpenTransactionModal(true);
+            },
+            disabled: wallets.length === 0,
+        },
+        {
+            key: 'expense',
+            label: t('catat_pengeluaran'),
+            icon: Minus,
+            iconClassName: 'bg-[#FBE5EA] text-red-500',
+            textClassName: 'text-red-500',
+            onClick: () => {
+                if (wallets.length === 0) {
+                    setOpenWalletModal(true);
+                    return;
+                }
+
+                setFormType('EXPENSE');
+                setOpenTransactionModal(true);
+            },
+            disabled: wallets.length === 0,
+        },
+        {
+            key: 'transfer',
+            label: 'Transfer',
+            icon: Repeat,
+            iconClassName: 'bg-blue-50 text-blue-600',
+            textClassName: 'text-blue-600',
+            onClick: () => {
+                if (wallets.length < 2) {
+                    setOpenWalletModal(true);
+                    return;
+                }
+
+                setOpenTransferModal(true);
+            },
+            disabled: wallets.length < 2,
+        },
+    ];
+
     const formatRiskLabel = (risk) => {
         const normalizedRisk = String(risk || '').toLowerCase();
         const activeLanguage = language === 'en' ? 'en' : 'id';
@@ -221,88 +274,65 @@ const Dashboard = () => {
 
             <div className="grid gap-4 lg:grid-cols-[1.7fr_0.95fr]">
                 <section className="finance-card overflow-hidden bg-gradient-to-br from-finance-700 via-finance-600 to-finance-500 p-6 text-white shadow-soft md:p-8 lg:p-10">
-                    <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/70">{t('total_balance')}</p>
-                            <h2 className="mt-3 text-4xl font-extrabold leading-none md:text-5xl">{formatCurrency(totalBalance)}</h2>
-                            <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                                <div className="rounded-[20px] bg-white/10 p-4 backdrop-blur-sm">
-                                    <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/75">
-                                        <ArrowDown className="h-3.5 w-3.5" /> {t('income')}
-                                    </div>
-                                    <p className="mt-2 text-lg font-bold md:text-xl">{formatCurrency(totalIncome)}</p>
-                                </div>
-                                <div className="rounded-[20px] bg-white/10 p-4 backdrop-blur-sm">
-                                    <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/75">
-                                        <ArrowUp className="h-3.5 w-3.5" /> {t('expense')}
-                                    </div>
-                                    <p className="mt-2 text-lg font-bold md:text-xl">{formatCurrency(totalExpense)}</p>
-                                </div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/70">{t('total_balance')}</p>
+                    <h2 className="mt-3 text-4xl font-extrabold leading-none md:text-5xl">{formatCurrency(totalBalance)}</h2>
+                    <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-[20px] bg-white/10 p-4 backdrop-blur-sm">
+                            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/75">
+                                <ArrowDown className="h-3.5 w-3.5" /> {t('income')}
                             </div>
+                            <p className="mt-2 text-lg font-bold md:text-xl">{formatCurrency(totalIncome)}</p>
+                        </div>
+                        <div className="rounded-[20px] bg-white/10 p-4 backdrop-blur-sm">
+                            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/75">
+                                <ArrowUp className="h-3.5 w-3.5" /> {t('expense')}
+                            </div>
+                            <p className="mt-2 text-lg font-bold md:text-xl">{formatCurrency(totalExpense)}</p>
                         </div>
                     </div>
                 </section>
 
-                <section className="mt-4 grid grid-cols-3 gap-3 lg:hidden">
-                    <button
-                        onClick={() => {
-                            if (wallets.length === 0) {
-                                setOpenWalletModal(true);
-                                return;
-                            }
-
-                            setFormType('INCOME');
-                            setOpenTransactionModal(true);
-                        }}
-                        className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-finance-700 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-                        disabled={wallets.length === 0}
-                    >
-                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#DDF4E2]">
-                            <Plus className="h-5 w-5" />
-                        </div>
-                        <span className="text-xs font-semibold">{t('catat_pemasukan')}</span>
-                    </button>
-                    <button
-                        onClick={() => {
-                            if (wallets.length === 0) {
-                                setOpenWalletModal(true);
-                                return;
-                            }
-
-                            setFormType('EXPENSE');
-                            setOpenTransactionModal(true);
-                        }}
-                        className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-red-500 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-                        disabled={wallets.length === 0}
-                    >
-                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FBE5EA]">
-                            <Minus className="h-5 w-5" />
-                        </div>
-                        <span className="text-xs font-semibold">{t('catat_pengeluaran')}</span>
-                    </button>
-                    <button
-                        onClick={() => {
-                            if (wallets.length < 2) {
-                                setOpenWalletModal(true);
-                                return;
-                            }
-                            setOpenTransferModal(true);
-                        }}
-                        className="flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 text-blue-600 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-                        disabled={wallets.length < 2}
-                    >
-                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50">
-                            <Repeat className="h-5 w-5" />
-                        </div>
-                        <span className="text-xs font-semibold">Transfer</span>
-                    </button>
+                <section className="hidden lg:flex lg:flex-col lg:gap-3">
+                    {quickActions.map((action) => (
+                        <button
+                            key={action.key}
+                            onClick={action.onClick}
+                            className={cn(
+                                'flex items-center gap-4 rounded-[24px] bg-white px-5 py-5 text-left shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60',
+                                action.textClassName,
+                            )}
+                            disabled={action.disabled}
+                        >
+                            <div className={cn('flex h-12 w-12 items-center justify-center rounded-full', action.iconClassName)}>
+                                <action.icon className="h-5 w-5" />
+                            </div>
+                            <span className="min-w-0 text-sm font-bold">{action.label}</span>
+                        </button>
+                    ))}
                 </section>
             </div>
 
+            <section className="mt-4 grid grid-cols-3 gap-3 lg:hidden">
+                    {quickActions.map((action) => (
+                        <button
+                            key={action.key}
+                            onClick={action.onClick}
+                            className={cn(
+                                'flex flex-col items-center justify-center gap-2 rounded-[24px] bg-white px-3 py-4 shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60',
+                                action.textClassName,
+                            )}
+                            disabled={action.disabled}
+                        >
+                            <div className={cn('flex h-11 w-11 items-center justify-center rounded-full', action.iconClassName)}>
+                                <action.icon className="h-5 w-5" />
+                            </div>
+                            <span className="text-xs font-semibold">{action.label}</span>
+                        </button>
+                    ))}
+                </section>
             <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-6">
                 {accountCards.map((account, index) => (
                     <motion.div
-                        key={`${account.name}-${index}`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.03 * index }}
