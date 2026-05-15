@@ -67,7 +67,12 @@ const getDashboardSummary = async (req, res) => {
         try {
             // Tembak ke API Data Science Python
             const pythonUrl = process.env.PYTHON_API_URL || 'http://96.9.210.207:8000/api/v1';
-            const dsResponse = await axios.post(`${pythonUrl}/ds/predict`, rawDataPayload);
+            const dsResponse = await axios.post(`${pythonUrl}/ds/predict`, rawDataPayload, {
+                headers: {
+                    'x-internal-service-key': process.env.INTERNAL_SERVICE_KEY
+                },
+                timeout: 30000
+            });
             dsMetrics = dsResponse.data;
         } catch (dsError) {
             if (dsError.response) {

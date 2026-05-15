@@ -40,17 +40,28 @@ const runMonthlyInsight = async () => {
             let health_score = 0, predicted_cashflow = 0, overbudget_risk = "low", money_leak = "-", total_spent = 0, total_budget = 0, categories = [];
             let ai_insight = "Insight belum tersedia karena masalah koneksi ke AI Service.";
 
+            const axiosConfig = {
+                headers: {
+                    'x-internal-service-key': process.env.INTERNAL_SERVICE_KEY
+                },
+                timeout: 30000
+            };
+
             // Tembak DS (Team Bang Pascal)
             try {
-                const dsRes = await axios.post(`${pythonUrl}/ds/predict`, payload);
+                const dsRes = await axios.post(`${pythonUrl}/ds/predict`, payload, axiosConfig);
                 ({ health_score, predicted_cashflow, overbudget_risk, money_leak, total_spent, total_budget, categories } = dsRes.data);
             } catch (err) {
-                console.error(` [Insight Worker] DS Service Error for User ${userId}:`, err.message);
+                if (err.response) {
+                    console.error(` [Insight Worker] DS Service Error (${err.response.status}):`, JSON.stringify(err.response.data));
+                } else {
+                    console.error(` [Insight Worker] DS Service Unreachable:`, err.message);
+                }
             }
 
             // Tembak AI (Team Bang Hafizh)
             try {
-                const aiRes = await axios.post(`${pythonUrl}/ai/financial-insights/monthly`, payload);
+                const aiRes = await axios.post(`${pythonUrl}/ai/financial-insights/monthly`, payload, axiosConfig);
                 ai_insight = aiRes.data.ai_insight;
             } catch (err) {
                 if (err.response) {
