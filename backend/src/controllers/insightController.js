@@ -3,7 +3,7 @@ const { runMonthlyInsight } = require('../cronJob/insightWorker');
 
 const getFinancialInsights = async (req, res) => {
     // Hanya butuh period dari query URL, user_id diambil dari token JWT (Auth Middleware)
-    const { period } = req.query; 
+    const { month_period } = req.query; 
     const userId = req.user.id;
 
     try {
@@ -14,8 +14,8 @@ const getFinancialInsights = async (req, res) => {
         // FIXED: Mencari berdasarkan user_id, 
         const insightData = await db.query(`
             SELECT * FROM financial_insights 
-            WHERE user_id = $1 AND period = $2
-        `, [userId, period]);
+            WHERE user_id = $1 AND month_period = $2
+        `, [userId, month_period]);
 
         if (insightData.rows.length === 0) {
              return res.status(200).json({ 
