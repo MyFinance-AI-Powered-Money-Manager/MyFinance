@@ -18,6 +18,7 @@ const Profile = () => {
     const deleteAccount = useDeleteAccount();
     const { t } = useLanguage();
 
+    const fileInputRef = React.useRef(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
     const [deleteConfirmText, setDeleteConfirmText] = React.useState('');
 
@@ -25,12 +26,16 @@ const Profile = () => {
     const [selectedFile, setSelectedFile] = React.useState(null);
     const [previewUrl, setPreviewUrl] = React.useState('');
     const [previewLoadFailed, setPreviewLoadFailed] = React.useState(false);
+    const [removePhoto, setRemovePhoto] = React.useState(false);
     const [oldPassword, setOldPassword] = React.useState('');
     const [newPassword, setNewPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
 
+    const activeUser = profile || authUser || {};
+    const avatarUrl = previewUrl || resolveMediaUrl(activeUser.profile_picture);
+    const initial = (activeUser.full_name || activeUser.name || 'U').trim().charAt(0).toUpperCase();
+
     React.useEffect(() => {
-        const activeUser = profile || authUser || {};
         setFullName(activeUser.full_name || '');
         setPreviewUrl(resolveMediaUrl(activeUser.profile_picture));
         setPreviewLoadFailed(false);
@@ -59,8 +64,6 @@ const Profile = () => {
             </Layout>
         );
     }
-
-    const activeUser = profile || authUser || {};
 
     // eslint-disable-next-line no-unused-vars
     const handleFileChange = (event) => {

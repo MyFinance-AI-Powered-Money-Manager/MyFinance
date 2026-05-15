@@ -246,7 +246,6 @@ const Reports = () => {
     const transactionTrend = calculatePercentageChange(currentTotals.count, previousTotals.count);
     const expenseTrend = calculatePercentageChange(averageExpense, previousAverageExpense);
     const chartData = buildChartData(currentMonthTransactions);
-    const recentTransactions = currentMonthTransactions.slice(0, 3);
     const hasCurrentMonthData = currentMonthTransactions.length > 0;
 
     return (
@@ -368,51 +367,6 @@ const Reports = () => {
                     </div>
                 </div>
 
-                <div className="finance-card p-5 sm:p-6 md:p-8">
-                    <div className="mb-6 flex items-center justify-between gap-4">
-                        <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('transaction_history')}</h3>
-                        <button className="text-sm font-bold text-finance-700 transition hover:opacity-80">{t('see_all')}</button>
-                    </div>
-
-                    <div className="space-y-5">
-                        {recentTransactions.length > 0 ? recentTransactions.map((tx, index) => {
-                            const amount = Number(tx.amount ?? 0);
-                            const txType = String(tx.type || '').toUpperCase();
-                            const isTransferOut = txType === 'TRANSFER' && tx.description === 'Transfer Keluar';
-                            const isTransferIn = txType === 'TRANSFER' && tx.description === 'Transfer Masuk';
-                            const isIncome = txType === 'INCOME' || isTransferIn;
-                            const Icon = getCategoryIcon(tx.category);
-
-                            return (
-                                <div key={tx.id ?? index} className="flex items-center justify-between gap-4 rounded-[20px] bg-[#FAFCF7] px-3 py-3 transition hover:bg-[#F3F8EE] dark:bg-[#253044] dark:hover:bg-[#2D3A52] sm:px-3 sm:py-3">
-                                    <div className="flex items-center gap-4">
-                                        <div className={cn(
-                                            'flex h-12 w-12 items-center justify-center rounded-full shadow-sm',
-                                            (txType === 'EXPENSE' || isTransferOut)
-                                                ? 'bg-[#FBE5EA] text-[#D1496F] dark:bg-[#402233] dark:text-[#F47A97]'
-                                                : 'bg-[#7CF38E] text-zinc-900 dark:bg-[#1F5B3A] dark:text-[#9AF2AF]'
-                                        )}>
-                                            <Icon className="h-5 w-5" />
-                                        </div>
-                                        <div>
-                                            <h4 className="text-sm font-bold text-zinc-900 dark:text-[#F0F1F3]">{tx.label || tx.description || t('transaction')}</h4>
-                                            <p className="text-[11px] text-zinc-500 dark:text-[#B0B8CC]">
-                                                {tx.category || t('category')} • {formatRelativeDate(tx.date || tx.createdAt, language)}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <p className={cn('text-sm font-bold md:text-base', isIncome ? 'text-finance-700 dark:text-[#7CF38E]' : 'text-[#D1496F] dark:text-[#F47A97]')}>
-                                        {isIncome ? '+' : '-'} {formatCurrency(Math.abs(amount))}
-                                    </p>
-                                </div>
-                            );
-                        }) : (
-                            <div className="rounded-[20px] border border-dashed border-zinc-200 p-8 text-center text-sm text-zinc-500 dark:border-[#3F4959] dark:text-[#8B92A9]">
-                                {t('transactions_data_unavailable')}
-                            </div>
-                        )}
-                    </div>
-                </div>
             </div>
         </Layout>
     );

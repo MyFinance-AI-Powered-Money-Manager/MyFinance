@@ -11,7 +11,7 @@ import { TransferFormModal } from '../components/TransferFormModal';
 import { BudgetFormModal } from '../components/BudgetFormModal';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { useBudgets, useCreateBudget, useCreateTransaction, useDashboardSummary, useDeleteBudget, useTransactions, useUpdateBudget, useWallets } from '../hooks/useFinance';
+import { useBudgets, useCreateBudget, useCreateTransaction, useDashboardSummary, useDeleteBudget, useMonthlyFinancialInsight, useTransactions, useUpdateBudget, useWallets } from '../hooks/useFinance';
 import { cn, formatCurrency } from '../lib/utils';
 
 const WALLET_ICON_MAP = {
@@ -21,7 +21,7 @@ const WALLET_ICON_MAP = {
 };
 
 const Dashboard = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
@@ -31,11 +31,18 @@ const Dashboard = () => {
     const [openTransferModal, setOpenTransferModal] = React.useState(false);
     const [openBudgetModal, setOpenBudgetModal] = React.useState(false);
     const [editingBudget, setEditingBudget] = React.useState(null);
+    const latestInsightPeriod = React.useMemo(() => {
+        const date = new Date();
+        date.setDate(1);
+        date.setMonth(date.getMonth() - 1);
+        return date.toISOString().slice(0, 7);
+    }, []);
 
     const { data: walletsData, isLoading: walletsLoading, error: walletsError } = useWallets();
     const { data: budgetsData } = useBudgets();
     const { data: transactionsData, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
     const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useDashboardSummary();
+    const { data: monthlyInsight, isLoading: insightLoading, error: insightError } = useMonthlyFinancialInsight(latestInsightPeriod);
     const createTransaction = useCreateTransaction();
     const createBudget = useCreateBudget();
     const updateBudget = useUpdateBudget();
@@ -89,8 +96,6 @@ const Dashboard = () => {
             type: wallet.type,
         }));
 
-    const activeBudget = budgets[0];
-
     // Get current month budgets
     const currentMonth = new Date().toISOString().slice(0, 7);
     const currentBudgets = budgets.filter((b) => (b.month_period || b.monthPeriod) === currentMonth);
@@ -138,6 +143,28 @@ const Dashboard = () => {
     const getTransactionPrefix = (tx) => {
         if (tx.type === 'EXPENSE' || tx.isTransferOut) return '-';
         return '+';
+    };
+
+    const formatRiskLabel = (risk) => {
+        const normalizedRisk = String(risk || '').toLowerCase();
+        const activeLanguage = language === 'en' ? 'en' : 'id';
+
+        const labels = {
+            id: {
+                low: 'Rendah',
+                medium: 'Sedang',
+                high: 'Tinggi',
+                unknown: 'Belum diketahui',
+            },
+            en: {
+                low: 'Low',
+                medium: 'Medium',
+                high: 'High',
+                unknown: 'Unknown',
+            },
+        };
+
+        return labels[activeLanguage][normalizedRisk] || String(risk || '').toUpperCase();
     };
 
     const handleCreateTransaction = async (payload) => {
@@ -391,12 +418,45 @@ const Dashboard = () => {
                             <Sparkles className="h-5 w-5" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('AI_insight')}</h3>
-                            <p className="mt-3 max-w-xl text-sm leading-7 text-zinc-500 dark:text-[#B0B8CC]">
-                                {activeBudget
-                                    ? `Pengeluaran kamu minggu ini 15% lebih rendah dari rata-rata bulanan. Pertahankan tren ini untuk mencapai target tabungan akhir tahun!`
-                                    : t('insight_text')}
-                            </p>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('AI_insight')}</h3>
+                                <span className="rounded-full bg-[#EDF6E7] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-finance-700">
+                                    {latestInsightPeriod}
+                                </span>
+                            </div>
+                            <div className="mt-3 max-w-xl text-sm leading-7 text-zinc-500 dark:text-[#B0B8CC]">
+                                {insightLoading ? (
+                                    <div className="space-y-2">
+                                        <div className="h-4 w-5/6 animate-pulse rounded-full bg-zinc-200 dark:bg-[#364154]" />
+                                        <div className="h-4 w-4/6 animate-pulse rounded-full bg-zinc-200 dark:bg-[#364154]" />
+                                        <div className="h-4 w-3/6 animate-pulse rounded-full bg-zinc-200 dark:bg-[#364154]" />
+                                    </div>
+                                ) : insightError ? (
+                                    <p>{t('insight_unavailable')}</p>
+                                ) : (
+                                    <p>{monthlyInsight?.ai_insight || t('insight_unavailable')}</p>
+                                )}
+                            </div>
+                            {!insightLoading && monthlyInsight ? (
+                                <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                    <div className="rounded-2xl bg-[#FAFCF7] px-4 py-3 dark:bg-[#253044]">
+                                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-[#8B92A9]">{t('insight_health_score')}</p>
+                                        <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-[#F0F1F3]">{monthlyInsight.health_score ?? 0}</p>
+                                    </div>
+                                    <div className="rounded-2xl bg-[#FAFCF7] px-4 py-3 dark:bg-[#253044]">
+                                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-[#8B92A9]">{t('insight_predicted_cashflow')}</p>
+                                        <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-[#F0F1F3]">{formatCurrency(monthlyInsight.predicted_cashflow ?? 0)}</p>
+                                    </div>
+                                    <div className="rounded-2xl bg-[#FAFCF7] px-4 py-3 dark:bg-[#253044]">
+                                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-[#8B92A9]">{t('insight_overbudget_risk')}</p>
+                                        <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-[#F0F1F3]">{formatRiskLabel(monthlyInsight.overbudget_risk)}</p>
+                                    </div>
+                                    <div className="rounded-2xl bg-[#FAFCF7] px-4 py-3 dark:bg-[#253044]">
+                                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-[#8B92A9]">{t('insight_money_leak')}</p>
+                                        <p className="mt-1 text-sm font-bold text-zinc-900 dark:text-[#F0F1F3]">{monthlyInsight.money_leak || '-'}</p>
+                                    </div>
+                                </div>
+                            ) : null}
                         </div>
                         <div className="hidden rounded-full bg-[#EDF6E7] p-3 text-finance-500 md:block">
                             <Sparkles className="h-6 w-6" />
