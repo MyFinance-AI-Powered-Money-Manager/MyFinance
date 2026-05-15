@@ -34,17 +34,27 @@ const runMonthlyInsight = async () => {
                 budgets: budgets.rows
             };
 
-            // 2. LOGIKA PARALEL: Tembak Bang Pascal (DS) & Bang Hafizh (AI) secara bersamaan
+            // 2. LOGIKA INDEPENDEN: Tembak DS & AI secara terpisah agar tidak saling menjatuhkan
             console.log(`   -> Menghubungi API DS & AI untuk User: ${userId}`);
 
-            const [dsRes, aiRes] = await Promise.all([
-                axios.post(`${pythonUrl}/ds/predict`, payload),
-                axios.post(`${pythonUrl}/ai/financial-insights/monthly`, payload)
-            ]);
+            let health_score = 0, predicted_cashflow = 0, overbudget_risk = "low", money_leak = "-", total_spent = 0, total_budget = 0, categories = [];
+            let ai_insight = "Insight belum tersedia karena masalah koneksi ke AI Service.";
 
-            // 3. Gabungkan hasil dari kedua tim
-            const { health_score, predicted_cashflow, overbudget_risk, money_leak, total_spent, total_budget, categories } = dsRes.data;
-            const { ai_insight } = aiRes.data;
+            // Tembak DS (Team Bang Pascal)
+            try {
+                const dsRes = await axios.post(`${pythonUrl}/ds/predict`, payload);
+                ({ health_score, predicted_cashflow, overbudget_risk, money_leak, total_spent, total_budget, categories } = dsRes.data);
+            } catch (err) {
+                console.error(` [Insight Worker] DS Service Error for User ${userId}:`, err.message);
+            }
+
+            // Tembak AI (Team Bang Hafizh)
+            try {
+                const aiRes = await axios.post(`${pythonUrl}/ai/financial-insights/monthly`, payload);
+                ai_insight = aiRes.data.ai_insight;
+            } catch (err) {
+                console.error(` [Insight Worker] AI Service Error for User ${userId}:`, err.message);
+            }
 
             // 4. UPSERT (Update or Insert) ke tabel financial_insights
             await db.query(`
