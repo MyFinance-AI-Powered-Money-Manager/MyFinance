@@ -118,8 +118,8 @@ export const Layout = ({ children }) => {
     return (
         <div className="finance-shell">
             <Sidebar />
-            <main className="min-h-screen pb-28 md:ml-[270px] md:pb-0">
-                <div className="mx-auto w-full max-w-[1240px] px-4 py-5 md:px-6 lg:px-8 lg:py-6">
+            <main className="min-h-screen pb-28 md:ml-[270px] md:pb-0 flex flex-col">
+                <div className="flex-1 mx-auto w-full max-w-[1240px] px-4 py-5 md:px-6 lg:px-8 lg:py-6">
                     {children}
                 </div>
                 <Footer />
