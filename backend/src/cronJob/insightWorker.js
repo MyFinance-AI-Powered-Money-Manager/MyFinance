@@ -37,8 +37,9 @@ const runMonthlyInsight = async () => {
             // 2. LOGIKA INDEPENDEN: Tembak DS & AI secara terpisah agar tidak saling menjatuhkan
             console.log(`   -> Menghubungi API DS & AI untuk User: ${userId}`);
 
-            let health_score = 0, predicted_cashflow = 0, overbudget_risk = "low", money_leak = "-", total_spent = 0, total_budget = 0, categories = [];
-            let ai_insight = "Insight belum tersedia karena masalah koneksi ke AI Service.";
+            // DEBUG: Cek apakah key terbaca (Hanya tampilkan 4 karakter pertama demi keamanan)
+            const keyPreview = process.env.INTERNAL_SERVICE_KEY ? process.env.INTERNAL_SERVICE_KEY.substring(0, 4) + '...' : 'TIDAK TERBACA';
+            console.log(`   -> Debug Service Key: ${keyPreview}`);
 
             const axiosConfig = {
                 headers: {
