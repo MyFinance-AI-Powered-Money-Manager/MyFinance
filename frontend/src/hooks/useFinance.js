@@ -398,7 +398,7 @@ export const useMonthlyFinancialInsight = (period, options = {}) => {
 
   return useQuery({
     queryKey: ['monthly-insight', period],
-    queryFn: async () => normalizeMonthlyInsight(await api.get('/insights', { params: { period } })),
+    queryFn: async () => normalizeMonthlyInsight(await api.get('/insights', { params: { month_period: period } })),
     enabled: Boolean(period) && optionEnabled,
     staleTime: 5 * 60 * 1000,
     ...restOptions,

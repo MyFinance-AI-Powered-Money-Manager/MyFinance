@@ -7,8 +7,8 @@ const getFinancialInsights = async (req, res) => {
     const userId = req.user.id;
 
     try {
-        if (!period) {
-            return res.status(400).json({ status: 'error', message: 'Parameter period (YYYY-MM) wajib disertakan.' });
+        if (!month_period) {
+            return res.status(400).json({ status: 'error', message: 'Parameter month_period (YYYY-MM) wajib disertakan.' });
         }
 
         // FIXED: Mencari berdasarkan user_id, 
