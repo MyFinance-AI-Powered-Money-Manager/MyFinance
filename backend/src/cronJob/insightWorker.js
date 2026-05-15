@@ -53,7 +53,11 @@ const runMonthlyInsight = async () => {
                 const aiRes = await axios.post(`${pythonUrl}/ai/financial-insights/monthly`, payload);
                 ai_insight = aiRes.data.ai_insight;
             } catch (err) {
-                console.error(` [Insight Worker] AI Service Error for User ${userId}:`, err.message);
+                if (err.response) {
+                    console.error(` [Insight Worker] AI Service Error (${err.response.status}):`, JSON.stringify(err.response.data));
+                } else {
+                    console.error(` [Insight Worker] AI Service Unreachable:`, err.message);
+                }
             }
 
             // 4. UPSERT (Update or Insert) ke tabel financial_insights
