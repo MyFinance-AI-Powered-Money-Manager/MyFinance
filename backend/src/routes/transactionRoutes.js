@@ -25,10 +25,10 @@ router.post('/upload-receipt', authenticateToken, upload.single('file'), async (
 
         const fileExt = req.file.originalname.split('.').pop();
         const fileName = `${req.user.id}-${Date.now()}.${fileExt}`;
-        const filePath = `receipt-scans/${fileName}`;
+        const filePath = `receipt_scan/${fileName}`;
 
         const { data, error } = await supabase.storage
-            .from('receipt-scan') // bucket: receipt-scan
+            .from('receipt_scan') // bucket: receipt-scan
             .upload(filePath, req.file.buffer, {
                 contentType: req.file.mimetype,
                 upsert: true
@@ -38,7 +38,7 @@ router.post('/upload-receipt', authenticateToken, upload.single('file'), async (
 
         // Ambil Public URL
         const { data: publicUrlData } = supabase.storage
-            .from('receipt-scan')
+            .from('receipt_scan')
             .getPublicUrl(filePath);
 
         res.status(200).json({ status: 'success', image_url: publicUrlData.publicUrl });
