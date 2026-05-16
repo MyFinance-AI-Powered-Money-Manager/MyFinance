@@ -14,9 +14,11 @@ Dokumentasi API
 ## 🔐 1. Authentication & Users
 
 ### 1.1 Register User
+
 `POST /auth/register`
 
 **Request Body:**
+
 ```json
 {
   "full_name": "Aditya Beckham",
@@ -27,9 +29,11 @@ Dokumentasi API
 ```
 
 ### 1.2 Login User
+
 `POST /auth/login`
 
 **Request Body:**
+
 ```json
 {
   "email": "adityabeckham@example.com",
@@ -38,6 +42,7 @@ Dokumentasi API
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "status": "success",
@@ -49,15 +54,20 @@ Dokumentasi API
 ```
 
 ### 1.3 Get Profile
+
 `GET /users/profile`
+
 - **Auth Required:** Yes
 - **Deskripsi:** Mengambil data profil pengguna yang sedang login.
 
 ### 1.4 Update Profile
+
 `PUT /users/profile`
+
 - **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "full_name": "Aditya Beckham (Updated)",
@@ -66,10 +76,13 @@ Dokumentasi API
 ```
 
 ### 1.5 Update Password
+
 `PUT /users/password`
+
 - **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "old_password": "password123",
@@ -79,11 +92,14 @@ Dokumentasi API
 ```
 
 ### 1.6 Delete Account (Hapus Permanen)
+
 `DELETE /users/profile`
+
 - **Auth Required:** Yes
 - **Deskripsi:** Menghapus akun user beserta seluruh data dompet, transaksi, dan budget yang terkait (Cascade).
 
 **Response (200 OK):**
+
 ```json
 {
   "status": "success",
@@ -96,6 +112,7 @@ Dokumentasi API
 ## 💳 2. Wallets (Dompet)
 
 > **NOTE:** Pastikan pilihan Dropdown type/jenis wallet di UI sesuai dengan yang dikirim ke backend:
+>
 > - BANK
 > - CASH
 > - E-WALLET
@@ -114,14 +131,19 @@ Dokumentasi API
   - Jika type == 'TRANSFER' dan description == 'Transfer Masuk', kasih icon panah hijau (Masuk).
 
 ### 2.1 Get All Wallets
+
 `GET /wallets`
+
 - **Auth Required:** Yes
 
 ### 2.2 Create Wallet
+
 `POST /wallets`
+
 - **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "name": "BCA Utama",
@@ -131,10 +153,13 @@ Dokumentasi API
 ```
 
 ### 2.3 Update Wallet
+
 `PUT /wallets/:id`
+
 - **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "name": "Gopay",
@@ -143,10 +168,13 @@ Dokumentasi API
 ```
 
 ### 2.4 Transfer Antar Dompet
+
 `POST /wallets/transfer`
+
 - **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "source_wallet_id": "uuid-wallet-a",
@@ -156,7 +184,9 @@ Dokumentasi API
 ```
 
 ### 2.5 Delete Wallet
+
 `DELETE /wallets/:id`
+
 - **Auth Required:** Yes
 
 ---
@@ -164,14 +194,19 @@ Dokumentasi API
 ## 📈 3. Budgets (Anggaran)
 
 ### 3.1 Get All Budgets
+
 `GET /budgets`
+
 - **Auth Required:** Yes
 
 ### 3.2 Set Budget Bulanan
+
 `POST /budgets`
+
 - **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "category": "WANTS",
@@ -181,10 +216,13 @@ Dokumentasi API
 ```
 
 ### 3.3 Update Budget Limit
+
 `PUT /budgets/:id`
+
 - **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "limit_amount": 2000000
@@ -192,7 +230,9 @@ Dokumentasi API
 ```
 
 ### 3.4 Delete Budget
+
 `DELETE /budgets/:id`
+
 - **Auth Required:** Yes
 
 ---
@@ -200,25 +240,28 @@ Dokumentasi API
 ## 💸 4. Transactions (Core Business Logic)
 
 ### 🛠️ Panduan UI/UX Frontend (Dropdown Menu)
+
 Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Frontend:
 
 #### A. Tipe: INCOME (Pemasukan)
-| Category (Dropdown 1) | Subcategory (Dropdown 2) |
-| :--- | :--- |
-| **GAJI** | Gaji Utama, Tunjangan / Allowances, Uang Saku Bulanan |
-| **FREELANCE** | Proyek / Project, Part-Time / Shift, Hasil Usaha / Jualan |
-| **BONUS** | THR / Bonus Tahunan, Hadiah / Uang Kaget, Cashback / Promo |
-| **LAINNYA** | Hasil Investasi / Bunga, Pencairan Tabungan, Utang Dibayar Teman, Lain-lain |
+
+| Category (Dropdown 1) | Subcategory (Dropdown 2)                                                    |
+| :-------------------- | :-------------------------------------------------------------------------- |
+| **GAJI**              | Gaji Utama, Tunjangan / Allowances, Uang Saku Bulanan                       |
+| **FREELANCE**         | Proyek / Project, Part-Time / Shift, Hasil Usaha / Jualan                   |
+| **BONUS**             | THR / Bonus Tahunan, Hadiah / Uang Kaget, Cashback / Promo                  |
+| **LAINNYA**           | Hasil Investasi / Bunga, Pencairan Tabungan, Utang Dibayar Teman, Lain-lain |
 
 #### B. Tipe: EXPENSE (Pengeluaran)
-| Category (Dropdown 1) | Subcategory (Dropdown 2) |
-| :--- | :--- |
-| **NEEDS** | Makan & Minum Harian, Kebutuhan Rumah & Mandi, Transportasi & Rutinitas, Tagihan & Kewajiban |
-| **WANTS** | Jajan & Nongkrong, Hobi & Self-Reward |
-| **OTHER** | Lain-lain & Darurat |
 
+| Category (Dropdown 1) | Subcategory (Dropdown 2)                                                                     |
+| :-------------------- | :------------------------------------------------------------------------------------------- |
+| **NEEDS**             | Makan & Minum Harian, Kebutuhan Rumah & Mandi, Transportasi & Rutinitas, Tagihan & Kewajiban |
+| **WANTS**             | Jajan & Nongkrong, Hobi & Self-Reward                                                        |
+| **OTHER**             | Lain-lain & Darurat                                                                          |
 
 > [💡Frontend Note]: Hanya panggil endpoint ini saat:
+
 - **(1) User baru login/buka apps**
 - **(2) User selesai input transaksi**
 - **(3) User melakukan pull-to-refresh.**
@@ -227,14 +270,19 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 > lalu minta pengguna menuliskan rinciannya di kolom Description (teks bebas).
 
 ### 4.1 Get All Transactions
+
 `GET /transactions`
+
 - **Auth Required:** Yes
 
 ### 4.2 Catat Transaksi Tipe INCOME
+
 `POST /transactions`
+
 - **Auth Required:** Yes
 
 **Request Body (Manual Income):**
+
 ```json
 {
   "wallet_id": "uuid-wallet-bca",
@@ -248,10 +296,13 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 ```
 
 ### 4.3 Catat Manual Expense
+
 `POST /transactions`
+
 - **Auth Required:** Yes
 
 **Request Body (Manual Expense):**
+
 ```json
 {
   "wallet_id": "uuid-wallet-bca",
@@ -265,11 +316,14 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 ```
 
 ### 4.4 Catat via OCR (Hasil Scan AI)
+
 `POST /transactions`
+
 - **Auth Required:** Yes
 - **Deskripsi:** Digunakan setelah Frontend menerima JSON dari Python AI Service.
 
 **Request Body (OCR Data):**
+
 ```json
 {
   "wallet_id": "uuid-wallet-cash",
@@ -278,9 +332,7 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
   "category": "NEEDS",
   "description": "Belanja Mingguan Indomaret",
   "transaction_date": "2026-05-11T10:00:00Z",
-  "receipt_data": {
-    "image_url": "https://supabase-storage.com/struk/001.jpg"
-  },
+  "image_url": "https://supabase-storage.com/struk/001.jpg",
   "items": [
     {
       "item_name": "Sabun Mandi",
@@ -299,10 +351,11 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "status": "success",
-  "is_overbudget": true, 
+  "is_overbudget": true,
   "data": { "transaction_id": "uuid-trx-999" }
 }
 ```
@@ -311,7 +364,9 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 > Deskripsi: Field ini adalah hasil prediksi real-time dari model ML (BiLSTM) Bang Pascal. Frontend bisa menggunakan flag ini untuk menampilkan pop-up peringatan ke user jika transaksi tersebut membuat anggaran jebol.
 
 ### 4.5 Delete Transaction
+
 `DELETE /transactions/:id`
+
 - **Auth Required:** Yes
 - **Deskripsi:** Menghapus transaksi dan me-reverse (mengembalikan) saldo dompet secara otomatis.
 
@@ -320,11 +375,14 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 ## 🧠 5. Integrasi Data Science & AI
 
 ### 5.1 Real-time Dashboard Summary
+
 `GET /dashboard/summary`
+
 - **Auth Required:** Yes
 - **Deskripsi:** Backend Node.js mengumpulkan data dan memanggil API Python untuk `ds_metrics`.
 
 **Response (200 OK):**
+
 ```json
 {
   "status": "success",
@@ -343,11 +401,14 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 ```
 
 ### 5.2 AI Monthly Insight
+
 `GET /insights?period=2026-05`
+
 - **Auth Required:** Yes
 - **Deskripsi:** Mengambil hasil analisis AI (Cron Job).
 
 **Response (200 OK):**
+
 ```json
 {
   "health_score": 75,
@@ -369,7 +430,9 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 ## ⚙️ 6. Cron & Automation
 
 ### 6.1 Trigger Manual Insight
+
 `POST /insights/trigger`
+
 - **Auth Required:** Custom Token
 - **Header:** `Authorization: Bearer <CRON_SECRET_KEY>`
 - **Response:** `200 OK` - "Cron job manual berhasil dipicu."
@@ -378,10 +441,10 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 
 ## ⚠️ 7. Error Codes Standar
 
-| Code | Status | Deskripsi |
-| :--- | :--- | :--- |
-| **400** | Bad Request | Input tidak valid atau kurang. |
-| **401** | Unauthorized | Token JWT hilang atau salah. |
-| **403** | Forbidden | Token expired atau Secret key salah. |
-| **404** | Not Found | Data tidak ditemukan di database. |
-| **500** | Internal Error | Masalah pada sistem/server. |
+| Code    | Status         | Deskripsi                            |
+| :------ | :------------- | :----------------------------------- |
+| **400** | Bad Request    | Input tidak valid atau kurang.       |
+| **401** | Unauthorized   | Token JWT hilang atau salah.         |
+| **403** | Forbidden      | Token expired atau Secret key salah. |
+| **404** | Not Found      | Data tidak ditemukan di database.    |
+| **500** | Internal Error | Masalah pada sistem/server.          |

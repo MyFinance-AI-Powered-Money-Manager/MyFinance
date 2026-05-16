@@ -5,11 +5,11 @@ const createTransaction = async (req, res) => {
     // Backend (Node.js) - Ambil User ID dari JWT
     const userId = req.user.id;
 
-    // 1. TAMBAHAN BARU: Tangkap image_url dan raw_ai_output
+    // 1. TAMBAHAN BARU: Tangkap image_url
     const {
         wallet_id, type, total_amount, category, subcategory,
         description, transaction_date, items,
-        receipt_data // buat pembungkus jika data struk
+        image_url
     } = req.body;
 
     const client = await db.connect();
@@ -51,11 +51,11 @@ const createTransaction = async (req, res) => {
         }
 
         // 5. Simpan Bukti Scan (Hanya jika ada data struk) ke tabel receipt_scans
-        if (receipt_data && receipt_data.image_url) {
+        if (image_url) {
             await client.query(
                 `INSERT INTO receipt_scans (user_id, transaction_id, image_url) 
          VALUES ($1, $2, $3)`,
-                [userId, transactionId, receipt_data.image_url]
+                [userId, transactionId, image_url]
             );
         }
 
