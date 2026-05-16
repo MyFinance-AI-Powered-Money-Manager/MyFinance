@@ -38,25 +38,28 @@ const createTransaction = async (req, res) => {
 
         const transactionId = newTransaction.rows[0].id;
 
-        // 4. Simpan Detail Item OCR/Struk ke tabel transaction_items dan transactions
+        // 4. Simpan Detail Item OCR/Struk ke tabel transaction_items
         if (items && Array.isArray(items) && items.length > 0) {
-            const itemQueries = items.map(item => {
-                return client.query(
+            for (const item of items) {
+                await client.query(
                     `INSERT INTO transaction_items (transaction_id, item_name, price, category, subcategory) 
                      VALUES ($1, $2, $3, $4, $5)`,
                     [transactionId, item.item_name, item.price, item.category, item.subcategory]
                 );
-            });
-            await Promise.all(itemQueries);
+            }
         }
 
-        // 5. Simpan Bukti Scan (Hanya jika ada data struk) ke tabel receipt_scans
-        if (image_url) {
+        // 5. Simpan Bukti Scan ke tabel receipt_scans
+        console.log(`   -> [Backend Debug] image_url: "${image_url}"`);
+        if (image_url && String(image_url).trim() !== '') {
             await client.query(
                 `INSERT INTO receipt_scans (user_id, transaction_id, image_url) 
-         VALUES ($1, $2, $3)`,
+                 VALUES ($1, $2, $3)`,
                 [userId, transactionId, image_url]
             );
+            console.log('   -> [Backend Debug] Success: receipt_scans inserted.');
+        } else {
+            console.log('   -> [Backend Debug] Skip: image_url is empty.');
         }
 
         // 6. Update Saldo Dompet
