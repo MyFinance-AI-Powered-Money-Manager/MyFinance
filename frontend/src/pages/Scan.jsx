@@ -74,7 +74,7 @@ const normalizeScanResult = (data) => {
     merchant: coalesce(raw.merchant, raw.store_name, raw.storeName, raw.description, ''),
     date: toDateInputValue(raw.date, raw.transaction_date, raw.transactionDate),
     predictedCategory: coalesce(raw.predicted_category, raw.predictedCategory, ''),
-    image_url: coalesce(raw.image_url, raw.receipt_url, ''),
+    image_url: coalesce(raw.image_url, raw.receipt_url, raw.url, raw.file_url, ''),
     raw,
   };
 };
@@ -164,6 +164,7 @@ const Scan = () => {
       formData.append('file', file);
 
       const response = await scanReceipt.mutateAsync(formData);
+      console.log('   -> [Frontend Debug] AI Raw Response:', response);
       const normalized = normalizeScanResult(response);
 
       if (!normalized) {
