@@ -11,7 +11,7 @@ import { TransferFormModal } from '../components/TransferFormModal';
 import { BudgetFormModal } from '../components/BudgetFormModal';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { useBudgets, useCreateBudget, useCreateTransaction, useDashboardSummary, useDeleteBudget, useMonthlyFinancialInsight, useTransactions, useUpdateBudget, useWallets } from '../hooks/useFinance';
+import { useBudgets, useCreateBudget, useCreateTransaction, useDashboardSummary, useDeleteBudget, useDeleteWallet, useMonthlyFinancialInsight, useTransactions, useUpdateBudget, useWallets } from '../hooks/useFinance';
 import { cn, formatCurrency } from '../lib/utils';
 import { showWarning } from '../lib/toast';
 
@@ -48,6 +48,7 @@ const Dashboard = () => {
     const createBudget = useCreateBudget();
     const updateBudget = useUpdateBudget();
     const deleteBudget = useDeleteBudget();
+    const deleteWallet = useDeleteWallet();
 
     const wallets = Array.isArray(walletsData) ? walletsData : walletsData?.data ?? [];
     const budgets = Array.isArray(budgetsData) ? budgetsData : budgetsData?.data ?? [];
@@ -89,7 +90,6 @@ const Dashboard = () => {
     const totalExpense = dashboardData?.total_expense ?? 0;
 
     const accountCards = wallets
-        .slice(0, 5)
         .map((wallet) => ({
             id: wallet.id || `${wallet.type || 'wallet'}-${wallet.name || wallet.label || ''}`,
             icon: WALLET_ICON_MAP[wallet.type] || Wallet,
@@ -281,6 +281,16 @@ const Dashboard = () => {
         }
     };
 
+    const handleDeleteWallet = async (walletId, walletName) => {
+        if (!window.confirm(`Yakin ingin menghapus dompet ${walletName || 'ini'}?`)) return;
+
+        try {
+            await deleteWallet.mutateAsync(walletId);
+        } catch {
+            // Error already handled by the mutation callback.
+        }
+    };
+
     return (
         <Layout>
             <DashboardHeader user={user} onProfileClick={() => navigate('/profile')} />
@@ -350,8 +360,18 @@ const Dashboard = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.03 * index }}
-                        className="finance-card flex flex-col items-center justify-center px-4 py-6 text-center"
+                        className="finance-card group relative flex flex-col items-center justify-center px-4 py-6 text-center"
                     >
+                        <button
+                            type="button"
+                            onClick={() => handleDeleteWallet(account.id, account.name)}
+                            disabled={deleteWallet.isPending}
+                            className="absolute right-3 top-3 rounded-full p-1.5 text-zinc-400 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
+                            title={t('delete')}
+                            aria-label={`Hapus wallet ${account.name}`}
+                        >
+                            <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-finance-700 text-white shadow-sm">
                             <account.icon className="h-5 w-5" />
                         </div>
