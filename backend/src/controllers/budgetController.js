@@ -31,9 +31,25 @@ const createBudget = async (req, res) => {
 
 const getBudgets = async (req, res) => {
     try {
-        const budgets = await db.query('SELECT * FROM budgets WHERE user_id = $1 ORDER BY month_period DESC', [req.user.id]);
+        // FIXED: Tambahkan subquery untuk menghitung total pengeluaran (spent) per kategori & bulan
+        const budgets = await db.query(`
+            SELECT b.*, 
+                   COALESCE((
+                       SELECT SUM(t.total_amount) 
+                       FROM transactions t 
+                       WHERE t.user_id = b.user_id 
+                         AND t.category = b.category 
+                         AND t.type = 'EXPENSE'
+                         AND to_char(t.transaction_date, 'YYYY-MM') = b.month_period
+                   ), 0) as spent
+            FROM budgets b 
+            WHERE b.user_id = $1 
+            ORDER BY b.month_period DESC
+        `, [req.user.id]);
+        
         res.status(200).json({ status: 'success', data: budgets.rows });
     } catch (error) {
+        console.error('Error getBudgets:', error);
         res.status(500).json({ status: 'error', message: 'Terjadi kesalahan server.' });
     }
 };

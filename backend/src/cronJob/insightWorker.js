@@ -36,14 +36,20 @@ const runMonthlyInsight = async () => {
 
             // 2. LOGIKA INDEPENDEN: Tembak DS & AI secara terpisah agar tidak saling menjatuhkan
             console.log(`   -> Menghubungi API DS & AI untuk User: ${userId}`);
-
-            // DEBUG: Cek apakah key terbaca (Hanya tampilkan 4 karakter pertama demi keamanan)
-            const keyPreview = process.env.INTERNAL_SERVICE_KEY ? process.env.INTERNAL_SERVICE_KEY.substring(0, 4) + '...' : 'TIDAK TERBACA';
-            console.log(`   -> Debug Service Key: ${keyPreview}`);
+            
+            // Inisialisasi default values
+            let health_score = 0;
+            let predicted_cashflow = 0;
+            let overbudget_risk = "low";
+            let money_leak = "-";
+            let total_spent = 0;
+            let total_budget = 0;
+            let categories = [];
+            let ai_insight = "Insight belum tersedia karena masalah koneksi ke AI Service.";
 
             const axiosConfig = {
                 headers: {
-                    'x-internal-service-key': process.env.INTERNAL_SERVICE_KEY
+                    'x-internal-service-key': process.env.INTERNAL_SERVICE_KEY || 'myfinance-internal-key'
                 },
                 timeout: 30000
             };
@@ -51,7 +57,15 @@ const runMonthlyInsight = async () => {
             // Tembak DS (Team Bang Pascal)
             try {
                 const dsRes = await axios.post(`${pythonUrl}/ds/predict`, payload, axiosConfig);
-                ({ health_score, predicted_cashflow, overbudget_risk, money_leak, total_spent, total_budget, categories } = dsRes.data);
+                if (dsRes.data) {
+                    health_score = dsRes.data.health_score ?? 0;
+                    predicted_cashflow = dsRes.data.predicted_cashflow ?? 0;
+                    overbudget_risk = dsRes.data.overbudget_risk ?? "low";
+                    money_leak = dsRes.data.money_leak ?? "-";
+                    total_spent = dsRes.data.total_spent ?? 0;
+                    total_budget = dsRes.data.total_budget ?? 0;
+                    categories = dsRes.data.categories ?? [];
+                }
             } catch (err) {
                 if (err.response) {
                     console.error(` [Insight Worker] DS Service Error (${err.response.status}):`, JSON.stringify(err.response.data));

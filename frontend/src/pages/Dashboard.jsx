@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useBudgets, useCreateBudget, useCreateTransaction, useDashboardSummary, useDeleteBudget, useMonthlyFinancialInsight, useTransactions, useUpdateBudget, useWallets } from '../hooks/useFinance';
 import { cn, formatCurrency } from '../lib/utils';
+import { showWarning } from '../lib/toast';
 
 const WALLET_ICON_MAP = {
     BANK: Landmark,
@@ -223,7 +224,18 @@ const Dashboard = () => {
 
     const handleCreateTransaction = async (payload) => {
         try {
-            await createTransaction.mutateAsync(payload);
+            const result = await createTransaction.mutateAsync(payload);
+            
+            // Tampilkan alert jika melebihi budget
+            if (result?.is_overbudget) {
+                showWarning(
+                    language === 'id' 
+                        ? '⚠️ Perhatian! Transaksi ini membuat pengeluaran kategori ini melebihi anggaran Anda.' 
+                        : '⚠️ Warning! This transaction exceeds your budget for this category.',
+                    { duration: 6000 }
+                );
+            }
+            
             setOpenTransactionModal(false);
         } catch {
             // Error already handled by the mutation callback.
