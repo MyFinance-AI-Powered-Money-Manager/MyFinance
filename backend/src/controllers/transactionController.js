@@ -57,9 +57,9 @@ const createTransaction = async (req, res) => {
                  VALUES ($1, $2, $3)`,
                 [userId, transactionId, image_url]
             );
-            console.log('   -> [Backend Debug] Success: receipt_scans inserted.');
+            console.log('   -> [Backend Debug] Success: receipt_scans disimpan di Supabase bucket.');
         } else {
-            console.log('   -> [Backend Debug] Skip: image_url is empty.');
+            console.log('   -> [Backend Debug] Skip: image_url kosong.');
         }
 
         // 6. Update Saldo Dompet
