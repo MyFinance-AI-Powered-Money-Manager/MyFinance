@@ -382,6 +382,19 @@ export const useScanReceipt = () => {
   });
 };
 
+export const useUploadReceipt = () => {
+  return useMutation({
+    mutationFn: async (file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await api.post('/transactions/upload-receipt', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      return response.data;
+    }
+  });
+};
+
 export const useFinancialInsights = (walletId, period = 'monthly', options = {}) => {
   const { enabled: optionEnabled = true, ...restOptions } = options;
 

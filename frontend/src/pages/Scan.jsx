@@ -1,7 +1,7 @@
 import React from 'react';
 import { Upload, FileImage, Save, Edit3, Plus, ShoppingCart, X } from 'lucide-react';
 import { Layout } from '../components/layout/Layout';
-import { useScanReceipt, useCreateTransaction, useWallets } from '../hooks/useFinance';
+import { useScanReceipt, useUploadReceipt, useCreateTransaction, useWallets } from '../hooks/useFinance';
 import { EXPENSE_CATEGORIES } from '../lib/categories';
 import { config } from '../lib/config';
 import { formatCurrency } from '../lib/utils';
@@ -92,6 +92,7 @@ const Scan = () => {
   const fileInputRef = React.useRef(null);
 
   const scanReceipt = useScanReceipt();
+  const uploadReceipt = useUploadReceipt();
   const createTransaction = useCreateTransaction();
   const { data: walletsData } = useWallets();
 
@@ -242,6 +243,14 @@ const Scan = () => {
     }
 
     try {
+      let finalImageUrl = result?.image_url || '';
+
+      // JIKA Server AI TIDAK memberikan URL, kita upload sendiri filenya ke backend kita
+      if (!finalImageUrl && file) {
+        const uploadRes = await uploadReceipt.mutateAsync(file);
+        finalImageUrl = uploadRes.image_url;
+      }
+
       const payload = {
         wallet_id: selectedWalletId,
         type: 'EXPENSE',
@@ -250,7 +259,7 @@ const Scan = () => {
         subcategory: editSubcategory || editItems[0]?.subcategory || '',
         description: editDescription || 'Hasil scan struk',
         transaction_date: editDate || new Date().toISOString().slice(0, 10),
-        image_url: result?.image_url || '',
+        image_url: finalImageUrl,
         items: editItems.map((item) => ({
           item_name: item.item_name,
           price: item.price,

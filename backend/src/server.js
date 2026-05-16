@@ -10,16 +10,17 @@ if (!process.env.JWT_SECRET_KEY) {
 }
 
 
-
 // Inisialisasi koneksi Database
 require('./config/db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const path = require('path');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health Check Server Express Endpoint
 app.get('/api/v1/health', (req, res) => {

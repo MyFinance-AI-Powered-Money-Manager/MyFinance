@@ -370,6 +370,25 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 - **Auth Required:** Yes
 - **Deskripsi:** Menghapus transaksi dan me-reverse (mengembalikan) saldo dompet secara otomatis.
 
+### 4.6 Upload Receipt Image (Supabase)
+
+`POST /transactions/upload-receipt`
+
+- **Auth Required:** Yes
+- **Content-Type:** `multipart/form-data`
+- **Deskripsi:** Mengunggah gambar struk langsung ke Supabase Storage (Bucket: `receipt-scan`). Digunakan sebagai fallback jika Server AI tidak memberikan URL gambar.
+
+**Request Body (Form Data):**
+- `file`: File gambar (jpg/png)
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "image_url": "https://xvlwcuhnowmlxxypoqeb.supabase.co/storage/v1/object/public/receipt-scan/user-123-171589000.jpg"
+}
+```
+
 ---
 
 ## 🧠 5. Integrasi Data Science & AI
