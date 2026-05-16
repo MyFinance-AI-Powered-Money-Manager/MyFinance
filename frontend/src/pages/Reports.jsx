@@ -1,11 +1,14 @@
 import React from 'react';
-import { Download, ChevronDown, Sparkles, TrendingDown, TrendingUp, Target, Car, Utensils, Wallet } from 'lucide-react';
+import { ChevronDown, Sparkles, TrendingDown, TrendingUp, Target, Car, Utensils, Wallet, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Layout } from '../components/layout/Layout';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { useTransactions } from '../hooks/useFinance';
 import { useLanguage } from '../context/LanguageContext';
 import { formatCurrency } from '../lib/utils';
+
+const dashboardDetailLink = '/dashboard/detail';
 
 const emptyChartData = [
     { name: 'W1', income: 0, expense: 0 },
@@ -120,6 +123,7 @@ const buildChartData = (transactions) => {
 
 const Reports = () => {
     const { t, language } = useLanguage();
+    const navigate = useNavigate();
     const { data: transactionsData, isLoading, error } = useTransactions();
 
     const transactions = Array.isArray(transactionsData) ? transactionsData : transactionsData?.data ?? [];
@@ -206,6 +210,19 @@ const Reports = () => {
     const chartData = buildChartData(currentMonthTransactions);
     const hasCurrentMonthData = currentMonthTransactions.length > 0;
 
+    const handleOpenDetail = () => {
+        if (!dashboardDetailLink) {
+            return;
+        }
+
+        if (/^https?:\/\//i.test(dashboardDetailLink)) {
+            window.location.assign(dashboardDetailLink);
+            return;
+        }
+
+        navigate(dashboardDetailLink);
+    };
+
     return (
         <Layout>
             <div className="space-y-4 md:space-y-5">
@@ -221,8 +238,12 @@ const Reports = () => {
                         <button className="finance-pill border border-white/60 bg-white text-zinc-700 shadow-card dark:border-[#3F4959] dark:bg-[#2D3748] dark:text-[#E8EAED]">
                             Bulan ini <ChevronDown className="h-4 w-4" />
                         </button>
-                        <button className="finance-pill bg-[#7CF38E] text-finance-800 transition hover:-translate-y-0.5 dark:bg-[#7CF38E] dark:text-finance-800">
-                            <Download className="h-4 w-4" /> {t('export')}
+                        <button
+                            type="button"
+                            onClick={handleOpenDetail}
+                            className="finance-pill bg-[#7CF38E] text-finance-800 transition hover:-translate-y-0.5 dark:bg-[#7CF38E] dark:text-finance-800"
+                        >
+                            <ArrowRight className="h-4 w-4" /> {t('detail')}
                         </button>
                     </div>
                 </div>

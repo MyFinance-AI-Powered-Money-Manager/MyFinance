@@ -425,10 +425,11 @@ const Profile = () => {
             </div>
             <div className="mb-4">
               <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">
-                {t("type_to_confirm").replace("{confirm}", "")}
+                {t("type_to_confirm").split("{confirm}")[0]}
                 <span className="font-mono font-bold text-red-600">
                   {t("delete_confirm_keyword")}
                 </span>
+                {t("type_to_confirm").split("{confirm}")[1]}
               </label>
               <input
                 type="text"
