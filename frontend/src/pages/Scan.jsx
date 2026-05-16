@@ -74,7 +74,7 @@ const normalizeScanResult = (data) => {
     merchant: coalesce(raw.merchant, raw.store_name, raw.storeName, raw.description, ''),
     date: toDateInputValue(raw.date, raw.transaction_date, raw.transactionDate),
     predictedCategory: coalesce(raw.predicted_category, raw.predictedCategory, ''),
-    image_url: coalesce(raw.image_url, raw.receipt_url, raw.url, raw.file_url, ''),
+    image_url: coalesce(raw.image_url, raw.receipt_url, raw.url, raw.file_url, raw.img_url, raw.link, raw.photo_url, ''),
     raw,
   };
 };
@@ -258,6 +258,8 @@ const Scan = () => {
           subcategory: item.subcategory || editSubcategory || '',
         })),
       };
+
+      console.log('   -> [Frontend Debug] Sending Payload to Backend:', payload);
 
       await createTransaction.mutateAsync(payload);
       showSuccess(t('save_scan_success'));
