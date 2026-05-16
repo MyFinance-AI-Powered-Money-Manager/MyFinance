@@ -90,6 +90,7 @@ const Dashboard = () => {
     const accountCards = wallets
         .slice(0, 5)
         .map((wallet) => ({
+            id: wallet.id || `${wallet.type || 'wallet'}-${wallet.name || wallet.label || ''}`,
             icon: WALLET_ICON_MAP[wallet.type] || Wallet,
             name: wallet.name || wallet.label || wallet.type || 'Wallet',
             amount: Number(wallet.balance ?? 0),
@@ -333,6 +334,7 @@ const Dashboard = () => {
             <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-6">
                 {accountCards.map((account, index) => (
                     <motion.div
+                        key={account.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.03 * index }}

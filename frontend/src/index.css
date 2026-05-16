@@ -82,7 +82,7 @@
 	}
 
 	.finance-input {
-		@apply h-14 w-full rounded-[20px] border border-transparent bg-[#E2E8D9] px-4 text-[15px] text-zinc-900 outline-none transition focus:border-finance-500 focus:bg-white focus:ring-4 focus:ring-finance-100;
+		@apply h-11 w-full rounded-[20px] border border-transparent bg-[#E2E8D9] px-4 text-[15px] text-zinc-900 outline-none transition focus:border-finance-500 focus:bg-white focus:ring-4 focus:ring-finance-100;
 	}
 
 	html.dark .finance-input {

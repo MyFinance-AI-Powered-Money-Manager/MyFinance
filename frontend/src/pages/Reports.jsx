@@ -299,7 +299,7 @@ const Reports = () => {
                         </div>
                     </div>
 
-                    <div className="finance-card p-5 sm:p-6 md:p-8">
+                    <div className="finance-card min-w-0 p-5 sm:p-6 md:p-8">
                         <div className="mb-6 flex items-start justify-between gap-4">
                             <div>
                                 <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('income_vs_expense')}</h3>
@@ -317,8 +317,8 @@ const Reports = () => {
                             </div>
                         </div>
 
-                        <div className="h-[330px] md:h-[360px]">
-                            <ResponsiveContainer width="100%" height="100%">
+                        <div className="h-[330px] min-h-[330px] min-w-0 md:h-[360px]">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={330}>
                                 <BarChart data={chartData} margin={{ top: 20, right: 0, left: -12, bottom: 0 }} barGap={12}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EDF2E9" />
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6B7280' }} />
