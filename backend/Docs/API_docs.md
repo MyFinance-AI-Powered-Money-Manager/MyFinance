@@ -402,7 +402,7 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 
 ### 5.2 AI Monthly Insight
 
-`GET /insights?period=2026-05`
+`GET /insights?month_period=2026-05`
 
 - **Auth Required:** Yes
 - **Deskripsi:** Mengambil hasil analisis AI (Cron Job).

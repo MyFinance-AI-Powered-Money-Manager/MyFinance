@@ -74,6 +74,7 @@ const normalizeScanResult = (data) => {
     merchant: coalesce(raw.merchant, raw.store_name, raw.storeName, raw.description, ''),
     date: toDateInputValue(raw.date, raw.transaction_date, raw.transactionDate),
     predictedCategory: coalesce(raw.predicted_category, raw.predictedCategory, ''),
+    image_url: coalesce(raw.image_url, raw.receipt_url, ''),
     raw,
   };
 };
@@ -248,6 +249,7 @@ const Scan = () => {
         subcategory: editSubcategory || editItems[0]?.subcategory || '',
         description: editDescription || 'Hasil scan struk',
         transaction_date: editDate || new Date().toISOString().slice(0, 10),
+        image_url: result?.image_url || '',
         items: editItems.map((item) => ({
           item_name: item.item_name,
           price: item.price,
