@@ -49,7 +49,7 @@ const runMonthlyInsight = async () => {
 
             const axiosConfig = {
                 headers: {
-                    'x-internal-service-key': process.env.INTERNAL_SERVICE_KEY || 'myfinance-internal-key'
+                    'x-internal-service-key': process.env.INTERNAL_SERVICE_KEY || 'secret-antara-express-dan-python'
                 },
                 timeout: 30000
             };
