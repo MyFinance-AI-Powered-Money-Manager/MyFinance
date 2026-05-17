@@ -20,7 +20,7 @@ const runMonthlyInsight = async () => {
             // 1. Tarik semua data mentah (Transactions, Items, Budgets)
             const [transactions, budgets, transactionItems] = await Promise.all([
                 db.query(`SELECT type, total_amount, category, subcategory FROM transactions WHERE user_id = $1 AND to_char(transaction_date, 'YYYY-MM') = $2`, [userId, lastMonth]),
-                db.query(`SELECT category, limit_amount FROM budgets WHERE user_id = $1 AND month_period = $2`, [userId, lastMonth]),
+                db.query(`SELECT category, limit_amount, month_period FROM budgets WHERE user_id = $1 AND month_period = $2`, [userId, lastMonth]),
                 db.query(`SELECT ti.item_name, ti.price, ti.category FROM transaction_items ti JOIN transactions t ON ti.transaction_id = t.id WHERE t.user_id = $1 AND to_char(t.transaction_date, 'YYYY-MM') = $2`, [userId, lastMonth])
             ]);
 
