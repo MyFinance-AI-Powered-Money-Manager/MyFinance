@@ -62,6 +62,7 @@ const normalizeTransactionPayload = (data) => ({
   transaction_date: data?.transaction_date ?? data?.date ?? new Date().toISOString().slice(0, 10),
   items: data?.items,
   receipt_data: data?.receipt_data,
+  image_url: data?.image_url ?? '',
 });
 
 const normalizeInsight = (insight) => {
