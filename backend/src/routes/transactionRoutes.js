@@ -37,11 +37,12 @@ router.post('/upload-receipt', authenticateToken, upload.single('file'), async (
         if (error) throw error;
 
         // Ambil Public URL
-        const { data: publicUrlData } = supabase.storage
+        const publicUrlData = supabase.storage
             .from('receipt_scan')
             .getPublicUrl(filePath);
 
-        res.status(200).json({ status: 'success', image_url: publicUrlData.publicUrl });
+        console.log('   -> [Backend Debug] Upload Success, URL:', publicUrlData.data.publicUrl);
+        res.status(200).json({ status: 'success', image_url: publicUrlData.data.publicUrl });
     } catch (err) {
         console.error('Upload Error:', err);
         res.status(500).json({ status: 'error', message: err.message });

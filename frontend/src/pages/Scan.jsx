@@ -268,7 +268,7 @@ const Scan = () => {
         })),
       };
 
-      console.log('   -> [Frontend Debug] Sending Payload to Backend:', payload);
+      console.log('   -> [Frontend Debug] Final Payload with Image:', payload);
 
       await createTransaction.mutateAsync(payload);
       showSuccess(t('save_scan_success'));
