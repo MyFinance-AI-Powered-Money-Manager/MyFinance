@@ -165,7 +165,6 @@ const Scan = () => {
       formData.append('file', file);
 
       const response = await scanReceipt.mutateAsync(formData);
-      console.log('   -> [Frontend Debug] AI Raw Response:', response);
       const normalized = normalizeScanResult(response);
 
       if (!normalized) {
@@ -267,8 +266,6 @@ const Scan = () => {
           subcategory: item.subcategory || editSubcategory || '',
         })),
       };
-
-      console.log('   -> [Frontend Debug] Final Payload with Image:', payload);
 
       await createTransaction.mutateAsync(payload);
       showSuccess(t('save_scan_success'));
