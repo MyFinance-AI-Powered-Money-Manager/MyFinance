@@ -19,9 +19,9 @@ const runMonthlyInsight = async () => {
 
             // 1. Tarik semua data mentah (Transactions, Items, Budgets)
             const [transactions, budgets, transactionItems] = await Promise.all([
-                db.query(`SELECT type, total_amount, category, subcategory FROM transactions WHERE user_id = $1 AND to_char(transaction_date, 'YYYY-MM') = $2`, [userId, lastMonth]),
+                db.query(`SELECT id, user_id, wallet_id, type, total_amount, category, subcategory, description as deskripsi, transaction_date as created_at FROM transactions WHERE user_id = $1 AND to_char(transaction_date, 'YYYY-MM') = $2`, [userId, lastMonth]),
                 db.query(`SELECT category, limit_amount, month_period FROM budgets WHERE user_id = $1 AND month_period = $2`, [userId, lastMonth]),
-                db.query(`SELECT ti.item_name, ti.price, ti.category FROM transaction_items ti JOIN transactions t ON ti.transaction_id = t.id WHERE t.user_id = $1 AND to_char(t.transaction_date, 'YYYY-MM') = $2`, [userId, lastMonth])
+                db.query(`SELECT ti.id, ti.transaction_id, ti.item_name, ti.price, ti.category, ti.subcategory FROM transaction_items ti JOIN transactions t ON ti.transaction_id = t.id WHERE t.user_id = $1 AND to_char(t.transaction_date, 'YYYY-MM') = $2`, [userId, lastMonth])
             ]);
 
             if (transactions.rows.length === 0) continue;
@@ -29,9 +29,9 @@ const runMonthlyInsight = async () => {
             const payload = {
                 user_id: userId,
                 month_period: lastMonth,
-                transactions: transactions.rows,
-                transaction_items: transactionItems.rows,
-                budgets: budgets.rows
+                transactions: transactions.rows.map(t => ({ ...t, total_amount: parseFloat(t.total_amount) })),
+                transaction_items: transactionItems.rows.map(ti => ({ ...ti, price: parseFloat(ti.price) })),
+                budgets: budgets.rows.map(b => ({ ...b, limit_amount: parseFloat(b.limit_amount) }))
             };
 
             // 2. LOGIKA INDEPENDEN: Tembak DS & AI secara terpisah agar tidak saling menjatuhkan
