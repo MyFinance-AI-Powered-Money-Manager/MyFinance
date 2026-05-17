@@ -9,6 +9,7 @@ import { TransactionFormModal } from '../components/TransactionFormModal';
 import { WalletFormModal } from '../components/WalletFormModal';
 import { TransferFormModal } from '../components/TransferFormModal';
 import { BudgetFormModal } from '../components/BudgetFormModal';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useBudgets, useCreateBudget, useCreateTransaction, useDashboardSummary, useDeleteBudget, useDeleteWallet, useMonthlyFinancialInsight, useTransactions, useUpdateBudget, useWallets } from '../hooks/useFinance';
@@ -32,6 +33,7 @@ const Dashboard = () => {
     const [openTransferModal, setOpenTransferModal] = React.useState(false);
     const [openBudgetModal, setOpenBudgetModal] = React.useState(false);
     const [editingBudget, setEditingBudget] = React.useState(null);
+    const [deleteConfirm, setDeleteConfirm] = React.useState(null);
     const latestInsightPeriod = React.useMemo(() => {
         const date = new Date();
         date.setDate(1);
@@ -272,20 +274,47 @@ const Dashboard = () => {
         }
     };
 
-    const handleDeleteBudget = async (budgetId) => {
-        if (!window.confirm('Yakin ingin menghapus anggaran ini?')) return;
-        try {
-            await deleteBudget.mutateAsync(budgetId);
-        } catch {
-            // Error already handled by the mutation callback.
-        }
+    const handleDeleteBudgetRequest = (budget) => {
+        setDeleteConfirm({
+            type: 'budget',
+            id: budget.id,
+            title: 'Hapus anggaran ini?',
+            description: `Anggaran ${budget.category || 'ini'} akan dihapus permanen dan tidak bisa dikembalikan.`,
+            confirmLabel: 'Hapus anggaran',
+        });
     };
 
-    const handleDeleteWallet = async (walletId, walletName) => {
-        if (!window.confirm(`Yakin ingin menghapus dompet ${walletName || 'ini'}?`)) return;
+    const handleDeleteWalletRequest = (walletId, walletName) => {
+        setDeleteConfirm({
+            type: 'wallet',
+            id: walletId,
+            title: `Hapus dompet ${walletName || 'ini'}?`,
+            description: 'Dompet ini akan dihapus permanen. Pastikan tidak ada data yang masih dibutuhkan.',
+            confirmLabel: 'Hapus dompet',
+        });
+    };
+
+    const handleCloseDeleteConfirm = () => {
+        if (deleteBudget.isPending || deleteWallet.isPending) {
+            return;
+        }
+
+        setDeleteConfirm(null);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deleteConfirm) {
+            return;
+        }
 
         try {
-            await deleteWallet.mutateAsync(walletId);
+            if (deleteConfirm.type === 'budget') {
+                await deleteBudget.mutateAsync(deleteConfirm.id);
+            } else {
+                await deleteWallet.mutateAsync(deleteConfirm.id);
+            }
+
+            setDeleteConfirm(null);
         } catch {
             // Error already handled by the mutation callback.
         }
@@ -364,7 +393,7 @@ const Dashboard = () => {
                     >
                         <button
                             type="button"
-                            onClick={() => handleDeleteWallet(account.id, account.name)}
+                            onClick={() => handleDeleteWalletRequest(account.id, account.name)}
                             disabled={deleteWallet.isPending}
                             className="absolute right-3 top-3 rounded-full p-1.5 text-zinc-400 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
                             title={t('delete')}
@@ -445,7 +474,7 @@ const Dashboard = () => {
                                                 <Edit3 className="h-3.5 w-3.5" />
                                             </button>
                                             <button
-                                                onClick={() => handleDeleteBudget(budget.id)}
+                                                onClick={() => handleDeleteBudgetRequest(budget)}
                                                 className="rounded-full p-1.5 text-zinc-400 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
                                                 title={t('delete')}
                                             >
@@ -630,6 +659,17 @@ const Dashboard = () => {
                 onSubmit={handleBudgetSubmit}
                 isSubmitting={createBudget.isPending || updateBudget.isPending}
                 editingBudget={editingBudget}
+            />
+
+            <ConfirmDialog
+                open={Boolean(deleteConfirm)}
+                title={deleteConfirm?.title || 'Konfirmasi hapus'}
+                description={deleteConfirm?.description || 'Aksi ini tidak dapat dibatalkan.'}
+                confirmLabel={deleteConfirm?.confirmLabel || 'Hapus'}
+                pending={deleteBudget.isPending || deleteWallet.isPending}
+                pendingLabel="Menghapus..."
+                onCancel={handleCloseDeleteConfirm}
+                onConfirm={handleConfirmDelete}
             />
         </Layout>
     );

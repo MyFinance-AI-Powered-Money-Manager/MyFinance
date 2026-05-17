@@ -102,10 +102,10 @@ export const MobileNav = () => {
 
 export const Footer = () => {
     return (
-        <footer className="mt-12 md:mt-16 border-t border-[#E3EAD8] bg-[#EDF4E4]/70 px-6 py-6 text-xs text-zinc-500 dark:border-[#2D3748] dark:bg-[#1A1F2E]/70 dark:text-[#9CA3AF]">
+        <footer className="mt-12 md:mt-16 border-t border-[#E3EAD8] bg-[#EDF4E4]/70 px-6 py-6 text-zinc-500 dark:border-[#2D3748] dark:bg-[#1A1F2E]/70 dark:text-[#9CA3AF]">
             <div className="mx-auto flex max-w-7xl flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                <p className="md:max-w-[65%] md:text-sm leading-6">© 2026 MyFinance. Perlindungan Terpandu untuk kekayaan Anda.</p>
-                <div className="flex items-center gap-2">
+                <p className="whitespace-nowrap text-[11px] leading-5 sm:text-xs md:max-w-[65%] md:text-sm md:leading-6">© 2026 MyFinance. Perlindungan Terpandu untuk kekayaan Anda.</p>
+                <div className="hidden items-center gap-2 md:flex">
                     <div className="h-2 w-2 rounded-full bg-finance-500"></div>
                     <span>Layanan Beroperasi Normal.</span>
                 </div>

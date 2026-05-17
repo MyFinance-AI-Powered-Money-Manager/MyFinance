@@ -40,11 +40,11 @@ export const PageFooter = () => {
           </ul>
         </div>
       </div>
-      <div className="mt-20 pt-8 border-t border-zinc-100 flex flex-col md:flex-row justify-between items-center text-sm text-zinc-400">
-        <p>© 2026 MyFinance. Pengelolaan keuangan yang cepat dan efisien.</p>
-        <div className="flex items-center gap-2 mt-4 md:mt-0">
+      <div className="mt-20 flex flex-col items-center justify-between gap-3 border-t border-zinc-100 pt-8 text-zinc-400 md:flex-row md:text-sm">
+        <p className="whitespace-nowrap text-[11px] leading-5 sm:text-xs md:text-sm">© 2026 MyFinance. Pengelolaan keuangan yang cepat dan efisien.</p>
+        <div className="hidden items-center gap-2 md:flex">
           <div className="h-2 w-2 rounded-full bg-[#008744]"></div>
-          <span>Layanan beroperasi normal</span>
+          <p className="whitespace-nowrap text-[11px] leading-5 sm:text-xs md:text-sm">Layanan beroperasi normal</p>
         </div>
       </div>
     </footer>

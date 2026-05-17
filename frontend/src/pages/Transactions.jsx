@@ -22,6 +22,7 @@ import {
 } from "../hooks/useFinance";
 import { TransactionFormModal } from "../components/TransactionFormModal";
 import { Layout } from "../components/layout/Layout";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 
 const Transactions = () => {
   const { t, language } = useLanguage();
@@ -32,6 +33,7 @@ const Transactions = () => {
   const [formType] = React.useState("INCOME");
   const [openTransactionModal, setOpenTransactionModal] = React.useState(false);
   const [deletingId, setDeletingId] = React.useState(null);
+  const [deleteConfirm, setDeleteConfirm] = React.useState(null);
   const { data, isLoading, error } = useTransactions();
   const { data: walletsData } = useWallets();
   const createTransaction = useCreateTransaction();
@@ -229,14 +231,32 @@ const Transactions = () => {
     }
   };
 
-  const handleDeleteTransaction = async (txId) => {
-    if (!window.confirm("Yakin ingin menghapus transaksi ini? Saldo dompet akan dikembalikan.")) {
+  const handleDeleteTransactionRequest = (tx) => {
+    setDeleteConfirm({
+      id: tx.id,
+      title: "Hapus transaksi ini?",
+      description: "Transaksi ini akan dihapus permanen dan saldo dompet akan dikembalikan.",
+      confirmLabel: "Hapus transaksi",
+    });
+  };
+
+  const handleCloseDeleteConfirm = () => {
+    if (deleteTransaction.isPending) {
       return;
     }
 
-    setDeletingId(txId);
+    setDeleteConfirm(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirm) {
+      return;
+    }
+
+    setDeletingId(deleteConfirm.id);
     try {
-      await deleteTransaction.mutateAsync(txId);
+      await deleteTransaction.mutateAsync(deleteConfirm.id);
+      setDeleteConfirm(null);
     } catch {
       // Error already handled by the mutation callback.
     } finally {
@@ -336,7 +356,7 @@ const Transactions = () => {
                       </p>
                       {tx.type !== "TRANSFER" && (
                         <button
-                          onClick={() => handleDeleteTransaction(tx.id)}
+                          onClick={() => handleDeleteTransactionRequest(tx)}
                           disabled={deletingId === tx.id}
                           className="rounded-full p-2 text-zinc-400 opacity-0 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-[#482233] dark:hover:text-[#F47A97] group-hover:opacity-100 disabled:opacity-50"
                           title="Hapus transaksi"
@@ -373,6 +393,17 @@ const Transactions = () => {
         onClose={() => setOpenTransactionModal(false)}
         onSubmit={handleCreateTransaction}
         isSubmitting={createTransaction.isPending}
+      />
+
+      <ConfirmDialog
+        open={Boolean(deleteConfirm)}
+        title={deleteConfirm?.title || "Konfirmasi hapus"}
+        description={deleteConfirm?.description || "Aksi ini tidak dapat dibatalkan."}
+        confirmLabel={deleteConfirm?.confirmLabel || "Hapus"}
+        pending={deleteTransaction.isPending}
+        pendingLabel="Menghapus..."
+        onCancel={handleCloseDeleteConfirm}
+        onConfirm={handleConfirmDelete}
       />
     </Layout>
   );
