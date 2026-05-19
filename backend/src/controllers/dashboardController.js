@@ -51,9 +51,30 @@ const getDashboardSummary = async (req, res) => {
         const rawDataPayload = {
             user_id: userId,
             month_period: currentMonth,
-            transactions: transactions.rows.map(t => ({ ...t, total_amount: parseFloat(t.total_amount) })),
-            transaction_items: transactionItems.rows.map(ti => ({ ...ti, price: parseFloat(ti.price) })),
-            budgets: budgets.rows.map(b => ({ ...b, limit_amount: parseFloat(b.limit_amount) }))
+            transactions: transactions.rows.map(t => ({
+                id: t.id || "",
+                wallet_id: t.wallet_id || "",
+                type: t.type || "",
+                total_amount: Math.round(parseFloat(t.total_amount || 0)),
+                category: t.category || "General",
+                subcategory: t.subcategory || "General",
+                description: t.description || "",
+                transaction_date: t.transaction_date ? new Date(t.transaction_date).toISOString().split('T')[0] : ""
+            })),
+            transaction_items: transactionItems.rows.map(ti => ({
+                id: ti.id || "",
+                transaction_id: ti.transaction_id || "",
+                item_name: ti.item_name || "",
+                price: Math.round(parseFloat(ti.price || 0)),
+                category: ti.category || "General",
+                subcategory: ti.subcategory || "General"
+            })),
+            budgets: budgets.rows.map(b => ({
+                id: b.id || "",
+                category: b.category || "General",
+                limit_amount: Math.round(parseFloat(b.limit_amount || 0)),
+                month_period: b.month_period || currentMonth
+            }))
         };
 
         // 4. DS response

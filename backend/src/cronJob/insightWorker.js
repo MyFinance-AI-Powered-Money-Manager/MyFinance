@@ -19,19 +19,72 @@ const runMonthlyInsight = async () => {
 
             // 1. Tarik semua data mentah (Transactions, Items, Budgets)
             const [transactions, budgets, transactionItems] = await Promise.all([
-                db.query(`SELECT id, user_id, wallet_id, type, total_amount, category, subcategory, description as deskripsi, transaction_date as created_at FROM transactions WHERE user_id = $1 AND to_char(transaction_date, 'YYYY-MM') = $2`, [userId, lastMonth]),
-                db.query(`SELECT category, limit_amount, month_period FROM budgets WHERE user_id = $1 AND month_period = $2`, [userId, lastMonth]),
+                db.query(`SELECT id, wallet_id, type, total_amount, category, subcategory, description, transaction_date FROM transactions WHERE user_id = $1 AND to_char(transaction_date, 'YYYY-MM') = $2`, [userId, lastMonth]),
+                db.query(`SELECT id, category, limit_amount, month_period FROM budgets WHERE user_id = $1 AND month_period = $2`, [userId, lastMonth]),
                 db.query(`SELECT ti.id, ti.transaction_id, ti.item_name, ti.price, ti.category, ti.subcategory FROM transaction_items ti JOIN transactions t ON ti.transaction_id = t.id WHERE t.user_id = $1 AND to_char(t.transaction_date, 'YYYY-MM') = $2`, [userId, lastMonth])
             ]);
 
             if (transactions.rows.length === 0) continue;
 
-            const payload = {
+            // 1a. Format payload untuk DS (Data Science) - Sangat ketat terhadap null & nama field
+            const dsPayload = {
                 user_id: userId,
                 month_period: lastMonth,
-                transactions: transactions.rows.map(t => ({ ...t, total_amount: parseFloat(t.total_amount) })),
-                transaction_items: transactionItems.rows.map(ti => ({ ...ti, price: parseFloat(ti.price) })),
-                budgets: budgets.rows.map(b => ({ ...b, limit_amount: parseFloat(b.limit_amount) }))
+                transactions: transactions.rows.map(t => ({
+                    id: t.id || "",
+                    wallet_id: t.wallet_id || "",
+                    type: t.type || "",
+                    total_amount: Math.round(parseFloat(t.total_amount || 0)),
+                    category: t.category || "General",
+                    subcategory: t.subcategory || "General",
+                    description: t.description || "",
+                    transaction_date: t.transaction_date ? new Date(t.transaction_date).toISOString().split('T')[0] : ""
+                })),
+                transaction_items: transactionItems.rows.map(ti => ({
+                    id: ti.id || "",
+                    transaction_id: ti.transaction_id || "",
+                    item_name: ti.item_name || "",
+                    price: Math.round(parseFloat(ti.price || 0)),
+                    category: ti.category || "General",
+                    subcategory: ti.subcategory || "General"
+                })),
+                budgets: budgets.rows.map(b => ({
+                    id: b.id || "",
+                    category: b.category || "General",
+                    limit_amount: Math.round(parseFloat(b.limit_amount || 0)),
+                    month_period: b.month_period || lastMonth
+                }))
+            };
+
+            // 1b. Format payload untuk AI (Hafizh) - Sesuai skema openapi AI
+            const aiPayload = {
+                user_id: userId,
+                month_period: lastMonth,
+                transactions: transactions.rows.map(t => ({
+                    id: t.id,
+                    user_id: userId,
+                    wallet_id: t.wallet_id,
+                    type: t.type,
+                    total_amount: parseFloat(t.total_amount || 0),
+                    category: t.category,
+                    subcategory: t.subcategory,
+                    deskripsi: t.description,
+                    created_at: t.transaction_date ? new Date(t.transaction_date).toISOString() : null
+                })),
+                transaction_items: transactionItems.rows.map(ti => ({
+                    id: ti.id,
+                    transaction_id: ti.transaction_id,
+                    item_name: ti.item_name,
+                    price: parseFloat(ti.price || 0),
+                    category: ti.category,
+                    subcategory: ti.subcategory
+                })),
+                budgets: budgets.rows.map(b => ({
+                    id: b.id,
+                    user_id: userId,
+                    limit_amount: parseFloat(b.limit_amount || 0),
+                    month_period: b.month_period
+                }))
             };
 
             // 2. LOGIKA INDEPENDEN: Tembak DS & AI secara terpisah agar tidak saling menjatuhkan
@@ -54,50 +107,50 @@ const runMonthlyInsight = async () => {
                 timeout: 30000
             };
 
-            // Tembak DS (Team Bang Pascal) - Menggunakan 3 Endpoint secara Paralel
-            try {
-                const [dsCatRes, dsBudgRes, dsLeakRes] = await Promise.allSettled([
-                    axios.post(`${pythonUrl}/category-prediction`, payload, axiosConfig),
-                    axios.post(`${pythonUrl}/budget-calculator`, payload, axiosConfig),
-                    axios.post(`${pythonUrl}/leak-and-financial-score`, payload, axiosConfig)
-                ]);
-
-                let dsData = {};
-                
-                // Gabungkan hasil respons dari ke-3 endpoint jika berhasil (fulfilled)
-                if (dsCatRes.status === 'fulfilled' && dsCatRes.value.data) {
-                    dsData = { ...dsData, ...dsCatRes.value.data };
-                } else if (dsCatRes.status === 'rejected') {
-                    console.error(' [Insight Worker] DS Category Prediction Error:', dsCatRes.reason?.response?.data || dsCatRes.reason?.message);
-                }
-
-                if (dsBudgRes.status === 'fulfilled' && dsBudgRes.value.data) {
-                    dsData = { ...dsData, ...dsBudgRes.value.data };
-                } else if (dsBudgRes.status === 'rejected') {
-                    console.error(' [Insight Worker] DS Budget Calculator Error:', dsBudgRes.reason?.response?.data || dsBudgRes.reason?.message);
-                }
-
-                if (dsLeakRes.status === 'fulfilled' && dsLeakRes.value.data) {
-                    dsData = { ...dsData, ...dsLeakRes.value.data };
-                } else if (dsLeakRes.status === 'rejected') {
-                    console.error(' [Insight Worker] DS Leak & Financial Score Error:', dsLeakRes.reason?.response?.data || dsLeakRes.reason?.message);
-                }
-
-                health_score = dsData.health_score ?? 0;
-                predicted_cashflow = dsData.predicted_cashflow ?? 0;
-                overbudget_risk = dsData.overbudget_risk ?? "low";
-                money_leak = dsData.money_leak ?? "-";
-                total_spent = dsData.total_spent ?? 0;
-                total_budget = dsData.total_budget ?? 0;
-                categories = dsData.categories ?? [];
-                
-            } catch (err) {
-                console.error(` [Insight Worker] DS Service Parallel Execution Failed:`, err.message);
-            }
-
-            // Tembak AI (Team Bang Hafizh)
-            try {
-                const aiRes = await axios.post(`${pythonUrl}/ai/financial-insights/monthly`, payload, axiosConfig);
+             // Tembak DS (Team Bang Pascal) - Menggunakan 3 Endpoint secara Paralel
+             try {
+                 const [dsCatRes, dsBudgRes, dsLeakRes] = await Promise.allSettled([
+                     axios.post(`${pythonUrl}/category-prediction`, dsPayload, axiosConfig),
+                     axios.post(`${pythonUrl}/budget-calculator`, dsPayload, axiosConfig),
+                     axios.post(`${pythonUrl}/leak-and-financial-score`, dsPayload, axiosConfig)
+                 ]);
+ 
+                 let dsData = {};
+                 
+                 // Gabungkan hasil respons dari ke-3 endpoint jika berhasil (fulfilled)
+                 if (dsCatRes.status === 'fulfilled' && dsCatRes.value.data) {
+                     dsData = { ...dsData, ...dsCatRes.value.data };
+                 } else if (dsCatRes.status === 'rejected') {
+                     console.error(' [Insight Worker] DS Category Prediction Error:', dsCatRes.reason?.response?.data || dsCatRes.reason?.message);
+                 }
+ 
+                 if (dsBudgRes.status === 'fulfilled' && dsBudgRes.value.data) {
+                     dsData = { ...dsData, ...dsBudgRes.value.data };
+                 } else if (dsBudgRes.status === 'rejected') {
+                     console.error(' [Insight Worker] DS Budget Calculator Error:', dsBudgRes.reason?.response?.data || dsBudgRes.reason?.message);
+                 }
+ 
+                 if (dsLeakRes.status === 'fulfilled' && dsLeakRes.value.data) {
+                     dsData = { ...dsData, ...dsLeakRes.value.data };
+                 } else if (dsLeakRes.status === 'rejected') {
+                     console.error(' [Insight Worker] DS Leak & Financial Score Error:', dsLeakRes.reason?.response?.data || dsLeakRes.reason?.message);
+                 }
+ 
+                 health_score = dsData.health_score ?? 0;
+                 predicted_cashflow = dsData.predicted_cashflow ?? 0;
+                 overbudget_risk = dsData.overbudget_risk ?? "low";
+                 money_leak = dsData.money_leak ?? "-";
+                 total_spent = dsData.total_spent ?? 0;
+                 total_budget = dsData.total_budget ?? 0;
+                 categories = dsData.categories ?? [];
+                 
+             } catch (err) {
+                 console.error(` [Insight Worker] DS Service Parallel Execution Failed:`, err.message);
+             }
+ 
+             // Tembak AI (Team Bang Hafizh)
+             try {
+                 const aiRes = await axios.post(`${pythonUrl}/ai/financial-insights/monthly`, aiPayload, axiosConfig);
                 ai_insight = aiRes.data.ai_insight;
             } catch (err) {
                 if (err.response) {
