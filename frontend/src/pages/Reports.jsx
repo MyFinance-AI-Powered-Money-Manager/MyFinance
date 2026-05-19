@@ -5,10 +5,30 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Layout } from '../components/layout/Layout';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { useTransactions } from '../hooks/useFinance';
+import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { formatCurrency } from '../lib/utils';
 
-const dashboardDetailLink = '/dashboard/detail';
+const dashboardDetailBaseUrl = 'https://myfinance-dashboard-cp.streamlit.app/';
+
+const formatStreamlitDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}_${month}_${day}`;
+};
+
+const buildDashboardDetailLink = (userId) => {
+    if (userId === null || userId === undefined || userId === '') {
+        return '';
+    }
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const encodedUserId = encodeURIComponent(String(userId));
+
+    return `${dashboardDetailBaseUrl}?USERID=${encodedUserId}&START=${formatStreamlitDate(startOfMonth)}&END=${formatStreamlitDate(now)}`;
+};
 
 const emptyChartData = [
     { name: 'W1', income: 0, expense: 0 },
@@ -124,11 +144,13 @@ const buildChartData = (transactions) => {
 const Reports = () => {
     const { t, language } = useLanguage();
     const navigate = useNavigate();
+    const { user: authUser } = useAuth();
     const { data: transactionsData, isLoading, error } = useTransactions();
 
     const transactions = Array.isArray(transactionsData) ? transactionsData : transactionsData?.data ?? [];
     const currentMonthKey = getCurrentMonthKey();
     const previousMonthKey = getPreviousMonthKey(currentMonthKey);
+    const dashboardDetailLink = buildDashboardDetailLink(authUser?.id ?? authUser?.user_id ?? authUser?._id);
 
     if (isLoading) {
         return <LoadingScreen />;
