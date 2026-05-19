@@ -136,13 +136,16 @@ const runMonthlyInsight = async () => {
                      console.error(' [Insight Worker] DS Leak & Financial Score Error:', dsLeakRes.reason?.response?.data || dsLeakRes.reason?.message);
                  }
  
-                 health_score = dsData.health_score ?? 0;
-                 predicted_cashflow = dsData.predicted_cashflow ?? 0;
-                 overbudget_risk = dsData.overbudget_risk ?? "low";
-                 money_leak = dsData.money_leak ?? "-";
-                 total_spent = dsData.total_spent ?? 0;
-                 total_budget = dsData.total_budget ?? 0;
-                 categories = dsData.categories ?? [];
+                 const finSummary = dsData['financial summary'] || {};
+                 const leakProducts = dsData['leak_products'] || [];
+                 
+                 health_score = finSummary.financial_score ?? 0;
+                 predicted_cashflow = finSummary.net_cashflow ?? 0;
+                 overbudget_risk = finSummary.overbudget_category_count > 0 ? "high" : "low";
+                 money_leak = leakProducts.length > 0 ? leakProducts.join(', ') : "-";
+                 total_spent = finSummary.total_expense ?? dsPayload.transactions.reduce((sum, t) => t.type === 'EXPENSE' ? sum + t.total_amount : sum, 0);
+                 total_budget = dsPayload.budgets.reduce((sum, b) => sum + b.limit_amount, 0);
+                 categories = dsData;
                  
              } catch (err) {
                  console.error(` [Insight Worker] DS Service Parallel Execution Failed:`, err.message);
