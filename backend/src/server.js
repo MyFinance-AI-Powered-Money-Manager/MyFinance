@@ -39,6 +39,7 @@ const budgetRoutes = require('./routes/budgetRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const insightRoutes = require('./routes/insightRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const exportRoutes = require('./routes/exportRoutes');
 
 
 // cron job
@@ -52,6 +53,7 @@ app.use('/api/v1/budgets', budgetRoutes);
 app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/insights', insightRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1/export', exportRoutes);
 
 
 // Server Listener

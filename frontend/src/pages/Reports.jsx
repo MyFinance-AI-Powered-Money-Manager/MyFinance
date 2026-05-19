@@ -238,7 +238,7 @@ const Reports = () => {
         }
 
         if (/^https?:\/\//i.test(dashboardDetailLink)) {
-            window.location.assign(dashboardDetailLink);
+            window.open(dashboardDetailLink, '_blank', 'noopener,noreferrer');
             return;
         }
 

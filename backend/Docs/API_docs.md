@@ -444,6 +444,58 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 }
 ```
 
+### 5.3 Data Export for DS Streamlit
+
+`GET /export/streamlit?USERID=uuid-123&START=2026_05_01&END=2026_05_19`
+
+- **Auth Required:** No
+- **Deskripsi:** Endpoint untuk menyediakan data transaksi dan anggaran secara mentah bagi aplikasi Streamlit eksternal Tim Data Science. Dapat dipanggil langsung dari Streamlit.
+
+**Query Parameters:**
+- `USERID` / `user_id`: UUID User
+- `START` / `start`: Tanggal mulai dalam format `YYYY_MM_DD`
+- `END` / `end`: Tanggal selesai dalam format `YYYY_MM_DD`
+
+**Response (200 OK):**
+
+```json
+{
+  "user_id": "uuid-123",
+  "start_date": "2026-05-01",
+  "end_date": "2026-05-19",
+  "transactions": [
+    {
+      "id": "trx-001",
+      "wallet_id": "wallet-123",
+      "type": "EXPENSE",
+      "total_amount": 50000,
+      "category": "NEEDS",
+      "subcategory": "Makan & Minum Harian",
+      "description": "Makan Siang",
+      "transaction_date": "2026-05-05"
+    }
+  ],
+  "transaction_items": [
+    {
+      "id": "ti-001",
+      "transaction_id": "trx-001",
+      "item_name": "Ayam Bakar",
+      "price": 50000,
+      "category": "NEEDS",
+      "subcategory": "Makan & Minum Harian"
+    }
+  ],
+  "budgets": [
+    {
+      "id": "bdg-001",
+      "category": "NEEDS",
+      "limit_amount": 2000000,
+      "month_period": "2026-05"
+    }
+  ]
+}
+```
+
 ---
 
 ## ⚙️ 6. Cron & Automation
