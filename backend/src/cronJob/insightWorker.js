@@ -7,9 +7,19 @@ const runMonthlyInsight = async () => {
     console.log('⏳ [CRON JOB] Memulai proses sinkronisasi Rapor Bulanan (DS & AI)...');
 
     try {
-        const date = new Date();
-        date.setMonth(date.getMonth() - 1);
-        const lastMonth = date.toISOString().slice(0, 7);
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth(); // 0-indexed (4 for May)
+        
+        let prevYear = year;
+        let prevMonth = month - 1;
+        if (prevMonth < 0) {
+            prevMonth = 11;
+            prevYear -= 1;
+        }
+        
+        const formattedMonth = String(prevMonth + 1).padStart(2, '0');
+        const lastMonth = `${prevYear}-${formattedMonth}`;
 
         const users = await db.query('SELECT id FROM users');
         const pythonUrl = process.env.PYTHON_API_URL || 'http://96.9.210.207:8000/api/v1';

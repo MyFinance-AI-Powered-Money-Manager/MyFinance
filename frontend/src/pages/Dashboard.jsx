@@ -35,10 +35,19 @@ const Dashboard = () => {
     const [editingBudget, setEditingBudget] = React.useState(null);
     const [deleteConfirm, setDeleteConfirm] = React.useState(null);
     const latestInsightPeriod = React.useMemo(() => {
-        const date = new Date();
-        date.setDate(1);
-        date.setMonth(date.getMonth() - 1);
-        return date.toISOString().slice(0, 7);
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth(); // 0-indexed (4 for May)
+        
+        let prevYear = year;
+        let prevMonth = month - 1;
+        if (prevMonth < 0) {
+            prevMonth = 11;
+            prevYear -= 1;
+        }
+        
+        const formattedMonth = String(prevMonth + 1).padStart(2, '0');
+        return `${prevYear}-${formattedMonth}`;
     }, []);
 
     const { data: walletsData, isLoading: walletsLoading, error: walletsError } = useWallets();
