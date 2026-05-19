@@ -54,24 +54,45 @@ const runMonthlyInsight = async () => {
                 timeout: 30000
             };
 
-            // Tembak DS (Team Bang Pascal)
+            // Tembak DS (Team Bang Pascal) - Menggunakan 3 Endpoint secara Paralel
             try {
-                const dsRes = await axios.post(`${pythonUrl}/ds/predict`, payload, axiosConfig);
-                if (dsRes.data) {
-                    health_score = dsRes.data.health_score ?? 0;
-                    predicted_cashflow = dsRes.data.predicted_cashflow ?? 0;
-                    overbudget_risk = dsRes.data.overbudget_risk ?? "low";
-                    money_leak = dsRes.data.money_leak ?? "-";
-                    total_spent = dsRes.data.total_spent ?? 0;
-                    total_budget = dsRes.data.total_budget ?? 0;
-                    categories = dsRes.data.categories ?? [];
+                const [dsCatRes, dsBudgRes, dsLeakRes] = await Promise.allSettled([
+                    axios.post(`${pythonUrl}/category-prediction`, payload, axiosConfig),
+                    axios.post(`${pythonUrl}/budget-calculator`, payload, axiosConfig),
+                    axios.post(`${pythonUrl}/leak-and-financial-score`, payload, axiosConfig)
+                ]);
+
+                let dsData = {};
+                
+                // Gabungkan hasil respons dari ke-3 endpoint jika berhasil (fulfilled)
+                if (dsCatRes.status === 'fulfilled' && dsCatRes.value.data) {
+                    dsData = { ...dsData, ...dsCatRes.value.data };
+                } else if (dsCatRes.status === 'rejected') {
+                    console.error(' [Insight Worker] DS Category Prediction Error:', dsCatRes.reason?.response?.data || dsCatRes.reason?.message);
                 }
+
+                if (dsBudgRes.status === 'fulfilled' && dsBudgRes.value.data) {
+                    dsData = { ...dsData, ...dsBudgRes.value.data };
+                } else if (dsBudgRes.status === 'rejected') {
+                    console.error(' [Insight Worker] DS Budget Calculator Error:', dsBudgRes.reason?.response?.data || dsBudgRes.reason?.message);
+                }
+
+                if (dsLeakRes.status === 'fulfilled' && dsLeakRes.value.data) {
+                    dsData = { ...dsData, ...dsLeakRes.value.data };
+                } else if (dsLeakRes.status === 'rejected') {
+                    console.error(' [Insight Worker] DS Leak & Financial Score Error:', dsLeakRes.reason?.response?.data || dsLeakRes.reason?.message);
+                }
+
+                health_score = dsData.health_score ?? 0;
+                predicted_cashflow = dsData.predicted_cashflow ?? 0;
+                overbudget_risk = dsData.overbudget_risk ?? "low";
+                money_leak = dsData.money_leak ?? "-";
+                total_spent = dsData.total_spent ?? 0;
+                total_budget = dsData.total_budget ?? 0;
+                categories = dsData.categories ?? [];
+                
             } catch (err) {
-                if (err.response) {
-                    console.error(` [Insight Worker] DS Service Error (${err.response.status}):`, JSON.stringify(err.response.data));
-                } else {
-                    console.error(` [Insight Worker] DS Service Unreachable:`, err.message);
-                }
+                console.error(` [Insight Worker] DS Service Parallel Execution Failed:`, err.message);
             }
 
             // Tembak AI (Team Bang Hafizh)

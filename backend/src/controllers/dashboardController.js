@@ -51,9 +51,9 @@ const getDashboardSummary = async (req, res) => {
         const rawDataPayload = {
             user_id: userId,
             month_period: currentMonth,
-            transactions: transactions.rows,
-            transaction_items: transactionItems.rows,
-            budgets: budgets.rows
+            transactions: transactions.rows.map(t => ({ ...t, total_amount: parseFloat(t.total_amount) })),
+            transaction_items: transactionItems.rows.map(ti => ({ ...ti, price: parseFloat(ti.price) })),
+            budgets: budgets.rows.map(b => ({ ...b, limit_amount: parseFloat(b.limit_amount) }))
         };
 
         // 4. DS response
@@ -65,21 +65,40 @@ const getDashboardSummary = async (req, res) => {
         };
 
         try {
-            // Tembak ke API Data Science Python
+            // Tembak ke API Data Science Python - Paralel 3 Endpoint
             const pythonUrl = process.env.PYTHON_API_URL || 'http://96.9.210.207:8000/api/v1';
-            const dsResponse = await axios.post(`${pythonUrl}/ds/predict`, rawDataPayload, {
-                headers: {
-                    'x-internal-service-key': process.env.INTERNAL_SERVICE_KEY
-                },
+            const axiosConfig = {
+                headers: { 'x-internal-service-key': process.env.INTERNAL_SERVICE_KEY },
                 timeout: 30000
-            });
-            dsMetrics = dsResponse.data;
-        } catch (dsError) {
-            if (dsError.response) {
-                console.error(`DS Service Error: ${dsError.response.status} - ${JSON.stringify(dsError.response.data)}`);
-            } else {
-                console.error("DS Service Offline/Unreachable: Menggunakan fallback data default.");
+            };
+
+            const [dsBudgRes, dsLeakRes] = await Promise.allSettled([
+                axios.post(`${pythonUrl}/budget-calculator`, rawDataPayload, axiosConfig),
+                axios.post(`${pythonUrl}/leak-and-financial-score`, rawDataPayload, axiosConfig)
+            ]);
+
+            let dsData = {};
+            if (dsBudgRes.status === 'fulfilled' && dsBudgRes.value.data) {
+                dsData = { ...dsData, ...dsBudgRes.value.data };
+            } else if (dsBudgRes.status === 'rejected') {
+                console.error("DS Budget Calculator Offline/Error:", dsBudgRes.reason?.message);
             }
+
+            if (dsLeakRes.status === 'fulfilled' && dsLeakRes.value.data) {
+                dsData = { ...dsData, ...dsLeakRes.value.data };
+            } else if (dsLeakRes.status === 'rejected') {
+                console.error("DS Leak & Score Offline/Error:", dsLeakRes.reason?.message);
+            }
+
+            dsMetrics = {
+                health_score: dsData.health_score ?? 0,
+                predicted_cashflow: dsData.predicted_cashflow ?? 0,
+                overbudget_risk: dsData.overbudget_risk ?? "low",
+                money_leak: dsData.money_leak ?? "-"
+            };
+
+        } catch (dsError) {
+            console.error(`DS Service Parallel Execution Failed:`, dsError.message);
         }
 
         // 5. Kirim Response Final ke Frontend
