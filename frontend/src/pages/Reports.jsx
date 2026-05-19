@@ -27,14 +27,18 @@ const buildDashboardDetailLink = (userId) => {
     }
 
     const encodedUserId = encodeURIComponent(String(userId));
-
-    // TODO(Production): Ubah kembali ke bulan berjalan jika seeder Mei sudah masuk
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    return `${dashboardDetailBaseUrl}?USERID=${encodedUserId}&START=${formatStreamlitDate(startOfMonth)}&END=${formatStreamlitDate(now)}`;
-
-    // // HARDCODE APRIL UNTUK TESTING (Kareba data bulan Mei dikosongkan)
-    // return `${dashboardDetailBaseUrl}?USERID=${encodedUserId}&START=2026_04_01&END=2026_04_30`;
+    
+    // HARDCODE APRIL UNTUK TESTING (karena data bulan Mei saat ini dikosongkan)
+    // formatStreamlitDate tetap digunakan agar tidak ada warning ESLint 'unused variable'
+    const startDate = new Date(2026, 3, 1);  // 1 April 2026 (0-indexed month)
+    const endDate = new Date(2026, 3, 30);    // 30 April 2026
+    
+    return `${dashboardDetailBaseUrl}?USERID=${encodedUserId}&START=${formatStreamlitDate(startDate)}&END=${formatStreamlitDate(endDate)}`;
+    
+    // TODO(Production): Buka baris di bawah ini dan hapus baris testing April di atas saat data Mei siap
+    // const now = new Date();
+    // const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // return `${dashboardDetailBaseUrl}?USERID=${encodedUserId}&START=${formatStreamlitDate(startOfMonth)}&END=${formatStreamlitDate(now)}`;
 };
 
 const emptyChartData = [
