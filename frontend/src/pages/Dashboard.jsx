@@ -505,19 +505,21 @@ const Dashboard = () => {
             </section>
 
             <div className="mt-4 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-                <section className="relative overflow-hidden rounded-[30px] border border-finance-200 bg-white p-6 shadow-card md:p-8 lg:col-start-1 lg:row-start-1">
-                    <div className="flex items-start gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#DDF4E2] text-finance-700">
+                <section className="relative isolate overflow-hidden rounded-[30px] border border-finance-200 bg-white p-5 shadow-card sm:p-6 md:p-8 lg:col-start-1 lg:row-start-1 dark:border-[#2D3748]">
+                    <div className="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full bg-finance-200/40 blur-3xl dark:bg-finance-500/10" />
+                    <div className="pointer-events-none absolute -bottom-20 -left-12 h-44 w-44 rounded-full bg-[#DDF4E2]/60 blur-3xl dark:bg-[#7CF38E]/10" />
+                    <div className="relative flex flex-col gap-5 md:flex-row md:items-start md:gap-6">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#DDF4E2] text-finance-700 shadow-sm md:h-12 md:w-12">
                             <Sparkles className="h-5 w-5" />
                         </div>
-                        <div className="flex-1">
+                        <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
                                 <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">{t('AI_insight')}</h3>
                                 <span className="rounded-full bg-[#EDF6E7] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-finance-700">
                                     {latestInsightPeriod}
                                 </span>
                             </div>
-                            <div className="mt-3 max-w-xl text-sm leading-7 text-zinc-500 dark:text-[#B0B8CC]">
+                            <div className="mt-3 max-w-2xl text-sm leading-7 text-zinc-600 dark:text-[#B0B8CC]">
                                 {insightLoading ? (
                                     <div className="space-y-2">
                                         <div className="h-4 w-5/6 animate-pulse rounded-full bg-zinc-200 dark:bg-[#364154]" />
@@ -531,27 +533,27 @@ const Dashboard = () => {
                                 )}
                             </div>
                             {!insightLoading && monthlyInsight ? (
-                                <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                    <div className="rounded-2xl bg-[#FAFCF7] px-4 py-3 dark:bg-[#253044]">
+                                <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                    <div className="rounded-2xl border border-white/70 bg-[#FAFCF7]/90 px-4 py-3 shadow-sm backdrop-blur-sm dark:border-[#364154] dark:bg-[#253044]/90">
                                         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-[#8B92A9]">{t('insight_health_score')}</p>
                                         <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-[#F0F1F3]">{monthlyInsight.health_score ?? 0}</p>
                                     </div>
-                                    <div className="rounded-2xl bg-[#FAFCF7] px-4 py-3 dark:bg-[#253044]">
+                                    <div className="rounded-2xl border border-white/70 bg-[#FAFCF7]/90 px-4 py-3 shadow-sm backdrop-blur-sm dark:border-[#364154] dark:bg-[#253044]/90">
                                         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-[#8B92A9]">{t('insight_predicted_cashflow')}</p>
                                         <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-[#F0F1F3]">{formatCurrency(monthlyInsight.predicted_cashflow ?? 0)}</p>
                                     </div>
-                                    <div className="rounded-2xl bg-[#FAFCF7] px-4 py-3 dark:bg-[#253044]">
+                                    <div className="rounded-2xl border border-white/70 bg-[#FAFCF7]/90 px-4 py-3 shadow-sm backdrop-blur-sm dark:border-[#364154] dark:bg-[#253044]/90">
                                         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-[#8B92A9]">{t('insight_overbudget_risk')}</p>
                                         <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-[#F0F1F3]">{formatRiskLabel(monthlyInsight.overbudget_risk)}</p>
                                     </div>
-                                    <div className="rounded-2xl bg-[#FAFCF7] px-4 py-3 dark:bg-[#253044]">
+                                    <div className="rounded-2xl border border-white/70 bg-[#FAFCF7]/90 px-4 py-3 shadow-sm backdrop-blur-sm dark:border-[#364154] dark:bg-[#253044]/90">
                                         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-[#8B92A9]">{t('insight_money_leak')}</p>
-                                        <p className="mt-1 text-sm font-bold text-zinc-900 dark:text-[#F0F1F3]">{monthlyInsight.money_leak || '-'}</p>
+                                        <p className="mt-1 break-words text-sm font-bold text-zinc-900 dark:text-[#F0F1F3]">{monthlyInsight.money_leak || '-'}</p>
                                     </div>
                                 </div>
                             ) : null}
                         </div>
-                        <div className="hidden rounded-full bg-[#EDF6E7] p-3 text-finance-500 md:block">
+                        <div className="hidden shrink-0 rounded-full bg-[#EDF6E7] p-3 text-finance-500 md:block">
                             <Sparkles className="h-6 w-6" />
                         </div>
                     </div>
