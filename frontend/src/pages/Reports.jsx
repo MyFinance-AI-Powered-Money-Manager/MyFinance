@@ -11,15 +11,15 @@ import { formatCurrency } from '../lib/utils';
 
 const dashboardDetailBaseUrl = 'https://myfinance-dashboard-cp.streamlit.app/';
 
-// const formatStreamlitDate = (date) => {
-//     if (!date) return '';
-//     const d = new Date(date);
-//     if (isNaN(d.getTime())) return '';
-//     const year = d.getFullYear();
-//     const month = String(d.getMonth() + 1).padStart(2, '0');
-//     const day = String(d.getDate()).padStart(2, '0');
-//     return `${year}_${month}_${day}`;
-// };
+const formatStreamlitDate = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}_${month}_${day}`;
+};
 
 const buildDashboardDetailLink = (userId) => {
     if (userId === null || userId === undefined || userId === '') {
@@ -29,12 +29,12 @@ const buildDashboardDetailLink = (userId) => {
     const encodedUserId = encodeURIComponent(String(userId));
 
     // TODO(Production): Ubah kembali ke bulan berjalan jika seeder Mei sudah masuk
-    // const now = new Date();
-    // const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    // return `${dashboardDetailBaseUrl}?USERID=${encodedUserId}&START=${formatStreamlitDate(startOfMonth)}&END=${formatStreamlitDate(now)}`;
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    return `${dashboardDetailBaseUrl}?USERID=${encodedUserId}&START=${formatStreamlitDate(startOfMonth)}&END=${formatStreamlitDate(now)}`;
 
-    // HARDCODE APRIL UNTUK TESTING (Kareba data bulan Mei dikosongkan)
-    return `${dashboardDetailBaseUrl}?USERID=${encodedUserId}&START=2026_04_01&END=2026_04_30`;
+    // // HARDCODE APRIL UNTUK TESTING (Kareba data bulan Mei dikosongkan)
+    // return `${dashboardDetailBaseUrl}?USERID=${encodedUserId}&START=2026_04_01&END=2026_04_30`;
 };
 
 const emptyChartData = [
