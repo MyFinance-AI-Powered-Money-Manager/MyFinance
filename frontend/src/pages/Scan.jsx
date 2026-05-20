@@ -124,9 +124,9 @@ const Scan = () => {
       return;
     }
 
-    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    const allowed = ['image/jpeg', 'image/png'];
     if (!allowed.includes(pickedFile.type)) {
-      showError('Format file harus JPG, PNG, atau WEBP');
+      showError('Format file harus JPG atau PNG');
       return;
     }
 
@@ -304,7 +304,7 @@ const Scan = () => {
             <div className="flex min-h-48 flex-col items-center justify-center text-center">
               <FileImage className="mb-3 h-10 w-10 text-zinc-400 dark:text-[#8B92A9]" />
               <span className="text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">{file ? file.name : '1 foto struk saja'}</span>
-              <span className="mt-1 text-xs text-zinc-500 dark:text-[#8B92A9]">JPG, PNG, WEBP · Maks 10 MB</span>
+              <span className="mt-1 text-xs text-zinc-500 dark:text-[#8B92A9]">JPG, PNG · Maks 10 MB</span>
               <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                 <button
                   type="button"
@@ -332,7 +332,7 @@ const Scan = () => {
                   </button>
                 ) : null}
               </div>
-              <input ref={fileInputRef} type="file" className="hidden" accept="image/jpeg,image/png,image/webp" onChange={handlePickFile} />
+              <input ref={fileInputRef} type="file" className="hidden" accept="image/jpeg,image/png" onChange={handlePickFile} />
             </div>
           </div>
 
