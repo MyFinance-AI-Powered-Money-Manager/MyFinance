@@ -1,9 +1,8 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { useWallets } from '../hooks/useFinance';
+import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '../lib/categories';
 import { showError } from '../lib/toast';
-
-const incomeCategories = ['bank', 'e-wallet', 'tabungan', 'investasi', 'lainnya'];
-const expenseCategories = ['makanan', 'transport', 'belanja', 'tagihan', 'lainnya'];
 
 const todayDate = () => new Date().toISOString().slice(0, 10);
 
@@ -17,9 +16,22 @@ export const TransactionFormModal = ({
 }) => {
     const [amount, setAmount] = React.useState('');
     const [category, setCategory] = React.useState('');
+    const [subcategory, setSubcategory] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [date, setDate] = React.useState(todayDate());
-    const [walletId, setWalletId] = React.useState('');
+    const [selectedWalletId, setSelectedWalletId] = React.useState('');
+
+    const { data: walletsData } = useWallets();
+    const availableWallets = React.useMemo(() => (
+        Array.isArray(wallets) && wallets.length > 0
+            ? wallets
+            : (Array.isArray(walletsData) ? walletsData : walletsData?.data ?? [])
+    ), [wallets, walletsData]);
+
+    const isIncome = type === 'income' || type === 'INCOME';
+    const categoryMap = isIncome ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+    const categoryKeys = Object.keys(categoryMap);
+    const subcategoryOptions = category ? (categoryMap[category] ?? []) : [];
 
     React.useEffect(() => {
         if (!open) {
@@ -28,16 +40,20 @@ export const TransactionFormModal = ({
 
         setAmount('');
         setCategory('');
+        setSubcategory('');
         setDescription('');
         setDate(todayDate());
-        setWalletId(wallets?.[0]?.id ? String(wallets[0].id) : '');
-    }, [open, type, wallets]);
+        const defaultWalletId = availableWallets?.[0]?.id ?? availableWallets?.[0]?.walletId ?? availableWallets?.[0]?._id ?? '';
+        setSelectedWalletId(defaultWalletId ? String(defaultWalletId) : '');
+    }, [open, type, availableWallets]);
+
+    React.useEffect(() => {
+        setSubcategory('');
+    }, [category]);
 
     if (!open) {
         return null;
     }
-
-    const categories = type === 'income' ? incomeCategories : expenseCategories;
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -53,19 +69,24 @@ export const TransactionFormModal = ({
             return;
         }
 
-        if (!walletId) {
-            showError('Pilih wallet terlebih dahulu');
+        if (!subcategory) {
+            showError('Subkategori wajib dipilih');
+            return;
+        }
+
+        if (!selectedWalletId) {
+            showError('Pilih sumber dana terlebih dahulu');
             return;
         }
 
         const payload = {
-            amount: numericAmount,
-            type,
+            total_amount: numericAmount,
+            type: isIncome ? 'INCOME' : 'EXPENSE',
             category,
-            date,
+            subcategory,
             description,
-            walletId,
-            wallet_id: walletId,
+            transaction_date: date,
+            wallet_id: selectedWalletId,
         };
 
         await onSubmit(payload);
@@ -73,15 +94,15 @@ export const TransactionFormModal = ({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/45 p-3 backdrop-blur-sm md:items-center md:p-4">
-            <div className="w-full max-w-lg rounded-[32px] bg-white p-6 shadow-2xl md:p-7">
+            <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[32px] bg-white p-6 shadow-2xl md:p-7">
                 <div className="mb-6 flex items-center justify-between">
-                    <h3 className="text-xl font-extrabold text-zinc-900">
-                        {type === 'income' ? 'Catat Pemasukan' : 'Catat Pengeluaran'}
+                    <h3 className="text-xl font-extrabold text-zinc-900 dark:text-[#F0F1F3]">
+                        {isIncome ? 'Catat Pemasukan' : 'Catat Pengeluaran'}
                     </h3>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-full p-2 text-zinc-500 transition hover:bg-zinc-100"
+                        className="rounded-full p-2 text-zinc-500 transition hover:bg-zinc-100 dark:text-[#8B92A9] dark:hover:bg-[#2D3748]"
                     >
                         <X className="h-5 w-5" />
                     </button>
@@ -89,7 +110,7 @@ export const TransactionFormModal = ({
 
                 <form className="space-y-4" onSubmit={handleSubmit}>
                     <div>
-                        <label className="mb-1 block text-sm font-semibold text-zinc-700">Jumlah</label>
+                        <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Jumlah (Rp)</label>
                         <input
                             type="number"
                             min="1"
@@ -103,7 +124,7 @@ export const TransactionFormModal = ({
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-semibold text-zinc-700">Kategori</label>
+                        <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Kategori</label>
                         <select
                             value={category}
                             onChange={(e) => setCategory(e.target.value)}
@@ -111,32 +132,53 @@ export const TransactionFormModal = ({
                             required
                         >
                             <option value="">Pilih kategori</option>
-                            {categories.map((item) => (
-                                <option key={item} value={item}>
-                                    {item}
+                            {categoryKeys.map((key) => (
+                                <option key={key} value={key}>
+                                    {key}
                                 </option>
                             ))}
                         </select>
                     </div>
 
+                    {category && subcategoryOptions.length > 0 && (
+                        <div>
+                            <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Subkategori</label>
+                            <select
+                                value={subcategory}
+                                onChange={(e) => setSubcategory(e.target.value)}
+                                className="finance-input"
+                                required
+                            >
+                                <option value="">Pilih subkategori</option>
+                                {subcategoryOptions.map((sub) => (
+                                    <option key={sub} value={sub}>
+                                        {sub}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
                     <div>
-                        <label className="mb-1 block text-sm font-semibold text-zinc-700">Sumber Dana</label>
+                        <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Sumber Dana</label>
                         <select
-                            value={walletId}
-                            onChange={(e) => setWalletId(e.target.value)}
+                            value={selectedWalletId}
+                            onChange={(e) => setSelectedWalletId(e.target.value)}
                             className="finance-input"
                             required
                         >
-                            {wallets.map((wallet) => {
-                                const id = wallet.id ?? wallet.walletId ?? wallet._id;
-                                const label = wallet.name || wallet.label || wallet.type || 'Wallet';
-                                if (!id) {
+                            <option value="">Pilih dompet</option>
+                            {availableWallets.map((wallet) => {
+                                const walletId = wallet.id ?? wallet.walletId ?? wallet._id;
+                                const walletLabel = wallet.name || wallet.label || wallet.type || 'Wallet';
+
+                                if (!walletId) {
                                     return null;
                                 }
 
                                 return (
-                                    <option key={id} value={String(id)}>
-                                        {label}
+                                    <option key={walletId} value={String(walletId)}>
+                                        {walletLabel}
                                     </option>
                                 );
                             })}
@@ -144,7 +186,7 @@ export const TransactionFormModal = ({
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-semibold text-zinc-700">Tanggal</label>
+                        <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Tanggal</label>
                         <input
                             type="date"
                             value={date}
@@ -155,12 +197,12 @@ export const TransactionFormModal = ({
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-semibold text-zinc-700">Catatan</label>
+                        <label className="mb-1 block text-sm font-semibold text-zinc-700 dark:text-[#D9DCE3]">Catatan (opsional)</label>
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            rows={3}
-                            className="finance-input min-h-[100px] py-3"
+                            rows={2}
+                            className="finance-input min-h-[72px] py-3"
                             placeholder="Contoh: Gaji bulanan / Belanja kebutuhan rumah"
                         />
                     </div>

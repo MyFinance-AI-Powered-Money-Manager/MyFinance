@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-// Simple translation map
+// Translation map
 const translations = {
     id: {
-        'welcome': 'Halo, Robby!',
+        'welcome': 'Halo, {name}!',
         'sub_welcome': 'Mari pantau kesehatan finansialmu hari ini.',
         'total_balance': 'Total Saldo',
         'income': 'Pemasukan',
@@ -14,15 +14,22 @@ const translations = {
         'cash': 'Cash',
         'savings': 'Tabungan',
         'add': 'Tambah',
-        'smart_insight': 'Insight Cerdas',
+        'AI_insight': 'AI Insight',
         'insight_text': 'Pengeluaran kamu minggu ini 15% lebih rendah dari rata-rata bulanan. Pertahankan tren ini untuk mencapai target tabungan akhir tahun!',
+        'insight_loading': 'Memuat insight AI...',
+        'insight_unavailable': 'Insight AI belum tersedia untuk periode ini.',
+        'insight_health_score': 'Skor kesehatan',
+        'insight_predicted_cashflow': 'Prediksi arus kas',
+        'insight_overbudget_risk': 'Risiko overbudget',
+        'insight_money_leak': 'Bocor utama',
         'transaction_history': 'Riwayat Transaksi',
         'see_all': 'Lihat Semua',
-        'home': 'Home',
-        'scan': 'Scan Transactions',
-        'all_transactions': 'All Transactions',
+        'home': 'Beranda',
+        'profile': 'Profil',
+        'scan': 'Scan',
+        'all_transactions': 'Semua Transaksi',
         'transactions': 'Transaksi',
-        'reports': 'Reports',
+        'reports': 'Laporan',
         'catat_pemasukan': 'Catat Pemasukan',
         'catat_pengeluaran': 'Catat Pengeluaran',
         'login_welcome': 'Selamat Datang Kembali',
@@ -37,7 +44,7 @@ const translations = {
         'no_account': 'Belum punya akun?',
         'register_now': 'Daftar sekarang',
         'footer_text': 'Sanctuary Terpandu untuk kekayaan Anda. Kami mendefinisikan ulang manajemen kekayaan melalui estetika editorial dan kecerdasan buatan.',
-        'copyright': '© 2024 MyFinance. Perlindungan Terpandu untuk kekayaan Anda.',
+        'copyright': '© 2026 MyFinance. Perlindungan Terpandu untuk kekayaan Anda.',
         'welcome_back': 'Selamat datang kembali',
         'financial_sanctuary': 'Sanctuary Finansial',
         'dark_mode': 'Mode Gelap',
@@ -46,17 +53,18 @@ const translations = {
         'translate_to_indonesia': 'Terjemahkan ke Indonesia',
         'service_status': 'Layanan Beroperasi Normal',
         'dashboard_load_failed': 'Gagal memuat dashboard',
-        'dashboard_load_hint': 'Silakan cek koneksi backend atau coba muat ulang halaman.',
-        'recent_backend_empty': 'Belum ada transaksi dari backend.',
+        'dashboard_load_hint': 'Silakan cek koneksi anda atau coba muat ulang halaman.',
+        'recent_backend_empty': 'Belum ada transaksi',
         'report_load_failed': 'Gagal memuat laporan',
         'report_load_hint': 'Pastikan endpoint /transactions, /wallets, dan /budgets tersedia.',
         'financial_reports': 'Laporan Keuangan',
         'financial_overview': 'Tinjauan komprehensif aktivitas finansial Anda.',
         'backend_live': 'Backend Live',
         'export': 'Export',
+        'detail': 'Detail',
         'total_transactions': 'Total Transaksi',
         'avg_expense': 'Rata-rata Pengeluaran',
-        'expense_tracked_backend': 'Pengeluaran terpantau dari backend',
+        'expense_tracked_backend': 'Pengeluaran terpantau',
         'savings_rate': 'Tingkat Tabungan',
         'total_balance_label': 'Total saldo',
         'income_vs_expense': 'Pemasukan vs Pengeluaran',
@@ -68,7 +76,7 @@ const translations = {
         'budget_progress_from_endpoint': 'Progress dari data endpoint /budgets',
         'spent_target': 'Spent / Target',
         'transactions_load_failed': 'Gagal memuat transaksi',
-        'transactions_load_hint': 'Pastikan backend aktif dan endpoint /transactions tersedia.',
+        'transactions_load_hint': 'Pastikan server aktif dan endpoint /transactions tersedia.',
         'manage_cashflow': 'Kelola dan pantau arus kas Anda.',
         'search_transactions_placeholder': 'Cari transaksi, kategori, atau jumlah...',
         'filter_all': 'Semua',
@@ -78,10 +86,87 @@ const translations = {
         'no_transactions_match_filter': 'Tidak ada transaksi yang cocok dengan filter saat ini.',
         'transaction': 'Transaksi',
         'category': 'Kategori',
-        'see_all_upper': 'Lihat Semua'
+        'see_all_upper': 'Lihat Semua',
+        'this_month': 'Bulan ini',
+        'switch_to_dark': 'Mode Gelap',
+        'switch_to_light': 'Mode Terang',
+        'change_language': 'Ganti Bahasa',
+        'delete': 'Hapus',
+        'save': 'Simpan',
+        
+        // Budget
+        'this_month_budgets': 'Anggaran Bulan Ini',
+        'create_budget': 'Buat Anggaran',
+        'edit_budget': 'Edit Anggaran',
+        'new_budget': 'Buat Anggaran Baru',
+        'budget_limit': 'Batas Anggaran (Rp)',
+        'budget_period': 'Periode Bulan',
+        'confirm_delete_budget': 'Yakin ingin menghapus anggaran ini?',
+        'no_budget_this_month': 'Belum ada anggaran untuk bulan ini',
+        'click_to_create_budget': 'Klik "Buat Anggaran" untuk mulai mengatur batasan pengeluaran.',
+        'save_budget': 'Simpan Anggaran',
+        'updating_budget': 'Memperbarui...',
+        'creating_budget': 'Menyimpan...',
+
+        // OCR / Scan
+        'scan_title': 'Scan Struk AI',
+        'scan_subtitle': 'Upload foto struk → AI baca otomatis → kamu cek & edit → simpan sebagai transaksi.',
+        'upload_receipt': 'Upload Struk',
+        'click_to_upload': 'Klik untuk pilih gambar struk JPG atau PNG',
+        'max_size': 'JPG, PNG · Maks 10 MB',
+        'processing_scan': 'Memproses scan...',
+        'scan_success_hint': 'Scan struk berhasil! Silakan cek dan edit hasilnya.',
+        'ai_server_not_configured': 'AI Server belum dikonfigurasi',
+        'select_photo_first': 'Pilih foto dulu',
+        'scan_with_ai': 'Scan dengan AI',
+        'check_edit_results': 'Hasil Scan — Cek & Edit',
+        'total_detected': 'Total Terdeteksi',
+        'items_detected': 'item terdeteksi',
+        'item_list': 'Daftar Item',
+        'add_item': 'Tambah',
+        'item_name': 'Nama item',
+        'price': 'Harga',
+        'qty': 'Qty',
+        'subtotal': 'Subtotal',
+        'description_store': 'Deskripsi / Toko',
+        'save_to_wallet': 'Simpan ke Dompet',
+        'no_wallet': 'Belum ada dompet',
+        'save_scan_success': 'Transaksi dari struk berhasil disimpan!',
+        'saving': 'Menyimpan...',
+        'save_with_amount': 'Simpan — {amount}',
+        'raw_ai_response': 'Lihat respons mentah AI',
+
+        // Profile & Account Management
+        'account_settings': 'Pengaturan Akun',
+        'personal_info': 'Informasi Pribadi',
+        'full_name_label': 'Nama Lengkap',
+        'update_profile': 'Perbarui Profil',
+        'change_password': 'Ganti Password',
+        'old_password': 'Password Lama',
+        'new_password': 'Password Baru',
+        'confirm_new_password': 'Konfirmasi Password Baru',
+        'update_password': 'Ubah Password',
+        'account_summary': 'Ringkasan Akun',
+        'status_active': 'Akun aktif',
+        'danger_zone': 'Zona Bahaya',
+        'danger_zone_desc': 'Tindakan ini tidak dapat dibatalkan.',
+        'delete_account_desc': 'Menghapus akun akan menghapus semua data secara permanen, termasuk dompet, transaksi, dan anggaran.',
+        'delete_account_permanently': 'Hapus Akun Permanen',
+        'confirm_delete_account': 'Konfirmasi Penghapusan',
+        'permanent_action_warning': 'Tindakan ini tidak dapat dibatalkan',
+        'delete_warning_list': 'Semua data berikut akan dihapus permanen:',
+        'data_list_item_1': 'Profil dan data akun',
+        'data_list_item_2': 'Seluruh dompet dan saldo',
+        'data_list_item_3': 'Semua riwayat transaksi',
+        'data_list_item_4': 'Seluruh anggaran',
+        'type_to_confirm': 'Ketik {confirm} untuk mengkonfirmasi',
+        'delete_now': 'Hapus Sekarang',
+        'deleting': 'Menghapus...',
+        'cancel': 'Batal',
+        'delete_confirm_keyword': 'HAPUS'
     },
     en: {
-        'welcome': 'Hello, Robby!',
+        'welcome': 'Hello, {name}!',
         'sub_welcome': "Let's monitor your financial health today.",
         'total_balance': 'Total Balance',
         'income': 'Income',
@@ -92,12 +177,19 @@ const translations = {
         'cash': 'Cash',
         'savings': 'Savings',
         'add': 'Add',
-        'smart_insight': 'Smart Insight',
+        'AI_insight': 'AI Insight',
         'insight_text': "Your spending this week is 15% lower than the monthly average. Keep it up to reach your year-end savings goal!",
+        'insight_loading': 'Loading AI insight...',
+        'insight_unavailable': 'AI insight is not available for this period yet.',
+        'insight_health_score': 'Health score',
+        'insight_predicted_cashflow': 'Predicted cashflow',
+        'insight_overbudget_risk': 'Overbudget risk',
+        'insight_money_leak': 'Main leak',
         'transaction_history': 'Transaction History',
         'see_all': 'See All',
         'home': 'Home',
-        'scan': 'Scan Transactions',
+        'profile': 'Profile',
+        'scan': 'Scan',
         'all_transactions': 'All Transactions',
         'transactions': 'Transactions',
         'reports': 'Reports',
@@ -115,7 +207,7 @@ const translations = {
         'no_account': "Don't have an account?",
         'register_now': 'Register now',
         'footer_text': 'A Guided Sanctuary for your wealth. We redefine wealth management through editorial aesthetics and artificial intelligence.',
-        'copyright': '© 2024 MyFinance. Guided Protection for your wealth.',
+        'copyright': '© 2026 MyFinance. Guided Protection for your wealth.',
         'welcome_back': 'Welcome back',
         'financial_sanctuary': 'Financial Sanctuary',
         'dark_mode': 'Dark Mode',
@@ -124,14 +216,15 @@ const translations = {
         'translate_to_indonesia': 'Translate to Indonesian',
         'service_status': 'Service Operating Normally',
         'dashboard_load_failed': 'Failed to load dashboard',
-        'dashboard_load_hint': 'Please check backend connectivity or reload the page.',
-        'recent_backend_empty': 'No transactions available from backend yet.',
+        'dashboard_load_hint': 'Please check your connectivity or reload the page.',
+        'recent_backend_empty': 'No transactions available',
         'report_load_failed': 'Failed to load reports',
         'report_load_hint': 'Ensure /transactions, /wallets, and /budgets endpoints are available.',
         'financial_reports': 'Financial Reports',
         'financial_overview': 'Comprehensive overview of your financial activity.',
         'backend_live': 'Backend Live',
         'export': 'Export',
+        'detail': 'Detail',
         'total_transactions': 'Total Transactions',
         'avg_expense': 'Average Expense',
         'expense_tracked_backend': 'Expense tracked from backend',
@@ -156,7 +249,84 @@ const translations = {
         'no_transactions_match_filter': 'No transactions match the current filter.',
         'transaction': 'Transaction',
         'category': 'Category',
-        'see_all_upper': 'See All'
+        'see_all_upper': 'See All',
+        'this_month': 'This month',
+        'switch_to_dark': 'Dark Mode',
+        'switch_to_light': 'Light Mode',
+        'change_language': 'Change Language',
+        'delete': 'Delete',
+        'save': 'Save',
+
+        // Budget
+        'this_month_budgets': 'This Month Budgets',
+        'create_budget': 'Create Budget',
+        'edit_budget': 'Edit Budget',
+        'new_budget': 'Create New Budget',
+        'budget_limit': 'Budget Limit (Rp)',
+        'budget_period': 'Month Period',
+        'confirm_delete_budget': 'Are you sure you want to delete this budget?',
+        'no_budget_this_month': 'No budgets set for this month',
+        'click_to_create_budget': 'Click "Create Budget" to start setting spending limits.',
+        'save_budget': 'Save Budget',
+        'updating_budget': 'Updating...',
+        'creating_budget': 'Saving...',
+
+        // OCR / Scan
+        'scan_title': 'AI Receipt Scan',
+        'scan_subtitle': 'Upload receipt photo → AI reads automatically → you check & edit → save as transaction.',
+        'upload_receipt': 'Upload Receipt',
+        'click_to_upload': 'Click to select JPG or PNG receipt image',
+        'max_size': 'JPG, PNG · Max 10 MB',
+        'processing_scan': 'Processing scan...',
+        'scan_success_hint': 'Scan successful! Please check and edit the results.',
+        'ai_server_not_configured': 'AI Server not configured',
+        'select_photo_first': 'Select a photo first',
+        'scan_with_ai': 'Scan with AI',
+        'check_edit_results': 'Scan Result — Check & Edit',
+        'total_detected': 'Total Detected',
+        'items_detected': 'items detected',
+        'item_list': 'Item List',
+        'add_item': 'Add',
+        'item_name': 'Item name',
+        'price': 'Price',
+        'qty': 'Qty',
+        'subtotal': 'Subtotal',
+        'description_store': 'Description / Store',
+        'save_to_wallet': 'Save to Wallet',
+        'no_wallet': 'No wallet available',
+        'save_scan_success': 'Receipt transaction saved successfully!',
+        'saving': 'Saving...',
+        'save_with_amount': 'Save — {amount}',
+        'raw_ai_response': 'View raw AI response',
+
+        // Profile & Account Management
+        'account_settings': 'Account Settings',
+        'personal_info': 'Personal Information',
+        'full_name_label': 'Full Name',
+        'update_profile': 'Update Profile',
+        'change_password': 'Change Password',
+        'old_password': 'Old Password',
+        'new_password': 'New Password',
+        'confirm_new_password': 'Confirm New Password',
+        'update_password': 'Update Password',
+        'account_summary': 'Account Summary',
+        'status_active': 'Active account',
+        'danger_zone': 'Danger Zone',
+        'danger_zone_desc': 'This action cannot be undone.',
+        'delete_account_desc': 'Deleting your account will permanently remove all your data, including wallets, transactions, and budgets.',
+        'delete_account_permanently': 'Delete Account Permanently',
+        'confirm_delete_account': 'Delete Confirmation',
+        'permanent_action_warning': 'This action cannot be undone',
+        'delete_warning_list': 'The following data will be permanently deleted:',
+        'data_list_item_1': 'Profile and account data',
+        'data_list_item_2': 'All wallets and balances',
+        'data_list_item_3': 'All transaction history',
+        'data_list_item_4': 'All budgets',
+        'type_to_confirm': 'Type {confirm} to confirm',
+        'delete_now': 'Delete Now',
+        'deleting': 'Deleting...',
+        'cancel': 'Cancel',
+        'delete_confirm_keyword': 'DELETE'
     },
 };
 
@@ -165,20 +335,33 @@ const LanguageContext = createContext(undefined);
 export const LanguageProvider = ({ children }) => {
     const [language, setLanguage] = useState(() => {
         const savedLanguage = localStorage.getItem('language');
-        return savedLanguage || 'id';
+        return translations[savedLanguage] ? savedLanguage : 'id';
     });
 
+    const setSafeLanguage = useCallback((nextLanguage) => {
+        setLanguage(translations[nextLanguage] ? nextLanguage : 'id');
+    }, []);
+
     useEffect(() => {
-        localStorage.setItem('language', language);
-        document.documentElement.lang = language;
+        const activeLanguage = translations[language] ? language : 'id';
+        localStorage.setItem('language', activeLanguage);
+        document.documentElement.lang = activeLanguage;
     }, [language]);
 
-    const t = (key) => {
-        return translations[language][key] || key;
-    };
+    const currentTranslations = translations[language] || translations.id;
+
+    const t = useCallback((key, params = {}) => {
+        let value = currentTranslations[key] || translations.id[key] || key;
+
+        Object.entries(params).forEach(([paramKey, paramValue]) => {
+            value = value.replace(`{${paramKey}}`, paramValue ?? '');
+        });
+
+        return value;
+    }, [currentTranslations]);
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t }}>
+        <LanguageContext.Provider value={{ language, setLanguage: setSafeLanguage, t }}>
             {children}
         </LanguageContext.Provider>
     );

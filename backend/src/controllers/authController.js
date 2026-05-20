@@ -11,26 +11,26 @@ const register = async (req, res) => {
     try {
         // 2. Validasi Input Kelengkapan Data
         if (!full_name || !email || !password || !confirm_password) {
-            return res.status(400).json({ 
-                status: 'error', 
-                message: 'Semua kolom (Nama Lengkap, Email, Password, Konfirmasi Password) wajib diisi.' 
+            return res.status(400).json({
+                status: 'error',
+                message: 'Semua kolom (Nama Lengkap, Email, Password, Konfirmasi Password) wajib diisi.'
             });
         }
 
         // 3. Validasi Kesesuaian Password 
         if (password !== confirm_password) {
-            return res.status(400).json({ 
-                status: 'error', 
-                message: 'Password dan Konfirmasi Password tidak cocok.' 
+            return res.status(400).json({
+                status: 'error',
+                message: 'Password dan Konfirmasi Password tidak cocok.'
             });
         }
 
         // 4. Cek apakah email sudah digunakan
         const userCheck = await db.query('SELECT id FROM users WHERE email = $1', [email]);
         if (userCheck.rows.length > 0) {
-            return res.status(400).json({ 
-                status: 'error', 
-                message: 'Email sudah terdaftar di dalam sistem.' 
+            return res.status(400).json({
+                status: 'error',
+                message: 'Email sudah terdaftar di dalam sistem.'
             });
         }
 
@@ -44,16 +44,16 @@ const register = async (req, res) => {
             [full_name, email, passwordHash]
         );
 
-        res.status(201).json({ 
-            status: 'success', 
+        res.status(201).json({
+            status: 'success',
             message: 'Registrasi berhasil.',
-            data: newUser.rows[0] 
+            data: newUser.rows[0]
         });
     } catch (error) {
         console.error('Error register:', error);
-        res.status(500).json({ 
-            status: 'error', 
-            message: 'Terjadi kesalahan sistem saat memproses registrasi.' 
+        res.status(500).json({
+            status: 'error',
+            message: 'Terjadi kesalahan sistem saat memproses registrasi.'
         });
     }
 };
@@ -83,17 +83,17 @@ const login = async (req, res) => {
 
         // 4. Buat Token JWT (Masa aktif 1 Hari)
         const token = jwt.sign(
-            { id: user.id, email: user.email }, 
-            process.env.JWT_SECRET || 'rahasia_sistem_keuangan', 
+            { id: user.id, email: user.email },
+            process.env.JWT_SECRET_KEY,
             { expiresIn: '1d' }
         );
 
-        res.status(200).json({ 
-            status: 'success', 
-            data: { 
+        res.status(200).json({
+            status: 'success',
+            data: {
                 user: { id: user.id, email: user.email },
-                token 
-            } 
+                token
+            }
         });
     } catch (error) {
         console.error('Error login:', error);

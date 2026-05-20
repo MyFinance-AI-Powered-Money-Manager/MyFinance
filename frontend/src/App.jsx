@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -8,12 +8,16 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoadingScreen } from './components/LoadingScreen';
 
 const Landing = lazy(() => import('./pages/Landing'));
+const LearnMore = lazy(() => import('./pages/LearnMore'));
+const InvestmentInsights = lazy(() => import('./pages/InvestmentInsights'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const Transactions = lazy(() => import('./pages/Transactions'));
 const Reports = lazy(() => import('./pages/Reports'));
 const Scan = lazy(() => import('./pages/Scan'));
+const Profile = lazy(() => import('./pages/Profile'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -35,6 +39,8 @@ export default function App() {
               <Suspense fallback={<LoadingScreen />}>
                 <Routes>
                   <Route path="/" element={<Landing />} />
+                  <Route path="/learn-more" element={<LearnMore />} />
+                  <Route path="/investment-insights" element={<InvestmentInsights />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route
@@ -62,6 +68,14 @@ export default function App() {
                     }
                   />
                   <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
                     path="/scan"
                     element={
                       <ProtectedRoute>
@@ -69,7 +83,7 @@ export default function App() {
                       </ProtectedRoute>
                     }
                   />
-                  <Route path="*" element={<Navigate to="/" />} />
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
             </Router>

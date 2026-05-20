@@ -1,63 +1,61 @@
 const db = require('../config/db');
-const axios = require('axios');
+const { runMonthlyInsight } = require('../cronJob/insightWorker');
 
 const getFinancialInsights = async (req, res) => {
-    // Menangkap filter dari Frontend (misal: /api/insights?wallet_id=xxx&period=monthly)
-    const { wallet_id, period } = req.query; 
+    // Hanya butuh period dari query URL, user_id diambil dari token JWT (Auth Middleware)
+    const { month_period } = req.query; 
+    const userId = req.user.id;
 
     try {
-        if (!wallet_id) {
-            return res.status(400).json({ status: 'error', message: 'wallet_id wajib disertakan.' });
+        if (!month_period) {
+            return res.status(400).json({ status: 'error', message: 'Parameter month_period (YYYY-MM) wajib disertakan.' });
         }
 
-        // 1. Tarik Data Historis dari Database (Supabase)
-        // Kita ambil transaksi bulan ini sebagai contoh dasar
-        const currentMonth = new Date().toISOString().slice(0, 7); 
-        
-        const transactions = await db.query(`
-            SELECT type, total_amount, category, transaction_date 
-            FROM transactions 
-            WHERE wallet_id = $1 AND to_char(transaction_date, 'YYYY-MM') = $2
-        `, [wallet_id, currentMonth]);
+        // FIXED: Mencari berdasarkan user_id, 
+        const insightData = await db.query(`
+            SELECT * FROM financial_insights 
+            WHERE user_id = $1 AND month_period = $2
+        `, [userId, month_period]);
 
-        if (transactions.rows.length === 0) {
-            return res.status(200).json({ 
-                status: 'success', 
-                message: 'Belum ada transaksi bulan ini untuk dianalisis.',
-                data: null
-            });
+        if (insightData.rows.length === 0) {
+             return res.status(200).json({ 
+                 status: 'success', 
+                 message: 'Insight belum tersedia untuk bulan ini.',
+                 data: null
+             });
         }
 
-        // 2. Siapkan Payload (Bungkus data) untuk dikirim ke Python
-        const payloadToAI = {
-            period: period || 'monthly',
-            transactions: transactions.rows
-        };
-
-        // 3. Tembak ke Server Python (AI Service)
-        // Pastikan tim AI punya endpoint ini di FastAPI/Flask mereka
-        const aiResponse = await axios.post('http://localhost:8000/api/ai/generate-insight', payloadToAI);
-
-        // 4. Kembalikan Insight dari AI ke Frontend
         res.status(200).json({
             status: 'success',
-            message: 'Insight berhasil di-generate',
-            data: aiResponse.data // Berisi teks saran/insight dari AI
+            message: 'Insight berhasil diambil',
+            data: insightData.rows[0] 
         });
 
     } catch (error) {
         console.error('Error fetching AI Insights:', error);
-        
-        // Handle error jika server Python mati/belum jalan
-        if (error.code === 'ECONNREFUSED') {
-            return res.status(503).json({ 
-                status: 'error', 
-                message: 'Server AI (Python) sedang tidak aktif atau tidak dapat dijangkau.' 
-            });
-        }
-
         res.status(500).json({ status: 'error', message: 'Terjadi kesalahan sistem.' });
     }
 };
 
-module.exports = { getFinancialInsights };
+const triggerMonthlyInsight = async (req, res) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (token !== process.env.CRON_SECRET_KEY) {
+        return res.status(403).json({ status: 'error', message: 'Unauthorized. Invalid Cron Secret Key.' });
+    }
+
+    try {
+        // Trigger worker secara async (jangan ditunggu selesai kalau datanya banyak)
+        runMonthlyInsight(); 
+        
+        res.status(200).json({ 
+            status: 'success', 
+            message: 'Cron job manual berhasil dipicu. Proses berjalan di background.' 
+        });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Gagal memicu cron job.' });
+    }
+};
+
+module.exports = { getFinancialInsights, triggerMonthlyInsight };

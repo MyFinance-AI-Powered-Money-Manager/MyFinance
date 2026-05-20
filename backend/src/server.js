@@ -3,16 +3,24 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
+// Keamanan: Cek apakah JWT_SECRET_KEY sudah diset di environment variable
+if (!process.env.JWT_SECRET_KEY) {
+    console.error('FATAL ERROR: JWT_SECRET_KEY tidak ada di environment variable.');
+    process.exit(1);
+}
+
 
 // Inisialisasi koneksi Database
 require('./config/db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const path = require('path');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health Check Server Express Endpoint
 app.get('/api/v1/health', (req, res) => {
@@ -30,6 +38,12 @@ const walletRoutes = require('./routes/walletRoutes');
 const budgetRoutes = require('./routes/budgetRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const insightRoutes = require('./routes/insightRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const exportRoutes = require('./routes/exportRoutes');
+
+
+// cron job
+require('./cronJob/insightWorker');
 
 // routing endpoint sesuai swagger 
 app.use('/api/v1/auth', authRoutes);
@@ -38,6 +52,9 @@ app.use('/api/v1/wallets', walletRoutes);
 app.use('/api/v1/budgets', budgetRoutes);
 app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/insights', insightRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1/export', exportRoutes);
+
 
 // Server Listener
 app.listen(PORT, () => {

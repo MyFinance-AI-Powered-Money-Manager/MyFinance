@@ -36,9 +36,10 @@ const updateProfile = async (req, res) => {
         const result = await db.query(
             `UPDATE users 
              SET full_name = COALESCE($1, full_name), 
-                 profile_picture = COALESCE($2, profile_picture) 
+                 profile_picture = COALESCE($2, profile_picture),
+                 updated_at = CURRENT_TIMESTAMP
              WHERE id = $3 
-             RETURNING id, full_name, email, profile_picture`,
+             RETURNING id, full_name, email, profile_picture, updated_at`,
             [full_name, profile_picture, userId]
         );
 
@@ -72,7 +73,7 @@ const updatePassword = async (req, res) => {
         const user = userResult.rows[0];
 
         // Verifikasi password lama
-        const validPassword = await bcrypt.compare(old_password, user.password_hash);
+        const validPassword = await bcrypt.compare(old_password, user.password);
         if (!validPassword) {
             return res.status(401).json({ status: 'error', message: 'Password lama salah.' });
         }
@@ -81,7 +82,7 @@ const updatePassword = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const newPasswordHash = await bcrypt.hash(new_password, salt);
 
-        await db.query('UPDATE users SET password = $1 WHERE id = $2', [newPasswordHash, userId]);
+        await db.query('UPDATE users SET password = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', [newPasswordHash, userId]);
 
         res.status(200).json({ status: 'success', message: 'Password berhasil diubah.' });
     } catch (error) {
@@ -90,4 +91,22 @@ const updatePassword = async (req, res) => {
     }
 };
 
-module.exports = { getProfile, updateProfile, updatePassword };
+// 4. Hapus Akun
+const deleteAccount = async (req, res) => {
+    try {
+        const deleted = await db.query('DELETE FROM users WHERE id = $1 RETURNING id', [req.user.id]);
+
+        if (deleted.rows.length === 0) {
+            return res.status(404).json({ status: 'error', message: 'User tidak ditemukan.' });
+        }
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Akun dan seluruh data terkait berhasil dihapus permanen.'
+        });
+    } catch (error) {
+        console.error('Error deleteAccount:', error);
+        res.status(500).json({ status: 'error', message: 'Terjadi kesalahan server saat menghapus akun.' });
+    }
+};
+module.exports = { getProfile, updateProfile, updatePassword, deleteAccount };

@@ -14,9 +14,6 @@ export class ErrorBoundary extends React.Component {
     componentDidCatch(error, errorInfo) {
         console.error('Error Boundary caught:', error, errorInfo);
         this.setState({ errorInfo });
-
-        // Kirim ke error tracking service (optional)
-        // Sentry.captureException(error, { contexts: { react: errorInfo } });
     }
 
     handleReset = () => {

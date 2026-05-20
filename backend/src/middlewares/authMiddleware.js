@@ -17,7 +17,7 @@ const authenticateToken = (req, res, next) => {
 
     try {
         // Memverifikasi validitas dan masa kedaluwarsa token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
         
         // Menyuntikkan data payload (termasuk id user) ke dalam object request
         req.user = decoded; 
