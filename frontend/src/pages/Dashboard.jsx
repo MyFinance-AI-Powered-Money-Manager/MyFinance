@@ -542,7 +542,7 @@ const Dashboard = () => {
                                 )}
                             </div>
                             {!insightLoading && monthlyInsight ? (
-                                <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     <div className="rounded-2xl border border-white/70 bg-[#FAFCF7]/90 px-4 py-3 shadow-sm backdrop-blur-sm dark:border-[#364154] dark:bg-[#253044]/90">
                                         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-[#8B92A9]">{t('insight_health_score')}</p>
                                         <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-[#F0F1F3]">{monthlyInsight.health_score ?? 0}</p>

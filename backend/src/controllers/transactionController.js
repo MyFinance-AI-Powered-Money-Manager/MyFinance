@@ -25,7 +25,7 @@ const createTransaction = async (req, res) => {
 
         let currentBalance = parseFloat(walletResult.rows[0].balance);
 
-        if (type === 'EXPENSE' && currentBalance < total_amount) {
+        if (txType === 'EXPENSE' && currentBalance < total_amount) {
             throw new Error('Saldo dompet tidak mencukupi.');
         }
 
