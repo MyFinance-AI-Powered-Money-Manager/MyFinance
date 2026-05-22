@@ -8,8 +8,9 @@ import { useTransactions } from '../hooks/useFinance';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { formatCurrency } from '../lib/utils';
+import { config } from '../lib/config';
 
-const dashboardDetailBaseUrl = 'https://myfinance-dashboard-cp.streamlit.app/';
+const dashboardDetailBaseUrl = config.streamlitUrl || 'https://myfinance-dashboard-cp.streamlit.app/';
 
 const formatStreamlitDate = (date) => {
     if (!date) return '';
