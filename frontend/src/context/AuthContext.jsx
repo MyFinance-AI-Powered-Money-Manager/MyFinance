@@ -9,6 +9,14 @@ export const AuthProvider = ({ children }) => {
     const [error, setError] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+    const logout = useCallback(() => {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+        delete api.defaults.headers.common.Authorization;
+        setUser(null);
+        setIsAuthenticated(false);
+    }, []);
+
     // Check if user is already logged in (on mount)
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
@@ -131,14 +139,6 @@ export const AuthProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    }, []);
-
-    const logout = useCallback(() => {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user');
-        delete api.defaults.headers.common.Authorization;
-        setUser(null);
-        setIsAuthenticated(false);
     }, []);
 
     const updateUser = useCallback((nextUser) => {
