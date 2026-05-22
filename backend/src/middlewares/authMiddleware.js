@@ -9,26 +9,26 @@ const authenticateToken = (req, res, next) => {
 
     // Jika klien tidak mengirimkan token sama sekali
     if (!token) {
-        return res.status(401).json({ 
-            status: 'error', 
-            message: 'Akses ditolak. Token autentikasi tidak ditemukan.' 
+        return res.status(401).json({
+            status: 'error',
+            message: 'Akses ditolak. Token autentikasi tidak ditemukan.'
         });
     }
 
     try {
         // Memverifikasi validitas dan masa kedaluwarsa token
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-        
+
         // Menyuntikkan data payload (termasuk id user) ke dalam object request
-        req.user = decoded; 
-        
+        req.user = decoded;
+
         // Mengizinkan request berlanjut ke Controller tujuan
-        next(); 
+        next();
     } catch (error) {
         console.error('JWT Verification Error:', error.message);
-        return res.status(403).json({ 
-            status: 'error', 
-            message: 'Token tidak valid atau telah kedaluwarsa. Silakan login kembali.' 
+        return res.status(403).json({
+            status: 'error',
+            message: 'Token tidak valid atau telah kedaluwarsa. Silakan login kembali.'
         });
     }
 };

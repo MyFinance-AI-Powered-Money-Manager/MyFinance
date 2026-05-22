@@ -3,7 +3,7 @@ const { runMonthlyInsight } = require('../cronJob/insightWorker');
 
 const getFinancialInsights = async (req, res) => {
     // Hanya butuh period dari query URL, user_id diambil dari token JWT (Auth Middleware)
-    const { month_period } = req.query; 
+    const { month_period } = req.query;
     const userId = req.user.id;
 
     try {
@@ -18,17 +18,17 @@ const getFinancialInsights = async (req, res) => {
         `, [userId, month_period]);
 
         if (insightData.rows.length === 0) {
-             return res.status(200).json({ 
-                 status: 'success', 
-                 message: 'Insight belum tersedia untuk bulan ini.',
-                 data: null
-             });
+            return res.status(200).json({
+                status: 'success',
+                message: 'Insight belum tersedia untuk bulan ini.',
+                data: null
+            });
         }
 
         res.status(200).json({
             status: 'success',
             message: 'Insight berhasil diambil',
-            data: insightData.rows[0] 
+            data: insightData.rows[0]
         });
 
     } catch (error) {
@@ -47,11 +47,11 @@ const triggerMonthlyInsight = async (req, res) => {
 
     try {
         // Trigger worker secara async (jangan ditunggu selesai kalau datanya banyak)
-        runMonthlyInsight(); 
-        
-        res.status(200).json({ 
-            status: 'success', 
-            message: 'Cron job manual berhasil dipicu. Proses berjalan di background.' 
+        runMonthlyInsight();
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Cron job manual berhasil dipicu. Proses berjalan di background.'
         });
     } catch (error) {
         res.status(500).json({ status: 'error', message: 'Gagal memicu cron job.' });

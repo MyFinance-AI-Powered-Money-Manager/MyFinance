@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, History, BarChart3, Scan, UserCircle2 } from 'lucide-react';
+import { LayoutDashboard, History, BarChart3, Scan, UserCircle2, LogOut } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { resolveMediaUrl } from '../../lib/utils';
@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils';
 
 export const Sidebar = () => {
     const { t } = useLanguage();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const avatarUrl = resolveMediaUrl(user?.profile_picture);
     const initial = user?.full_name?.trim()?.charAt(0)?.toUpperCase() || 'U';
 
@@ -63,6 +63,16 @@ export const Sidebar = () => {
                     </NavLink>
                 ))}
             </nav>
+
+            <div className="mt-auto p-4 border-t border-[#E3EAD8] dark:border-[#2D3748]">
+                <button
+                    onClick={logout}
+                    className="flex w-full items-center gap-3 rounded-[16px] px-4 py-3.5 text-sm font-semibold text-red-500 hover:bg-red-50 hover:text-red-600 transition-all dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300"
+                >
+                    <LogOut className="h-4 w-4" />
+                    {t('logout')}
+                </button>
+            </div>
         </aside>
     );
 };

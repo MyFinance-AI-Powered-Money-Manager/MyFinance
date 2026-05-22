@@ -8,6 +8,7 @@ import {
   Camera,
   Trash2,
   AlertTriangle,
+  LogOut,
 } from "lucide-react";
 import { Layout } from "../components/layout/Layout";
 import { LoadingScreen } from "../components/LoadingScreen";
@@ -25,7 +26,7 @@ import { showError } from "../lib/toast";
 const Profile = () => {
   const navigate = useNavigate();
   const fileInputRef = React.useRef(null);
-  const { user: authUser } = useAuth();
+  const { user: authUser, logout } = useAuth();
   const { data: profile, isLoading, error } = useProfile();
   const updateProfile = useUpdateProfile();
   const updatePassword = useUpdatePassword();
@@ -341,6 +342,23 @@ const Profile = () => {
                   </p>
                 </div>
               </div>
+            </section>
+
+            <section className="finance-card p-6 md:p-8">
+              <h3 className="text-lg font-extrabold text-zinc-900 dark:text-[#F0F1F3]">
+                {t("session_settings")}
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-[#B0B8CC]">
+                {t("session_settings_desc")}
+              </p>
+              <button
+                type="button"
+                onClick={logout}
+                className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-[20px] bg-red-600 font-semibold text-white transition hover:bg-red-700 shadow-sm shadow-red-200 dark:shadow-none"
+              >
+                <LogOut className="h-4 w-4" />
+                {t("logout")}
+              </button>
             </section>
 
             <section className="overflow-hidden rounded-[28px] border-2 border-red-200 bg-white p-6 md:p-8 dark:border-red-900/50 dark:bg-[#1F2733]">

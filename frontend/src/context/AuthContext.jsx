@@ -29,6 +29,35 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
+    // Monitor token presence in localStorage for automatic logout
+    useEffect(() => {
+        const checkToken = () => {
+            const token = localStorage.getItem('auth_token');
+            if (isAuthenticated && !token) {
+                console.warn('Access token is missing. Automatic logout triggered.');
+                logout();
+            }
+        };
+
+        // Check when the browser tab gains focus
+        window.addEventListener('focus', checkToken);
+        
+        // Check when changes happen in other tabs/windows
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'auth_token' && !e.newValue) {
+                logout();
+            }
+        });
+
+        // Periodic check every 1 second
+        const interval = setInterval(checkToken, 1000);
+
+        return () => {
+            window.removeEventListener('focus', checkToken);
+            clearInterval(interval);
+        };
+    }, [isAuthenticated, logout]);
+
     const login = useCallback(async (email, password) => {
         setLoading(true);
         setError(null);

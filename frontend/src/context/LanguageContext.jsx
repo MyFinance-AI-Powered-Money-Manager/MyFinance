@@ -93,6 +93,7 @@ const translations = {
         'change_language': 'Ganti Bahasa',
         'delete': 'Hapus',
         'save': 'Simpan',
+        'logout': 'Keluar',
         
         // Budget
         'this_month_budgets': 'Anggaran Bulan Ini',
@@ -138,6 +139,8 @@ const translations = {
 
         // Profile & Account Management
         'account_settings': 'Pengaturan Akun',
+        'session_settings': 'Sesi Akun',
+        'session_settings_desc': 'Keluar dari sesi aktif Anda pada perangkat ini. Anda perlu masuk kembali untuk mengakses data Anda.',
         'personal_info': 'Informasi Pribadi',
         'full_name_label': 'Nama Lengkap',
         'update_profile': 'Perbarui Profil',
@@ -256,6 +259,7 @@ const translations = {
         'change_language': 'Change Language',
         'delete': 'Delete',
         'save': 'Save',
+        'logout': 'Log Out',
 
         // Budget
         'this_month_budgets': 'This Month Budgets',
@@ -301,6 +305,8 @@ const translations = {
 
         // Profile & Account Management
         'account_settings': 'Account Settings',
+        'session_settings': 'Account Session',
+        'session_settings_desc': 'Log out of your active session on this device. You will need to log back in to access your data.',
         'personal_info': 'Personal Information',
         'full_name_label': 'Full Name',
         'update_profile': 'Update Profile',

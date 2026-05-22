@@ -114,15 +114,15 @@ const getDashboardSummary = async (req, res) => {
                 console.error("DS Leak & Score Offline/Error:", dsLeakRes.reason?.message);
             }
 
-             const finSummary = dsData['financial summary'] || {};
-             const leakProducts = dsData['leak_products'] || [];
- 
-             dsMetrics = {
-                 health_score: finSummary.financial_score ?? 0,
-                 predicted_cashflow: finSummary.net_cashflow ?? 0,
-                 overbudget_risk: finSummary.overbudget_category_count > 0 ? "high" : "low",
-                 money_leak: leakProducts.length > 0 ? leakProducts.join(', ') : "-"
-             };
+            const finSummary = dsData['financial summary'] || {};
+            const leakProducts = dsData['leak_products'] || [];
+
+            dsMetrics = {
+                health_score: finSummary.financial_score ?? 0,
+                predicted_cashflow: finSummary.net_cashflow ?? 0,
+                overbudget_risk: finSummary.overbudget_category_count > 0 ? "high" : "low",
+                money_leak: leakProducts.length > 0 ? leakProducts.join(', ') : "-"
+            };
 
         } catch (dsError) {
             console.error(`DS Service Parallel Execution Failed:`, dsError.message);

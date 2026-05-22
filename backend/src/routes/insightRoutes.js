@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getFinancialInsights,triggerMonthlyInsight} = require('../controllers/insightController');
+const { getFinancialInsights, triggerMonthlyInsight } = require('../controllers/insightController');
 const authenticateToken = require('../middlewares/authMiddleware');
 
 

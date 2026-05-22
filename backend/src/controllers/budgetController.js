@@ -46,7 +46,7 @@ const getBudgets = async (req, res) => {
             WHERE b.user_id = $1 
             ORDER BY b.month_period DESC
         `, [req.user.id]);
-        
+
         res.status(200).json({ status: 'success', data: budgets.rows });
     } catch (error) {
         console.error('Error getBudgets:', error);
