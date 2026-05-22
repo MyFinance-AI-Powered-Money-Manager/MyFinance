@@ -10,20 +10,20 @@ const runMonthlyInsight = async () => {
         const now = new Date();
         const year = now.getFullYear();
         const month = now.getMonth(); // 0-indexed (4 for May)
-        
+
         let prevYear = year;
         let prevMonth = month - 1;
         if (prevMonth < 0) {
             prevMonth = 11;
             prevYear -= 1;
         }
-        
+
         const formattedMonth = String(prevMonth + 1).padStart(2, '0');
         const lastMonth = `${prevYear}-${formattedMonth}`;
 
         const pythonUrl = process.env.PYTHON_API_URL;
         if (!pythonUrl) {
-            console.error('❌ [Insight Worker] ERROR: PYTHON_API_URL tidak terdefinisi di environment variable.');
+            console.error('[Insight Worker] ERROR: PYTHON_API_URL tidak terdefinisi di environment variable.');
             return;
         }
 
@@ -104,7 +104,7 @@ const runMonthlyInsight = async () => {
 
             // 2. LOGIKA INDEPENDEN: Tembak DS & AI secara terpisah agar tidak saling menjatuhkan
             console.log(`   -> Menghubungi API DS & AI untuk User: ${userId}`);
-            
+
             // Inisialisasi default values
             let health_score = 0;
             let predicted_cashflow = 0;
@@ -122,53 +122,53 @@ const runMonthlyInsight = async () => {
                 timeout: 30000
             };
 
-             // Tembak DS (Team Bang Pascal) - Menggunakan 3 Endpoint secara Paralel
-             try {
-                 const [dsCatRes, dsBudgRes, dsLeakRes] = await Promise.allSettled([
-                     axios.post(`${pythonUrl}/category-prediction`, dsPayload, axiosConfig),
-                     axios.post(`${pythonUrl}/budget-calculator`, dsPayload, axiosConfig),
-                     axios.post(`${pythonUrl}/leak-and-financial-score`, dsPayload, axiosConfig)
-                 ]);
- 
-                 let dsData = {};
-                 
-                 // Gabungkan hasil respons dari ke-3 endpoint jika berhasil (fulfilled)
-                 if (dsCatRes.status === 'fulfilled' && dsCatRes.value.data) {
-                     dsData = { ...dsData, ...dsCatRes.value.data };
-                 } else if (dsCatRes.status === 'rejected') {
-                     console.error(' [Insight Worker] DS Category Prediction Error:', dsCatRes.reason?.response?.data || dsCatRes.reason?.message);
-                 }
- 
-                 if (dsBudgRes.status === 'fulfilled' && dsBudgRes.value.data) {
-                     dsData = { ...dsData, ...dsBudgRes.value.data };
-                 } else if (dsBudgRes.status === 'rejected') {
-                     console.error(' [Insight Worker] DS Budget Calculator Error:', dsBudgRes.reason?.response?.data || dsBudgRes.reason?.message);
-                 }
- 
-                 if (dsLeakRes.status === 'fulfilled' && dsLeakRes.value.data) {
-                     dsData = { ...dsData, ...dsLeakRes.value.data };
-                 } else if (dsLeakRes.status === 'rejected') {
-                     console.error(' [Insight Worker] DS Leak & Financial Score Error:', dsLeakRes.reason?.response?.data || dsLeakRes.reason?.message);
-                 }
- 
-                 const finSummary = dsData['financial summary'] || {};
-                 const leakProducts = dsData['leak_products'] || [];
-                 
-                 health_score = finSummary.financial_score ?? 0;
-                 predicted_cashflow = finSummary.net_cashflow ?? 0;
-                 overbudget_risk = finSummary.overbudget_category_count > 0 ? "high" : "low";
-                 money_leak = leakProducts.length > 0 ? leakProducts.join(', ') : "-";
-                 total_spent = finSummary.total_expense ?? dsPayload.transactions.reduce((sum, t) => t.type === 'EXPENSE' ? sum + t.total_amount : sum, 0);
-                 total_budget = dsPayload.budgets.reduce((sum, b) => sum + b.limit_amount, 0);
-                 categories = dsData;
-                 
-             } catch (err) {
-                 console.error(` [Insight Worker] DS Service Parallel Execution Failed:`, err.message);
-             }
- 
-             // Tembak AI (Team Bang Hafizh)
-             try {
-                 const aiRes = await axios.post(`${pythonUrl}/ai/financial-insights/monthly`, aiPayload, axiosConfig);
+            // Tembak DS (Team Bang Pascal) - Menggunakan 3 Endpoint secara Paralel
+            try {
+                const [dsCatRes, dsBudgRes, dsLeakRes] = await Promise.allSettled([
+                    axios.post(`${pythonUrl}/category-prediction`, dsPayload, axiosConfig),
+                    axios.post(`${pythonUrl}/budget-calculator`, dsPayload, axiosConfig),
+                    axios.post(`${pythonUrl}/leak-and-financial-score`, dsPayload, axiosConfig)
+                ]);
+
+                let dsData = {};
+
+                // Gabungkan hasil respons dari ke-3 endpoint jika berhasil (fulfilled)
+                if (dsCatRes.status === 'fulfilled' && dsCatRes.value.data) {
+                    dsData = { ...dsData, ...dsCatRes.value.data };
+                } else if (dsCatRes.status === 'rejected') {
+                    console.error(' [Insight Worker] DS Category Prediction Error:', dsCatRes.reason?.response?.data || dsCatRes.reason?.message);
+                }
+
+                if (dsBudgRes.status === 'fulfilled' && dsBudgRes.value.data) {
+                    dsData = { ...dsData, ...dsBudgRes.value.data };
+                } else if (dsBudgRes.status === 'rejected') {
+                    console.error(' [Insight Worker] DS Budget Calculator Error:', dsBudgRes.reason?.response?.data || dsBudgRes.reason?.message);
+                }
+
+                if (dsLeakRes.status === 'fulfilled' && dsLeakRes.value.data) {
+                    dsData = { ...dsData, ...dsLeakRes.value.data };
+                } else if (dsLeakRes.status === 'rejected') {
+                    console.error(' [Insight Worker] DS Leak & Financial Score Error:', dsLeakRes.reason?.response?.data || dsLeakRes.reason?.message);
+                }
+
+                const finSummary = dsData['financial summary'] || {};
+                const leakProducts = dsData['leak_products'] || [];
+
+                health_score = finSummary.financial_score ?? 0;
+                predicted_cashflow = finSummary.net_cashflow ?? 0;
+                overbudget_risk = finSummary.overbudget_category_count > 0 ? "high" : "low";
+                money_leak = leakProducts.length > 0 ? leakProducts.join(', ') : "-";
+                total_spent = finSummary.total_expense ?? dsPayload.transactions.reduce((sum, t) => t.type === 'EXPENSE' ? sum + t.total_amount : sum, 0);
+                total_budget = dsPayload.budgets.reduce((sum, b) => sum + b.limit_amount, 0);
+                categories = dsData;
+
+            } catch (err) {
+                console.error(` [Insight Worker] DS Service Parallel Execution Failed:`, err.message);
+            }
+
+            // Tembak AI (Team Bang Hafizh)
+            try {
+                const aiRes = await axios.post(`${pythonUrl}/ai/financial-insights/monthly`, aiPayload, axiosConfig);
                 ai_insight = aiRes.data.ai_insight;
             } catch (err) {
                 if (err.response) {
