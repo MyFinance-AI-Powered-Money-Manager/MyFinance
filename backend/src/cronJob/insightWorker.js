@@ -21,8 +21,13 @@ const runMonthlyInsight = async () => {
         const formattedMonth = String(prevMonth + 1).padStart(2, '0');
         const lastMonth = `${prevYear}-${formattedMonth}`;
 
+        const pythonUrl = process.env.PYTHON_API_URL;
+        if (!pythonUrl) {
+            console.error('❌ [Insight Worker] ERROR: PYTHON_API_URL tidak terdefinisi di environment variable.');
+            return;
+        }
+
         const users = await db.query('SELECT id FROM users');
-        const pythonUrl = process.env.PYTHON_API_URL || 'http://96.9.210.207:8000/api/v1';
 
         for (const user of users.rows) {
             const userId = user.id;
@@ -112,7 +117,7 @@ const runMonthlyInsight = async () => {
 
             const axiosConfig = {
                 headers: {
-                    'x-internal-service-key': process.env.INTERNAL_SERVICE_KEY || 'secret-antara-express-dan-python'
+                    'x-internal-service-key': process.env.INTERNAL_SERVICE_KEY
                 },
                 timeout: 30000
             };

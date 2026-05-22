@@ -87,7 +87,10 @@ const getDashboardSummary = async (req, res) => {
 
         try {
             // Tembak ke API Data Science Python - Paralel 3 Endpoint
-            const pythonUrl = process.env.PYTHON_API_URL || 'http://96.9.210.207:8000/api/v1';
+            const pythonUrl = process.env.PYTHON_API_URL;
+            if (!pythonUrl) {
+                throw new Error('PYTHON_API_URL tidak terdefinisi di environment variable.');
+            }
             const axiosConfig = {
                 headers: { 'x-internal-service-key': process.env.INTERNAL_SERVICE_KEY },
                 timeout: 30000
