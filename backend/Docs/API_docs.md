@@ -4,8 +4,8 @@ Dokumentasi API
 
 ## 📌 Informasi Global
 
-- **Base URL:** `http://localhost:3000/api/v1` (Lokal) atau `https://myfinance-backend-production.up.railway.app/api/v1` (Railway)
-- **Backend Check Server:** https://myfinance-backend-production.up.railway.app/api/v1/health
+- **Base URL:** `http://localhost:3000/api/v1` (Lokal) atau `https://myfinance-backend-app.up.railway.app/api/v1` (Production)
+- **Backend Check Server:** https://myfinance-backend-app.up.railway.app/api/v1/health
 - **Format Data:** `JSON`
 - **Autentikasi:** Header `Authorization: Bearer <JWT_TOKEN>`
 
