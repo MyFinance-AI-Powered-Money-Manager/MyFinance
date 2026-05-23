@@ -262,7 +262,7 @@ const Reports = () => {
             <div className="space-y-4 md:space-y-5">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div>
-                        <h1 className="text-[clamp(2.5rem,4vw,4.5rem)] font-extrabold leading-[0.92] tracking-tight text-finance-700 dark:text-[#7CF38E]">
+                        <h1 className="bg-gradient-to-r from-finance-700 to-[#00A86B] bg-clip-text text-3xl font-extrabold text-transparent md:text-4xl">
                             {t('financial_reports')}
                         </h1>
                         <p className="mt-2 text-sm text-zinc-500 dark:text-[#B0B8CC]">Ikhtisar transaksi dan pengeluaran kamu</p>
