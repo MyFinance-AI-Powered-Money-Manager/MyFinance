@@ -32,13 +32,14 @@ const exportDataForDS = async (req, res) => {
             db.query(
                 `SELECT id, category, limit_amount, month_period 
                  FROM budgets 
-                 WHERE user_id = $1 AND month_period = $2`, 
+                 WHERE user_id = $1 AND month_period = $2`,
                 [userId, monthPeriod]
             )
         ]);
 
         const responseData = {
             user_id: userId,
+            month_period: monthPeriod,
             start_date: startDate,
             end_date: endDate,
             transactions: transactions.rows.map(t => ({
