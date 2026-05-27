@@ -7,7 +7,7 @@ export const config = {
   isDevelopment: import.meta.env.DEV,
   isProduction: import.meta.env.PROD,
 
-  aiApiUrl: import.meta.env.VITE_AI_API_URL || 'http://96.9.210.207:8000/api/v1',
+  aiApiUrl: import.meta.env.VITE_AI_API_URL || 'https://myfinance.nya.je/api/v1',
   aiServiceKey: import.meta.env.VITE_AI_SERVICE_KEY || 'secret-antara-express-dan-python',
   scanEndpoint: import.meta.env.VITE_SCAN_ENDPOINT || 'ocr',
   streamlitUrl: import.meta.env.VITE_STREAMLIT_URL || 'https://myfinance-dashboard-cp.streamlit.app/',

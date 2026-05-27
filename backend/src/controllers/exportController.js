@@ -10,6 +10,24 @@ const exportDataForDS = async (req, res) => {
             return res.status(400).json({ error: 'Missing required parameters: USERID, START, END' });
         }
 
+        // Membersihkan & Validasi format UUID untuk USERID
+        let cleanedUserId = String(userId).trim();
+        if (cleanedUserId.length === 37) {
+            const temp = cleanedUserId.slice(0, 36);
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (uuidRegex.test(temp)) {
+                cleanedUserId = temp;
+            }
+        }
+
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(cleanedUserId)) {
+            return res.status(400).json({
+                error: 'Invalid USERID format. Must be a valid 36-character UUID.',
+                received: userId
+            });
+        }
+
         // Convert YYYY_MM_DD to YYYY-MM-DD
         const startDate = startDateStr.replace(/_/g, '-');
         const endDate = endDateStr.replace(/_/g, '-');
@@ -20,20 +38,20 @@ const exportDataForDS = async (req, res) => {
                 `SELECT id, wallet_id, type, total_amount, category, subcategory, description, transaction_date 
                  FROM transactions 
                  WHERE user_id = $1 AND transaction_date::date >= $2::date AND transaction_date::date <= $3::date`,
-                [userId, startDate, endDate]
+                [cleanedUserId, startDate, endDate]
             ),
             db.query(
                 `SELECT ti.id, ti.transaction_id, ti.item_name, ti.price, ti.category, ti.subcategory 
                  FROM transaction_items ti 
                  JOIN transactions t ON ti.transaction_id = t.id 
                  WHERE t.user_id = $1 AND t.transaction_date::date >= $2::date AND t.transaction_date::date <= $3::date`,
-                [userId, startDate, endDate]
+                [cleanedUserId, startDate, endDate]
             ),
             db.query(
                 `SELECT id, category, limit_amount, month_period 
                  FROM budgets 
                  WHERE user_id = $1 AND month_period = $2`,
-                [userId, monthPeriod]
+                [cleanedUserId, monthPeriod]
             )
         ]);
 

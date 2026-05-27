@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 // 1. Ambil Data Profil
 const getProfile = async (req, res) => {
     try {
-        // Asumsi: Middleware JWT menyimpan ID user di req.user.id
         const userId = req.user.id;
 
         const result = await db.query(
