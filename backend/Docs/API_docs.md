@@ -4,7 +4,7 @@ Dokumentasi API
 
 ## 📌 Informasi Global
 
-**Base URL:** `http://localhost:3000/api/v1` (Lokal) atau `https://myfinance-backend-app.up.railway.app/api/v1` (Production)
+- **Base URL:** `http://localhost:3000/api/v1` (Lokal) atau `https://myfinance-backend-app.up.railway.app/api/v1` (Production)
 - **Backend Check Server:** https://myfinance-backend-app.up.railway.app/api/v1/health
 - **Format Data:** `JSON`
 - **Autentikasi:** Header `Authorization: Bearer <JWT_TOKEN>`
@@ -376,7 +376,7 @@ Berikut adalah struktur hirarki yang **WAJIB** diterapkan pada form input di Fro
 
 - **Auth Required:** Yes
 - **Content-Type:** `multipart/form-data`
-- **Deskripsi:** Mengunggah gambar struk langsung ke Supabase Storage (Bucket: `receipt-scan`). Digunakan sebagai fallback jika Server AI tidak memberikan URL gambar.
+- **Deskripsi:** Mengunggah gambar struk langsung ke Supabase Storage (Bucket: `receipt_scan`). Digunakan sebagai fallback jika Server AI tidak memberikan URL gambar.
 
 **Request Body (Form Data):**
 - `file`: File gambar (jpg/png)
