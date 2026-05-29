@@ -1,4 +1,5 @@
 import React from 'react';
+import imageCompression from 'browser-image-compression';
 import { Upload, FileImage, Save, Edit3, Plus, ShoppingCart, X } from 'lucide-react';
 import { Layout } from '../components/layout/Layout';
 import { useScanReceipt, useUploadReceipt, useCreateTransaction, useWallets } from '../hooks/useFinance';
@@ -77,6 +78,19 @@ const normalizeScanResult = (data) => {
     image_url: coalesce(raw.image_url, raw.receipt_url, raw.url, raw.file_url, raw.img_url, raw.link, raw.photo_url, ''),
     raw,
   };
+};
+
+const compressReceiptImage = async (inputFile) => {
+  const maxSizeMB = 1.5;
+  const maxWidthOrHeight = 1920;
+
+  return imageCompression(inputFile, {
+    maxSizeMB,
+    maxWidthOrHeight,
+    useWebWorker: true,
+    initialQuality: 0.8,
+    fileType: inputFile.type,
+  });
 };
 
 const Scan = () => {
@@ -161,8 +175,10 @@ const Scan = () => {
     }
 
     try {
+      const compressedFile = await compressReceiptImage(file);
+
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', compressedFile);
 
       const response = await scanReceipt.mutateAsync(formData);
       const normalized = normalizeScanResult(response);
@@ -183,7 +199,10 @@ const Scan = () => {
       setEditSubcategory(normalized.predictedCategory || normalized.items[0]?.subcategory || '');
 
       showSuccess(t('scan_success_hint'));
-    } catch {
+    } catch (error) {
+      if (error?.message?.toLowerCase?.().includes('compress')) {
+        showError('Gagal mengompres gambar sebelum upload. Coba pilih foto lain.');
+      }
       return;
     }
   };

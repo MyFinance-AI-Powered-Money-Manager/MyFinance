@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }) => {
             try {
                 setUser(JSON.parse(savedUser));
                 setIsAuthenticated(true);
-                // ensure axios has Authorization header for first requests after refresh
                 api.defaults.headers.common.Authorization = `Bearer ${token}`;
             } catch {
                 localStorage.removeItem('auth_token');
