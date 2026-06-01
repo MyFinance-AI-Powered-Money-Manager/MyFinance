@@ -7,9 +7,10 @@ const runMonthlyInsight = async () => {
     console.log('⏳ [CRON JOB] Memulai proses sinkronisasi Rapor Bulanan (DS & AI)...');
 
     try {
-        const now = new Date();
+        // Gunakan zona waktu Asia/Jakarta secara eksplisit
+        const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
         const year = now.getFullYear();
-        const month = now.getMonth(); // 0-indexed (4 for May)
+        const month = now.getMonth(); // 0-indexed (Misal: 5 untuk Juni)
 
         let prevYear = year;
         let prevMonth = month - 1;
