@@ -1,0 +1,739 @@
+{
+  "info": {
+    "name": "MyFinance API v1",
+    "description": "Koleksi API end-to-end untuk MyFinance Project",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication & Users",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Aditya Beckham\",\n  \"email\": \"adityabeckham@example.com\",\n  \"password\": \"password123\",\n  \"confirm_password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.token) {",
+                  "    pm.environment.set(\"jwt_token\", jsonData.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"adityabeckham@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Aditya Beckham (Updated)\",\n  \"profile_picture\": \"https://image-url.com/photo.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"old_password\": \"password123\",\n  \"new_password\": \"newpassword456\",\n  \"confirm_new_password\": \"newpassword456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "password"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "profile"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Wallets",
+      "item": [
+        {
+          "name": "Get All Wallets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/wallets",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "wallets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Wallet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"BCA Utama\",\n  \"type\": \"BANK\",\n  \"balance\": 5000000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/wallets",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "wallets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Wallet",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gopay\",\n  \"type\": \"E-WALLET\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/wallets/YOUR_WALLET_ID",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "wallets",
+                "YOUR_WALLET_ID"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Transfer Antar Dompet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_wallet_id\": \"uuid-wallet-a\",\n  \"destination_wallet_id\": \"uuid-wallet-b\",\n  \"amount\": 25000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/wallets/transfer",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "wallets",
+                "transfer"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Wallet",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/wallets/YOUR_WALLET_ID",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "wallets",
+                "YOUR_WALLET_ID"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Budgets",
+      "item": [
+        {
+          "name": "Get All Budgets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/budgets",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Set Budget Bulanan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"WANTS\",\n  \"limit_amount\": 1500000,\n  \"month_period\": \"2026-05\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/budgets",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "budgets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Budget Limit",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"limit_amount\": 2000000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/budgets/YOUR_BUDGET_ID",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "budgets",
+                "YOUR_BUDGET_ID"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Budget",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/budgets/YOUR_BUDGET_ID",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "budgets",
+                "YOUR_BUDGET_ID"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Transactions",
+      "item": [
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Catat Transaksi (Income)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"wallet_id\": \"YOUR_WALLET_ID\",\n  \"type\": \"INCOME\",\n  \"total_amount\": 1000000,\n  \"category\": \"GAJI\",\n  \"subcategory\": \"Gaji Utama\",\n  \"description\": \"Gaji Bulan ini\",\n  \"transaction_date\": \"2026-05-11T15:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Catat Transaksi (Expense)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"wallet_id\": \"YOUR_WALLET_ID\",\n  \"type\": \"EXPENSE\",\n  \"total_amount\": 50000,\n  \"category\": \"WANTS\",\n  \"subcategory\": \"Jajan & Nongkrong\",\n  \"description\": \"Beli Kopi\",\n  \"transaction_date\": \"2026-05-11T15:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Catat Transaksi (OCR)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"wallet_id\": \"YOUR_WALLET_ID\",\n  \"type\": \"EXPENSE\",\n  \"total_amount\": 105000,\n  \"category\": \"NEEDS\",\n  \"description\": \"Belanja Mingguan Indomaret\",\n  \"transaction_date\": \"2026-05-11T10:00:00Z\",\n  \"image_url\": \"https://supabase-storage.com/struk/001.jpg\",\n  \"items\": [\n    {\n      \"item_name\": \"Sabun Mandi\",\n      \"price\": 25000,\n      \"category\": \"NEEDS\",\n      \"subcategory\": \"Kebutuhan Rumah & Mandi\"\n    },\n    {\n      \"item_name\": \"Beras 5kg\",\n      \"price\": 80000,\n      \"category\": \"NEEDS\",\n      \"subcategory\": \"Kebutuhan Rumah & Mandi\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload Receipt Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions/upload-receipt",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions",
+                "upload-receipt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Transaction",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/transactions/YOUR_TRANSACTION_ID",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transactions",
+                "YOUR_TRANSACTION_ID"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Integrasi Data Science & AI",
+      "item": [
+        {
+          "name": "Real-time Dashboard Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/summary",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "dashboard",
+                "summary"
+              ]
+            }
+          }
+        },
+        {
+          "name": "AI Monthly Insight",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/insights?month_period=2026-05",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "insights"
+              ],
+              "query": [
+                {
+                  "key": "month_period",
+                  "value": "2026-05"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Data Export for DS Streamlit",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/export/streamlit?USERID=uuid-123&START=2026_05_01&END=2026_05_19",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "export",
+                "streamlit"
+              ],
+              "query": [
+                {
+                  "key": "USERID",
+                  "value": "uuid-123"
+                },
+                {
+                  "key": "START",
+                  "value": "2026_05_01"
+                },
+                {
+                  "key": "END",
+                  "value": "2026_05_19"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Cron & Automation",
+      "item": [
+        {
+          "name": "Trigger Manual Insight",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{cron_secret_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/insights/trigger",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "insights",
+                "trigger"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
