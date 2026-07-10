@@ -27,7 +27,11 @@ Fitur utama aplikasi:
 - **Anggaran & Peringatan Dini:** Penetapan *budget* bulanan dan deteksi *overbudget* secara real-time.
 - **Pindai Struk dengan AI (OCR):** Pengguna dapat memfoto struk belanja dan AI akan otomatis membaca nama barang dan harga untuk disimpan sebagai transaksi.
 - **AI Financial Insights:** Ringkasan dan saran finansial cerdas yang mengidentifikasi kebocoran (*money leak*) dan menghitung skor kesehatan finansial.
+<<<<<<< HEAD
 - **Laporan Data Science (Streamlit):** Integrasi menuju halaman *dashboard* khusus yang dikembangkan oleh tim DS untuk visualisasi data ekstensif.
+=======
+- **Laporan Data Science (Streamlit):** Integrasi mulus menuju halaman *dashboard* khusus yang dikembangkan oleh tim DS untuk visualisasi data ekstensif.
+>>>>>>> 1e5a1a576f06b2c0b06130d2142aef7ddba052ac
 
 ---
 
